@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AcadBot — More Success Academy</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.anthropic.com https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://generativelanguage.googleapis.com https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -90,6 +90,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .typing-dots span:nth-child(2){animation-delay:0.2s;}
 .typing-dots span:nth-child(3){animation-delay:0.4s;}
 @keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-7px);}}
+
 /* ROADMAP CARDS */
 .roadmap{display:flex;flex-direction:column;gap:10px;margin:12px 0;}
 .rm-step{display:flex;gap:12px;align-items:flex-start;padding:12px;background:#111A4A;border-radius:10px;border:1px solid var(--border);}
@@ -806,16 +807,34 @@ function showScreen(id) {
 }
 
 async function callClaude(messages, system) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'anthropic-dangerous-request-allowed':'true'
-    },
-    body: JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system,messages})
-  });
+  // Build Gemini-compatible contents array
+  const contents = [];
+  // Add system as first user message
+  if (system) {
+    contents.push({role:'user', parts:[{text: system}]});
+    contents.push({role:'model', parts:[{text:'Understood. I will follow these instructions.'}]});
+  }
+  // Add conversation history
+  for (const m of messages) {
+    contents.push({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{text: m.content}]
+    });
+  }
+  
+  const res = await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AQ.Ab8RN6K4TQYuZ0B3wuUi-eOLnot-D7Sqp01DauIebdJXih8UhA',
+    {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        contents,
+        generationConfig: {maxOutputTokens: 800, temperature: 0.7}
+      })
+    }
+  );
   const data = await res.json();
-  return data.content?.[0]?.text || 'I could not process that. Please try again.';
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'I could not process that. Please try again.';
 }
 </script>
 </body>
