@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AcadBot — More Success Academy</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://openrouter.ai https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://openrouter.ai; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -424,6 +424,8 @@ function submitKey() {
 window.onload = () => {
   renderCareers();
   initSpeakPro();
+  // Always show key screen on load
+  document.getElementById('keyScreen').style.display = 'flex';
 };
 
 function renderCareers() {
@@ -889,7 +891,7 @@ async function callClaude(messages, system) {
     return data.choices?.[0]?.message?.content || 'No response. Please try again.';
   } catch(e) {
     console.error('Fetch error:', e);
-    return 'Connection error. Please check your internet and try again.';
+    return 'Connection error: ' + e.message + '. Check console for details.';
   }
 }
 </script>
