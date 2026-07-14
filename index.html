@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AcadBot — More Success Academy</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://generativelanguage.googleapis.com https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -30,6 +30,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .screen{display:none;animation:fadeIn 0.4s ease;}
 .screen.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
 /* WELCOME SCREEN */
 .welcome{padding:40px 24px;max-width:700px;margin:0 auto;text-align:center;}
 .welcome-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border:1px solid var(--gold);border-radius:20px;font-size:12px;color:var(--gold);margin-bottom:24px;letter-spacing:0.8px;text-transform:uppercase;}
@@ -161,6 +162,22 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .sp-mic:hover{border-color:var(--teal);color:var(--teal);}
 .sp-mic.recording{border-color:var(--red);color:var(--red);background:rgba(255,107,107,0.1);animation:rec 1s infinite;}
 
+/* KEY SCREEN */
+.key-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--navy);z-index:999;display:flex;align-items:center;justify-content:center;padding:24px;}
+.key-box{background:var(--navy2);border:1px solid var(--gold);border-radius:20px;padding:32px 24px;max-width:420px;width:100%;text-align:center;}
+.key-logo{font-family:"Space Grotesk",sans-serif;font-size:22px;font-weight:700;color:var(--gold);margin-bottom:6px;}
+.key-logo span{color:var(--white);}
+.key-title{font-family:"Space Grotesk",sans-serif;font-size:18px;font-weight:700;margin-bottom:8px;margin-top:20px;}
+.key-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px;}
+.key-input{width:100%;background:#050B2E;border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--white);font-size:13px;font-family:"Inter",sans-serif;outline:none;margin-bottom:12px;transition:border-color 0.2s;}
+.key-input:focus{border-color:var(--gold);}
+.key-input::placeholder{color:var(--muted);}
+.key-btn{width:100%;padding:13px;background:var(--gold);border:none;border-radius:10px;color:var(--navy);font-weight:700;cursor:pointer;font-family:"Space Grotesk",sans-serif;font-size:15px;transition:all 0.2s;margin-bottom:12px;}
+.key-btn:hover{background:var(--gold2);}
+.key-note{font-size:11px;color:var(--muted);line-height:1.6;}
+.key-note a{color:var(--teal);text-decoration:none;}
+.key-error{font-size:12px;color:var(--red);margin-bottom:10px;display:none;}
+
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
@@ -258,6 +275,23 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
     <div class="input-hint" style="margin-top:8px;">🌍 Speak or type in any language</div>
   </div>
 </div>
+</div>
+
+<!-- API KEY SCREEN -->
+<div id="keyScreen" class="key-screen">
+  <div class="key-box">
+    <div class="key-logo">MSA <span>AcadBot</span></div>
+    <div style="font-size:32px;margin:16px 0;">🔐</div>
+    <div class="key-title">Enter Your API Key</div>
+    <div class="key-sub">Your key is never stored or sent anywhere except directly to OpenRouter to power Abia. It stays in your browser session only.</div>
+    <div class="key-error" id="keyError">Invalid key. Please check and try again.</div>
+    <input class="key-input" id="keyInput" type="password" placeholder="sk-or-v1-..." onkeydown="if(event.key==='Enter')submitKey()"/>
+    <button class="key-btn" onclick="submitKey()">Launch AcadBot →</button>
+    <div class="key-note">
+      Get a free key at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a><br/>
+      Key starts with <strong style="color:var(--gold)">sk-or-v1-...</strong>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -371,11 +405,27 @@ let msgCount = 0;
 let recognition = null;
 let activeRecognition = null;
 let currentSpeech = null;
+let geminiApiKey = "";
+
+// ─── KEY SCREEN ──────────────────────────────────────────────
+function submitKey() {
+  const val = document.getElementById('keyInput').value.trim();
+  const err = document.getElementById('keyError');
+  if (!val || !val.startsWith('sk-or-')) {
+    err.style.display = 'block';
+    err.textContent = 'Key must start with sk-or-v1-... Get yours free at openrouter.ai/keys';
+    return;
+  }
+  geminiApiKey = val;
+  document.getElementById('keyScreen').style.display = 'none';
+}
 
 // ─── INIT ────────────────────────────────────────────────────
 window.onload = () => {
   renderCareers();
   initSpeakPro();
+  // Always show key screen on load
+  document.getElementById('keyScreen').style.display = 'flex';
 };
 
 function renderCareers() {
@@ -805,35 +855,44 @@ function showScreen(id) {
   if (id === 'speakpro') document.querySelectorAll('.tab-btn')[1].classList.add('active');
 }
 
+
+
 async function callClaude(messages, system) {
-  // Build Gemini-compatible contents array
-  const contents = [];
-  // Add system as first user message
-  if (system) {
-    contents.push({role:'user', parts:[{text: system}]});
-    contents.push({role:'model', parts:[{text:'Understood. I will follow these instructions.'}]});
+  if (!geminiApiKey) {
+    document.getElementById('keyScreen').style.display = 'flex';
+    return 'Please enter your API key first.';
   }
-  // Add conversation history
+  const msgs = [];
+  if (system) msgs.push({role: 'system', content: system});
   for (const m of messages) {
-    contents.push({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{text: m.content}]
-    });
+    msgs.push({role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content});
   }
-  
-  const res = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AQ.Ab8RN6K4TQYuZ0B3wuUi-eOLnot-D7Sqp01DauIebdJXih8UhA',
-    {
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + geminiApiKey,
+        'HTTP-Referer': 'https://kehindealx.github.io/acadbot_demo/',
+        'X-Title': 'MSA AcadBot'
+      },
       body: JSON.stringify({
-        contents,
-        generationConfig: {maxOutputTokens: 800, temperature: 0.7}
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        messages: msgs,
+        max_tokens: 800,
+        temperature: 0.7
       })
+    });
+    const data = await res.json();
+    if (data.error) {
+      console.error('API error:', data.error);
+      return 'Error: ' + (data.error.message || 'API error. Check your key.');
     }
-  );
-  const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'I could not process that. Please try again.';
+    return data.choices?.[0]?.message?.content || 'No response. Please try again.';
+  } catch(e) {
+    console.error('Fetch error:', e);
+    return 'Connection error: ' + e.message + '. Check console for details.';
+  }
 }
 </script>
 </body>
