@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AcadBot — More Success Academy</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://generativelanguage.googleapis.com https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://openrouter.ai https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://openrouter.ai; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -147,6 +147,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .fb-box{background:#0A1F1D;border:1px solid var(--teal);border-radius:10px;padding:12px;margin-top:8px;}
 .fb-title{color:var(--teal);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
 .scores{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.score-pill{padding:4px 12px;border-radius:10px;font-size:11px;font-weight:600;}
 .score-pill.good{background:rgba(0,201,177,0.2);color:var(--teal);border:1px solid var(--teal);}
 .score-pill.warn{background:rgba(212,175,55,0.2);color:var(--gold);border:1px solid var(--gold);}
 .sp-input{background:#081A18;border:1px solid #00C9B130;border-top:1px solid var(--teal);border-radius:0 0 14px 14px;padding:14px 16px;}
@@ -160,6 +161,22 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .sp-mic{width:44px;height:44px;border-radius:10px;border:1px solid #00C9B130;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.2s;}
 .sp-mic:hover{border-color:var(--teal);color:var(--teal);}
 .sp-mic.recording{border-color:var(--red);color:var(--red);background:rgba(255,107,107,0.1);animation:rec 1s infinite;}
+
+/* KEY SCREEN */
+.key-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--navy);z-index:999;display:flex;align-items:center;justify-content:center;padding:24px;}
+.key-box{background:var(--navy2);border:1px solid var(--gold);border-radius:20px;padding:32px 24px;max-width:420px;width:100%;text-align:center;}
+.key-logo{font-family:"Space Grotesk",sans-serif;font-size:22px;font-weight:700;color:var(--gold);margin-bottom:6px;}
+.key-logo span{color:var(--white);}
+.key-title{font-family:"Space Grotesk",sans-serif;font-size:18px;font-weight:700;margin-bottom:8px;margin-top:20px;}
+.key-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px;}
+.key-input{width:100%;background:#050B2E;border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--white);font-size:13px;font-family:"Inter",sans-serif;outline:none;margin-bottom:12px;transition:border-color 0.2s;}
+.key-input:focus{border-color:var(--gold);}
+.key-input::placeholder{color:var(--muted);}
+.key-btn{width:100%;padding:13px;background:var(--gold);border:none;border-radius:10px;color:var(--navy);font-weight:700;cursor:pointer;font-family:"Space Grotesk",sans-serif;font-size:15px;transition:all 0.2s;margin-bottom:12px;}
+.key-btn:hover{background:var(--gold2);}
+.key-note{font-size:11px;color:var(--muted);line-height:1.6;}
+.key-note a{color:var(--teal);text-decoration:none;}
+.key-error{font-size:12px;color:var(--red);margin-bottom:10px;display:none;}
 
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:3px;}
@@ -258,6 +275,23 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
     <div class="input-hint" style="margin-top:8px;">🌍 Speak or type in any language</div>
   </div>
 </div>
+</div>
+
+<!-- API KEY SCREEN -->
+<div id="keyScreen" class="key-screen">
+  <div class="key-box">
+    <div class="key-logo">MSA <span>AcadBot</span></div>
+    <div style="font-size:32px;margin:16px 0;">🔐</div>
+    <div class="key-title">Enter Your API Key</div>
+    <div class="key-sub">Your key is never stored or sent anywhere except directly to OpenRouter to power Abia. It stays in your browser session only.</div>
+    <div class="key-error" id="keyError">Invalid key. Please check and try again.</div>
+    <input class="key-input" id="keyInput" type="password" placeholder="sk-or-v1-..." onkeydown="if(event.key==='Enter')submitKey()"/>
+    <button class="key-btn" onclick="submitKey()">Launch AcadBot →</button>
+    <div class="key-note">
+      Get a free key at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a><br/>
+      Key starts with <strong style="color:var(--gold)">sk-or-v1-...</strong>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -372,19 +406,10 @@ let recognition = null;
 let activeRecognition = null;
 let currentSpeech = null;
 
-// Global variable to keep the API Key securely in memory
-let geminiApiKey = "";
-
 // ─── INIT ────────────────────────────────────────────────────
 window.onload = () => {
   renderCareers();
   initSpeakPro();
-  
-  // Prompts you for the key once when you open the page
-  geminiApiKey = prompt("Please enter your Gemini API Key to initialize AcadBot:");
-  if (!geminiApiKey) {
-    alert("Notice: No API key was provided. The AI features will not answer until you refresh and provide your key.");
-  }
 };
 
 function renderCareers() {
@@ -676,6 +701,7 @@ function toggleMic(target) {
         interim += e.results[i][0].transcript;
       }
     }
+    // Show interim results in input so user sees what's being captured
     document.getElementById(inputId).value = finalTranscript || interim;
   };
   rec.onspeechend = () => {
@@ -814,21 +840,13 @@ function showScreen(id) {
 }
 
 async function callClaude(messages, system) {
-  // If the key variable is missing or empty, ask the user again
-  if (!geminiApiKey) {
-    geminiApiKey = prompt("API Key is missing. Please enter your Gemini API Key to continue:");
-    if (!geminiApiKey) return 'Error: Missing API key.';
-  }
-
   // Build Gemini-compatible contents array
   const contents = [];
-  
   // Add system as first user message
   if (system) {
     contents.push({role:'user', parts:[{text: system}]});
     contents.push({role:'model', parts:[{text:'Understood. I will follow these instructions.'}]});
   }
-  
   // Add conversation history
   for (const m of messages) {
     contents.push({
@@ -837,9 +855,8 @@ async function callClaude(messages, system) {
     });
   }
   
-  // Using the key variable dynamically from memory
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AQ.Ab8RN6K4TQYuZ0B3wuUi-eOLnot-D7Sqp01DauIebdJXih8UhA',
     {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -850,6 +867,12 @@ async function callClaude(messages, system) {
     }
   );
   const data = await res.json();
+  if (data.error) {
+    console.error('Gemini error:', data.error);
+    if (data.error.code === 400) return 'API Key error: Please refresh and enter a valid key starting with AIzaSy...';
+    if (data.error.code === 403) return 'API Key invalid or expired. Please refresh and enter a valid key.';
+    return 'Error: ' + (data.error.message || 'Unknown error');
+  }
   return data.candidates?.[0]?.content?.parts?.[0]?.text || 'I could not process that. Please try again.';
 }
 </script>
