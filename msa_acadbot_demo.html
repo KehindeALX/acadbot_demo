@@ -405,6 +405,20 @@ let msgCount = 0;
 let recognition = null;
 let activeRecognition = null;
 let currentSpeech = null;
+let geminiApiKey = "";
+
+// ─── KEY SCREEN ──────────────────────────────────────────────
+function submitKey() {
+  const val = document.getElementById('keyInput').value.trim();
+  const err = document.getElementById('keyError');
+  if (!val || !val.startsWith('sk-or-')) {
+    err.style.display = 'block';
+    err.textContent = 'Key must start with sk-or-v1-... Get yours free at openrouter.ai/keys';
+    return;
+  }
+  geminiApiKey = val;
+  document.getElementById('keyScreen').style.display = 'none';
+}
 
 // ─── INIT ────────────────────────────────────────────────────
 window.onload = () => {
@@ -839,41 +853,44 @@ function showScreen(id) {
   if (id === 'speakpro') document.querySelectorAll('.tab-btn')[1].classList.add('active');
 }
 
+
+
 async function callClaude(messages, system) {
-  // Build Gemini-compatible contents array
-  const contents = [];
-  // Add system as first user message
-  if (system) {
-    contents.push({role:'user', parts:[{text: system}]});
-    contents.push({role:'model', parts:[{text:'Understood. I will follow these instructions.'}]});
+  if (!geminiApiKey) {
+    document.getElementById('keyScreen').style.display = 'flex';
+    return 'Please enter your API key first.';
   }
-  // Add conversation history
+  const msgs = [];
+  if (system) msgs.push({role: 'system', content: system});
   for (const m of messages) {
-    contents.push({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{text: m.content}]
-    });
+    msgs.push({role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content});
   }
-  
-  const res = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AQ.Ab8RN6K4TQYuZ0B3wuUi-eOLnot-D7Sqp01DauIebdJXih8UhA',
-    {
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + geminiApiKey,
+        'HTTP-Referer': 'https://kehindealx.github.io/acadbot_demo/',
+        'X-Title': 'MSA AcadBot'
+      },
       body: JSON.stringify({
-        contents,
-        generationConfig: {maxOutputTokens: 800, temperature: 0.7}
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        messages: msgs,
+        max_tokens: 800,
+        temperature: 0.7
       })
+    });
+    const data = await res.json();
+    if (data.error) {
+      console.error('API error:', data.error);
+      return 'Error: ' + (data.error.message || 'API error. Check your key.');
     }
-  );
-  const data = await res.json();
-  if (data.error) {
-    console.error('Gemini error:', data.error);
-    if (data.error.code === 400) return 'API Key error: Please refresh and enter a valid key starting with AIzaSy...';
-    if (data.error.code === 403) return 'API Key invalid or expired. Please refresh and enter a valid key.';
-    return 'Error: ' + (data.error.message || 'Unknown error');
+    return data.choices?.[0]?.message?.content || 'No response. Please try again.';
+  } catch(e) {
+    console.error('Fetch error:', e);
+    return 'Connection error. Please check your internet and try again.';
   }
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'I could not process that. Please try again.';
 }
 </script>
 </body>
