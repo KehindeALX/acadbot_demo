@@ -16,8 +16,6 @@
   --red:#FF6B6B;--green:#4CAF50;
 }
 body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;overflow-x:hidden;}
-
-/* NAV */
 nav{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(5,11,46,0.97);position:sticky;top:0;z-index:200;backdrop-filter:blur(10px);}
 .logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;color:var(--gold);}
 .logo span{color:var(--white);}
@@ -25,13 +23,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .tab-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;}
 .tab-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:600;}
 .tab-btn:hover:not(.active){border-color:var(--gold);color:var(--gold);}
-
-/* SCREENS */
 .screen{display:none;animation:fadeIn 0.4s ease;}
 .screen.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
-
-/* WELCOME SCREEN */
 .welcome{padding:40px 24px;max-width:700px;margin:0 auto;text-align:center;}
 .welcome-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border:1px solid var(--gold);border-radius:20px;font-size:12px;color:var(--gold);margin-bottom:24px;letter-spacing:0.8px;text-transform:uppercase;}
 .welcome h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,5vw,44px);font-weight:700;line-height:1.15;margin-bottom:12px;}
@@ -48,8 +42,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .career-card .cc-icon{font-size:28px;margin-bottom:8px;}
 .career-card .cc-name{font-size:13px;font-weight:600;color:var(--white);}
 .career-card .cc-tag{font-size:11px;color:var(--muted);margin-top:3px;}
-
-/* JOURNEY SCREEN */
 .journey{max-width:720px;margin:0 auto;padding:20px 16px 40px;}
 .journey-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px 20px;background:var(--navy2);border-radius:14px;border:1px solid var(--border);}
 .jh-back{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;transition:all 0.2s;}
@@ -61,8 +53,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .stage-tab{padding:8px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
 .stage-tab.active{background:var(--gold3);border-color:var(--gold);color:var(--gold);font-weight:600;}
 .stage-tab.done{border-color:var(--teal);color:var(--teal);}
-
-/* CHAT */
 .chat-wrap{border:1px solid var(--border);border-radius:16px;overflow:hidden;}
 .chat-top{background:linear-gradient(135deg,#0D1854,#1A2A7A);padding:16px 20px;display:flex;align-items:center;gap:12px;}
 .abia-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
@@ -90,8 +80,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .typing-dots span:nth-child(2){animation-delay:0.2s;}
 .typing-dots span:nth-child(3){animation-delay:0.4s;}
 @keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-7px);}}
-
-/* ROADMAP CARDS */
 .roadmap{display:flex;flex-direction:column;gap:10px;margin:12px 0;}
 .rm-step{display:flex;gap:12px;align-items:flex-start;padding:12px;background:#111A4A;border-radius:10px;border:1px solid var(--border);}
 .rm-num{width:28px;height:28px;border-radius:50%;background:var(--gold3);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gold);flex-shrink:0;}
@@ -100,9 +88,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .msa-offer{background:var(--gold3);border:1px solid var(--gold);border-radius:10px;padding:12px;margin-top:8px;}
 .msa-offer-title{font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
 .offer-pills{display:flex;flex-wrap:wrap;gap:6px;}
-.offer-pill{padding:4px 12px;border-radius:12px;background:rgba(212,175,55,0.2);border:1px solid var(--gold);font-size:11px;color:var(--gold);}
-
-/* SKILLS CHECK */
+.offer-pill{padding:4px 12px;border-radius:12px;background:rgba(212,175,55,0.2);border:1px solid var(--gold);font-size:11px;color:var(--gold);cursor:pointer;transition:all .2s;}
+.offer-pill:hover{background:var(--gold);color:var(--navy);}
 .skills-check{display:flex;flex-direction:column;gap:8px;margin:10px 0;}
 .skill-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#111A4A;border-radius:10px;border:1px solid var(--border);}
 .skill-item span{font-size:13px;}
@@ -112,8 +99,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .sk-btn.no{background:rgba(255,107,107,0.2);color:var(--red);border:1px solid var(--red);}
 .sk-btn.yes:hover{background:#4CAF50;color:white;}
 .sk-btn.no:hover{background:var(--red);color:white;}
-
-/* INPUT AREA */
 .input-area{background:#0A1240;border-top:1px solid var(--gold);padding:14px 16px;}
 .quick-row{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:4px;}
 .qk{padding:5px 12px;border-radius:14px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;transition:all 0.2s;flex-shrink:0;}
@@ -130,8 +115,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .send-btn:hover{background:var(--gold2);}
 .send-btn:disabled{opacity:0.4;cursor:not-allowed;}
 .input-hint{font-size:10px;color:var(--muted);margin-top:8px;text-align:center;}
-
-/* SPEAKPRO SCREEN */
 .speakpro{max-width:720px;margin:0 auto;padding:20px 16px 40px;}
 .sp-header{background:linear-gradient(135deg,#003D35,#005A4F);border-radius:14px 14px 0 0;padding:16px 20px;display:flex;align-items:center;gap:12px;border:1px solid #00C9B140;border-bottom:none;}
 .sp-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#00A090);display:flex;align-items:center;justify-content:center;font-size:20px;}
@@ -161,8 +144,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .sp-mic{width:44px;height:44px;border-radius:10px;border:1px solid #00C9B130;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.2s;}
 .sp-mic:hover{border-color:var(--teal);color:var(--teal);}
 .sp-mic.recording{border-color:var(--red);color:var(--red);background:rgba(255,107,107,0.1);animation:rec 1s infinite;}
-
-/* KEY SCREEN */
 .key-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--navy);z-index:999;display:flex;align-items:center;justify-content:center;padding:24px;}
 .key-box{background:var(--navy2);border:1px solid var(--gold);border-radius:20px;padding:32px 24px;max-width:420px;width:100%;text-align:center;}
 .key-logo{font-family:"Space Grotesk",sans-serif;font-size:22px;font-weight:700;color:var(--gold);margin-bottom:6px;}
@@ -177,11 +158,50 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .key-note{font-size:11px;color:var(--muted);line-height:1.6;}
 .key-note a{color:var(--teal);text-decoration:none;}
 .key-error{font-size:12px;color:var(--red);margin-bottom:10px;display:none;}
+.key-skip{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px;}
+.key-skip:hover{color:var(--gold);}
 
-/* SCROLLBAR */
+/* LESSON VIEWER */
+.lesson-overlay{position:fixed;inset:0;background:rgba(2,5,20,0.85);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.lesson-overlay.active{display:flex;}
+.lesson-box{background:var(--navy2);border:1px solid var(--gold);border-radius:18px;max-width:560px;width:100%;max-height:85vh;overflow-y:auto;padding:0;}
+.lesson-head{padding:20px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:sticky;top:0;background:var(--navy2);border-radius:18px 18px 0 0;}
+.lesson-head h3{font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:4px;}
+.lesson-head p{font-size:11px;color:var(--gold);}
+.lesson-close{background:none;border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;flex-shrink:0;font-size:14px;}
+.lesson-close:hover{border-color:var(--gold);color:var(--gold);}
+.lesson-body{padding:20px 22px;}
+.lesson-progress{display:flex;gap:4px;margin-bottom:18px;}
+.lesson-progress span{flex:1;height:4px;border-radius:2px;background:var(--border);}
+.lesson-progress span.done{background:var(--gold);}
+.lesson-step{display:none;}
+.lesson-step.active{display:block;animation:fadeIn 0.3s ease;}
+.lesson-step h4{font-size:14px;color:var(--gold);margin-bottom:10px;font-family:'Space Grotesk',sans-serif;}
+.lesson-step p{font-size:13px;color:#D8DEF2;line-height:1.7;margin-bottom:10px;}
+.lesson-step ul{margin:10px 0 10px 18px;}
+.lesson-step li{font-size:13px;color:#D8DEF2;line-height:1.7;margin-bottom:4px;}
+.lesson-quiz{background:#111A4A;border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;}
+.lesson-quiz-q{font-size:13px;font-weight:600;margin-bottom:10px;}
+.lesson-quiz-opt{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--white);font-size:12.5px;cursor:pointer;margin-bottom:6px;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.lesson-quiz-opt:hover{border-color:var(--gold);}
+.lesson-quiz-opt.correct{border-color:var(--green);background:rgba(76,175,80,0.15);color:var(--green);}
+.lesson-quiz-opt.wrong{border-color:var(--red);background:rgba(255,107,107,0.15);color:var(--red);}
+.lesson-quiz-fb{font-size:12px;margin-top:8px;padding:8px 10px;border-radius:8px;display:none;}
+.lesson-quiz-fb.show{display:block;}
+.lesson-quiz-fb.right{background:rgba(76,175,80,0.15);color:var(--green);}
+.lesson-quiz-fb.wrong{background:rgba(255,107,107,0.15);color:var(--red);}
+.lesson-nav{display:flex;justify-content:space-between;padding:16px 22px;border-top:1px solid var(--border);gap:10px;}
+.lesson-btn{padding:10px 18px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12.5px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;transition:all 0.2s;}
+.lesson-btn.primary{background:var(--gold);color:var(--navy);border-color:var(--gold);}
+.lesson-btn.primary:hover{background:var(--gold2);}
+.lesson-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.lesson-complete{text-align:center;padding:10px 0;}
+.lesson-complete .lc-icon{font-size:44px;margin-bottom:12px;}
+.lesson-complete h4{font-family:'Space Grotesk',sans-serif;font-size:17px;margin-bottom:8px;color:var(--gold);}
+.lesson-complete p{font-size:13px;color:var(--muted);line-height:1.6;}
+
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-
 @media(max-width:540px){
   .careers-grid{grid-template-columns:repeat(2,1fr);}
   .stats-row{gap:16px;}
@@ -199,7 +219,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
   </div>
 </nav>
 
-<!-- WELCOME SCREEN -->
 <div id="screen-welcome" class="screen active">
 <div class="welcome">
   <div class="welcome-badge">✦ Africa's AI Career Platform</div>
@@ -216,7 +235,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 </div>
 </div>
 
-<!-- JOURNEY SCREEN -->
 <div id="screen-journey" class="screen">
 <div class="journey">
   <div class="journey-header">
@@ -250,7 +268,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 </div>
 </div>
 
-<!-- SPEAKPRO SCREEN -->
 <div id="screen-speakpro" class="screen">
 <div class="speakpro">
   <h2 style="font-family:'Space Grotesk',sans-serif;margin-bottom:20px;text-align:center;">SpeakPro <span style="color:var(--teal)">AI Coach</span></h2>
@@ -277,7 +294,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 </div>
 </div>
 
-<!-- API KEY SCREEN -->
 <div id="keyScreen" class="key-screen">
   <div class="key-box">
     <div class="key-logo">MSA <span>AcadBot</span></div>
@@ -290,6 +306,28 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
     <div class="key-note">
       Get a free key at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a><br/>
       Key starts with <strong style="color:var(--gold)">sk-or-v1-...</strong>
+    </div>
+    <button class="key-skip" onclick="skipKey()">Skip for now — just show me the lessons →</button>
+  </div>
+</div>
+
+<!-- LESSON VIEWER OVERLAY -->
+<div id="lessonOverlay" class="lesson-overlay">
+  <div class="lesson-box">
+    <div class="lesson-head">
+      <div>
+        <h3 id="lessonTitle">Lesson</h3>
+        <p id="lessonMeta">Module 1 · MSA Course</p>
+      </div>
+      <button class="lesson-close" onclick="closeLesson()">✕</button>
+    </div>
+    <div class="lesson-body">
+      <div class="lesson-progress" id="lessonProgress"></div>
+      <div id="lessonSteps"></div>
+    </div>
+    <div class="lesson-nav" id="lessonNav">
+      <button class="lesson-btn" id="lessonPrevBtn" onclick="lessonPrev()">← Back</button>
+      <button class="lesson-btn primary" id="lessonNextBtn" onclick="lessonNext()">Continue →</button>
     </div>
   </div>
 </div>
@@ -307,7 +345,19 @@ const CAREERS = [
      {title:'Placement',desc:'Apply to roles via MSA Job Board. Interview prep with Abia.'}
    ],
    courses:['Data Analysis Fundamentals','Python for Analysts','SQL Masterclass','Power BI Dashboard Course'],
-   interviews:['Tell me about a time you used data to solve a problem.','How do you handle missing or inconsistent data?','Walk me through a dashboard you have built.','What is the difference between correlation and causation?','How would you explain your findings to a non-technical manager?']
+   interviews:['Tell me about a time you used data to solve a problem.','How do you handle missing or inconsistent data?','Walk me through a dashboard you have built.','What is the difference between correlation and causation?','How would you explain your findings to a non-technical manager?'],
+   lessons:{
+     'Data Analysis Fundamentals':{meta:'Module 1 · 20 min',steps:[
+       {h:'What Is Data Analysis?',body:'Data analysis is the process of inspecting, cleaning, and modeling data to discover useful information and support decisions.<ul><li>Descriptive: what happened?</li><li>Diagnostic: why did it happen?</li><li>Predictive: what will happen?</li><li>Prescriptive: what should we do?</li></ul>'},
+       {h:'The Analyst Workflow',body:'A typical project moves through five stages:<ul><li>Collect — gather data from spreadsheets, databases, or forms</li><li>Clean — remove duplicates, fix errors, handle missing values</li><li>Explore — look for patterns and outliers</li><li>Visualize — build charts that tell the story</li><li>Communicate — present findings to decision-makers</li></ul>'},
+       {h:'Quick Check',quiz:{q:'Which stage comes right after "Collect" in the analyst workflow?',opts:['Communicate','Clean','Visualize'],correct:1,fb:'Correct — you always clean data before exploring it. Messy data gives misleading patterns.'}}
+     ]},
+     'Python for Analysts':{meta:'Module 2 · 25 min',steps:[
+       {h:'Why Python for Data?',body:'Python is the most widely used language for data work because of two libraries:<ul><li><strong>Pandas</strong> — for loading, cleaning, and reshaping tables of data</li><li><strong>NumPy</strong> — for fast numerical calculations</li></ul>Together they let you do in a few lines what would take hours in a spreadsheet.'},
+       {h:'Reading Your First Dataset',body:'A common first step:<br/><code style="background:#1A2A6A;padding:2px 6px;border-radius:4px;">import pandas as pd<br/>df = pd.read_csv("sales.csv")<br/>df.head()</code><br/><br/>This loads a CSV file into a DataFrame — a table you can filter, sort, and summarize with simple commands.'},
+       {h:'Quick Check',quiz:{q:'Which Python library is used to load and clean tabular data?',opts:['NumPy','Pandas','Matplotlib'],correct:1,fb:'Correct — Pandas is built specifically for working with rows and columns of data.'}}
+     ]}
+   }
   },
   {id:'cyber',icon:'🔐',name:'Cybersecurity',tag:'Fast growing',color:'#FF6B6B',
    skills:['Networking Fundamentals','Operating Systems (Linux/Windows)','Ethical Hacking Basics','Security Frameworks (NIST, ISO 27001)','Incident Response'],
@@ -319,7 +369,19 @@ const CAREERS = [
      {title:'Placement',desc:'Apply to security roles. Practice with Abia on technical interview scenarios.'}
    ],
    courses:['Cybersecurity Fundamentals','Ethical Hacking Basics','Network Security','Security+ Exam Prep'],
-   interviews:['What is the difference between a virus and a worm?','How would you respond to a phishing attack on an organization?','Explain the CIA triad.','What tools do you use for vulnerability scanning?','How do you stay updated with the latest security threats?']
+   interviews:['What is the difference between a virus and a worm?','How would you respond to a phishing attack on an organization?','Explain the CIA triad.','What tools do you use for vulnerability scanning?','How do you stay updated with the latest security threats?'],
+   lessons:{
+     'Cybersecurity Fundamentals':{meta:'Module 1 · 22 min',steps:[
+       {h:'The CIA Triad',body:'Every security decision protects one or more of these three properties:<ul><li><strong>Confidentiality</strong> — only authorized people can see the data</li><li><strong>Integrity</strong> — data cannot be altered without detection</li><li><strong>Availability</strong> — systems stay up and usable when needed</li></ul>When you hear about a "breach," ask which of these three was violated.'},
+       {h:'Common Attack Types',body:'You will meet these terms constantly:<ul><li><strong>Phishing</strong> — tricking someone into giving up credentials</li><li><strong>Malware</strong> — malicious software (viruses, worms, ransomware)</li><li><strong>DDoS</strong> — flooding a system to knock it offline</li><li><strong>Social engineering</strong> — manipulating people, not machines</li></ul>'},
+       {h:'Quick Check',quiz:{q:'A hospital\'s patient database goes offline during an attack. Which part of the CIA triad was violated?',opts:['Confidentiality','Integrity','Availability'],correct:2,fb:'Correct — when a system cannot be accessed when needed, that is an availability failure.'}}
+     ]},
+     'Ethical Hacking Basics':{meta:'Module 2 · 24 min',steps:[
+       {h:'What Is Ethical Hacking?',body:'Ethical hackers ("white hats") use the same techniques as attackers, but with permission — to find weaknesses before criminals do. Every engagement needs a signed scope of work defining what can be tested.'},
+       {h:'The Penetration Testing Stages',body:'A typical pen test follows five stages:<ul><li>Reconnaissance — gather public information about the target</li><li>Scanning — identify live systems and open ports</li><li>Exploitation — attempt to gain access using found weaknesses</li><li>Post-exploitation — see what an attacker could reach next</li><li>Reporting — document findings and fixes for the client</li></ul>'},
+       {h:'Quick Check',quiz:{q:'What must exist before an ethical hacker can legally test a company\'s systems?',opts:['A strong password policy','Written permission / signed scope of work','Antivirus software'],correct:1,fb:'Correct — testing without authorization is illegal, no matter the intent.'}}
+     ]}
+   }
   },
   {id:'software',icon:'💻',name:'Software Dev',tag:'Top paying',color:'#00C9B1',
    skills:['HTML, CSS & JavaScript','React or Vue.js','Backend (Node.js / Python)','Databases (SQL & NoSQL)','Git & Version Control'],
@@ -331,7 +393,19 @@ const CAREERS = [
      {title:'Placement',desc:'Build 3 portfolio projects. MSA certifies and connects you to employers.'}
    ],
    courses:['Web Development Fundamentals','React.js Mastery','Backend Development with Node','Full Stack Bootcamp'],
-   interviews:['What is the difference between REST and GraphQL?','Explain how you would build a login system.','What is version control and why is it important?','How do you debug a problem in your code?','Describe a project you built from scratch.']
+   interviews:['What is the difference between REST and GraphQL?','Explain how you would build a login system.','What is version control and why is it important?','How do you debug a problem in your code?','Describe a project you built from scratch.'],
+   lessons:{
+     'Web Development Fundamentals':{meta:'Module 1 · 22 min',steps:[
+       {h:'The Three Building Blocks',body:'Every website is built from three languages:<ul><li><strong>HTML</strong> — structure and content (the skeleton)</li><li><strong>CSS</strong> — layout, color, spacing (the styling)</li><li><strong>JavaScript</strong> — interactivity and logic (the behavior)</li></ul>Master these in order — each one builds on the last.'},
+       {h:'How a Web Page Loads',body:'When someone visits your site: 1) the browser requests the HTML file, 2) it reads the HTML top to bottom, 3) it fetches linked CSS and JS files, 4) it renders the page, then runs your JavaScript. Understanding this order helps you debug loading issues later.'},
+       {h:'Quick Check',quiz:{q:'Which language is responsible for making a button actually do something when clicked?',opts:['HTML','CSS','JavaScript'],correct:2,fb:'Correct — JavaScript handles interactivity and logic; HTML and CSS only handle structure and appearance.'}}
+     ]},
+     'React.js Mastery':{meta:'Module 2 · 28 min',steps:[
+       {h:'Why React?',body:'React lets you build user interfaces from reusable pieces called <strong>components</strong>. Instead of rewriting the same button or card everywhere, you build it once and reuse it — keeping large apps organized and consistent.'},
+       {h:'State: The Heart of React',body:'A component\'s <strong>state</strong> is the data that can change over time (like a counter or form input). When state changes, React automatically re-renders the component to reflect it — you never manually update the page yourself.'},
+       {h:'Quick Check',quiz:{q:'In React, what triggers a component to re-render?',opts:['Refreshing the browser','A change in its state or props','Adding more CSS'],correct:1,fb:'Correct — React watches state and props, and re-renders automatically when they change.'}}
+     ]}
+   }
   },
   {id:'ai',icon:'🤖',name:'AI & Machine Learning',tag:'Future-proof',color:'#9B59B6',
    skills:['Python Programming','Mathematics (Linear Algebra, Statistics)','Machine Learning Algorithms','Deep Learning (TensorFlow/PyTorch)','Prompt Engineering & LLMs'],
@@ -343,7 +417,19 @@ const CAREERS = [
      {title:'Placement',desc:'MSA AI Certification + portfolio of projects = job-ready.'}
    ],
    courses:['Python for AI','Machine Learning Fundamentals','Deep Learning with TensorFlow','Prompt Engineering Masterclass'],
-   interviews:['What is the difference between supervised and unsupervised learning?','How do you handle overfitting in a model?','Explain what a neural network is in simple terms.','What experience do you have with large language models?','How would you evaluate whether an AI model is performing well?']
+   interviews:['What is the difference between supervised and unsupervised learning?','How do you handle overfitting in a model?','Explain what a neural network is in simple terms.','What experience do you have with large language models?','How would you evaluate whether an AI model is performing well?'],
+   lessons:{
+     'Machine Learning Fundamentals':{meta:'Module 2 · 26 min',steps:[
+       {h:'Supervised vs Unsupervised',body:'<ul><li><strong>Supervised learning</strong> — you train a model on labeled examples (input + correct answer), like predicting house prices from past sales</li><li><strong>Unsupervised learning</strong> — the model finds patterns in unlabeled data on its own, like grouping customers into segments</li></ul>Most business problems start with supervised learning because you have historical outcomes to learn from.'},
+       {h:'What Is Overfitting?',body:'A model "overfits" when it memorizes the training data instead of learning general patterns — it performs great on data it has seen, but poorly on new data. The fix: use more training data, simplify the model, or use techniques like cross-validation to catch it early.'},
+       {h:'Quick Check',quiz:{q:'A model scores 99% on training data but only 60% on new data. What is happening?',opts:['Underfitting','Overfitting','Perfect performance'],correct:1,fb:'Correct — a huge gap between training and real-world performance is the classic sign of overfitting.'}}
+     ]},
+     'Prompt Engineering Masterclass':{meta:'Module 4 · 20 min',steps:[
+       {h:'What Is a Prompt?',body:'A prompt is the instruction you give a large language model (LLM). The quality of your prompt directly shapes the quality of the response — vague prompts get vague answers.'},
+       {h:'Three Habits of Strong Prompts',body:'<ul><li>Be specific about the task, format, and audience</li><li>Give examples of what "good" looks like</li><li>Ask the model to think step by step for complex tasks</li></ul>These three habits alone fix most weak AI outputs.'},
+       {h:'Quick Check',quiz:{q:'Why do vague prompts usually produce vague answers?',opts:['The model is broken','The model has no context to work from','LLMs cannot read English well'],correct:1,fb:'Correct — LLMs respond to the information you give them. No specifics in, no specifics out.'}}
+     ]}
+   }
   },
   {id:'uiux',icon:'🎨',name:'UI/UX Design',tag:'Creative + tech',color:'#E91E8C',
    skills:['Figma & Design Tools','User Research Methods','Wireframing & Prototyping','Design Systems','Usability Testing'],
@@ -355,7 +441,14 @@ const CAREERS = [
      {title:'Placement',desc:'Portfolio of 3 case studies. MSA connects you with product teams.'}
    ],
    courses:['UI Design Fundamentals','Figma Mastery','UX Research Methods','Product Design for Startups'],
-   interviews:['Walk me through your design process from research to delivery.','How do you handle feedback from developers or stakeholders?','What is the difference between UI and UX?','Show me a case study of a problem you solved with design.','How do you design for users with limited digital literacy?']
+   interviews:['Walk me through your design process from research to delivery.','How do you handle feedback from developers or stakeholders?','What is the difference between UI and UX?','Show me a case study of a problem you solved with design.','How do you design for users with limited digital literacy?'],
+   lessons:{
+     'UI Design Fundamentals':{meta:'Module 1 · 20 min',steps:[
+       {h:'UI vs UX',body:'<ul><li><strong>UI (User Interface)</strong> — how the product looks: colors, buttons, typography</li><li><strong>UX (User Experience)</strong> — how the product feels to use: is it easy, logical, satisfying?</li></ul>A beautiful UI with confusing UX still fails. Both must work together.'},
+       {h:'Visual Hierarchy',body:'Visual hierarchy guides the eye to what matters most, using: <ul><li>Size — bigger elements draw attention first</li><li>Color & contrast — bright or high-contrast elements stand out</li><li>Spacing — grouped items feel related, spaced items feel separate</li></ul>'},
+       {h:'Quick Check',quiz:{q:'A screen is visually stunning but users cannot figure out how to complete a purchase. What has failed?',opts:['UI','UX','Both'],correct:1,fb:'Correct — this is a UX failure. Looking good is not the same as being usable.'}}
+     ]}
+   }
   },
   {id:'product',icon:'🗺️',name:'Product Management',tag:'Leadership path',color:'#FF9800',
    skills:['Product Strategy & Roadmapping','User Story Writing','Data-Driven Decision Making','Stakeholder Management','Agile & Scrum Methodologies'],
@@ -367,7 +460,14 @@ const CAREERS = [
      {title:'Placement',desc:'MSA PM Certification + case study portfolio = product career.'}
    ],
    courses:['Introduction to Product Management','Agile & Scrum for PMs','Product Analytics','Writing Great PRDs'],
-   interviews:['How do you prioritize features when everything seems urgent?','Tell me about a product you love and what you would improve.','How do you gather user requirements?','Describe a time you made a data-driven product decision.','How do you work with engineers and designers?']
+   interviews:['How do you prioritize features when everything seems urgent?','Tell me about a product you love and what you would improve.','How do you gather user requirements?','Describe a time you made a data-driven product decision.','How do you work with engineers and designers?'],
+   lessons:{
+     'Introduction to Product Management':{meta:'Module 1 · 20 min',steps:[
+       {h:'What Does a PM Actually Do?',body:'A Product Manager sits at the intersection of business, technology, and design. The job is not to write code or design screens — it is to decide <strong>what</strong> gets built and <strong>why</strong>, based on user needs and business goals.'},
+       {h:'Prioritization Frameworks',body:'When everything feels urgent, PMs use frameworks like:<ul><li><strong>RICE</strong> — Reach, Impact, Confidence, Effort</li><li><strong>MoSCoW</strong> — Must have, Should have, Could have, Won\'t have</li></ul>These turn "everything is important" into a ranked, defensible list.'},
+       {h:'Quick Check',quiz:{q:'What is the core job of a Product Manager?',opts:['Writing all the code','Deciding what gets built and why','Designing every screen'],correct:1,fb:'Correct — PMs decide direction and priority; engineers and designers execute it.'}}
+     ]}
+   }
   },
   {id:'digital',icon:'📱',name:'Digital Marketing',tag:'Business impact',color:'#2196F3',
    skills:['SEO & Content Strategy','Social Media Marketing','Google & Meta Ads','Email Marketing','Analytics (GA4)'],
@@ -379,7 +479,14 @@ const CAREERS = [
      {title:'Placement',desc:'MSA Digital Marketing Certification + portfolio campaigns = hired.'}
    ],
    courses:['Digital Marketing Fundamentals','SEO & Content Mastery','Paid Ads (Google & Meta)','Email Marketing with Analytics'],
-   interviews:['How would you grow a brand from zero on social media?','What metrics do you track to measure campaign success?','How do you approach SEO for a new website?','Describe a campaign you ran and its results.','What tools do you use for digital marketing?']
+   interviews:['How would you grow a brand from zero on social media?','What metrics do you track to measure campaign success?','How do you approach SEO for a new website?','Describe a campaign you ran and its results.','What tools do you use for digital marketing?'],
+   lessons:{
+     'Digital Marketing Fundamentals':{meta:'Module 1 · 18 min',steps:[
+       {h:'The Marketing Funnel',body:'Customers move through stages before buying:<ul><li><strong>Awareness</strong> — they discover your brand exists</li><li><strong>Consideration</strong> — they compare you to alternatives</li><li><strong>Conversion</strong> — they buy or sign up</li><li><strong>Loyalty</strong> — they come back and refer others</li></ul>Different content and channels work better at different stages.'},
+       {h:'Choosing the Right Channel',body:'Not every business needs every channel. Instagram and WhatsApp work well for consumer brands in Nigeria; LinkedIn suits B2B; email is best for retaining existing customers. Start where your actual customers already spend time.'},
+       {h:'Quick Check',quiz:{q:'A first-time visitor just discovered your brand exists. Which funnel stage are they in?',opts:['Awareness','Conversion','Loyalty'],correct:0,fb:'Correct — awareness is simply knowing you exist; they have not evaluated you yet.'}}
+     ]}
+   }
   },
   {id:'cloud',icon:'☁️',name:'Cloud Computing',tag:'Infrastructure',color:'#00BCD4',
    skills:['Cloud Fundamentals (AWS/Azure/GCP)','Networking in the Cloud','Infrastructure as Code','DevOps & CI/CD','Cloud Security'],
@@ -391,7 +498,14 @@ const CAREERS = [
      {title:'Certification',desc:'AWS Cloud Practitioner or Azure Fundamentals. MSA supports your prep.'}
    ],
    courses:['Cloud Computing Fundamentals','AWS for Beginners','Azure Fundamentals','DevOps & CI/CD Pipelines'],
-   interviews:['What is the difference between IaaS, PaaS, and SaaS?','How do you secure a cloud environment?','Explain what a VPC is and why it matters.','What is Infrastructure as Code and why use it?','How would you reduce cloud costs for a startup?']
+   interviews:['What is the difference between IaaS, PaaS, and SaaS?','How do you secure a cloud environment?','Explain what a VPC is and why it matters.','What is Infrastructure as Code and why use it?','How would you reduce cloud costs for a startup?'],
+   lessons:{
+     'Cloud Computing Fundamentals':{meta:'Module 1 · 20 min',steps:[
+       {h:'IaaS, PaaS, SaaS',body:'Cloud services come in three main flavors:<ul><li><strong>IaaS</strong> — raw infrastructure (servers, storage) you configure yourself, e.g. AWS EC2</li><li><strong>PaaS</strong> — a platform to deploy code without managing servers, e.g. Heroku</li><li><strong>SaaS</strong> — ready-to-use software, e.g. Gmail</li></ul>Less control moving down the list, but less setup work too.'},
+       {h:'Why Companies Move to the Cloud',body:'Instead of buying physical servers, companies rent computing power on demand — scaling up during busy periods and down when quiet, paying only for what they use. This is the core economic reason behind cloud adoption.'},
+       {h:'Quick Check',quiz:{q:'Which model gives you the least control but requires the least setup?',opts:['IaaS','PaaS','SaaS'],correct:2,fb:'Correct — SaaS is fully managed and ready to use; you just log in and go.'}}
+     ]}
+   }
   }
 ];
 
@@ -402,10 +516,115 @@ let spHistory = [];
 let spMode = 'interview';
 let currentStage = 'roadmap';
 let msgCount = 0;
-let recognition = null;
 let activeRecognition = null;
 let currentSpeech = null;
 let geminiApiKey = "";
+
+// ─── LESSON STATE ──────────────────────────────────────────
+let lessonState = { steps: [], idx: 0, quizAnswered: {} };
+
+function openLesson(courseName){
+  const c = currentCareer;
+  const lessonData = c && c.lessons && c.lessons[courseName];
+  if(!lessonData){
+    // fallback: generic single-step preview if a specific lesson hasn't been authored yet
+    lessonState = { steps: [
+      {h:courseName, body:`This module is part of the <strong>${c?c.name:''}</strong> track. Full interactive content for "${courseName}" is being finalized — the two live sample lessons in this path show the exact format every course will follow.`}
+    ], idx:0, quizAnswered:{} };
+  } else {
+    lessonState = { steps: lessonData.steps, idx: 0, quizAnswered: {} };
+  }
+  document.getElementById('lessonTitle').textContent = courseName;
+  document.getElementById('lessonMeta').textContent = (lessonData && lessonData.meta) ? lessonData.meta + ' · ' + (c?c.name:'') : (c?c.name:'MSA Course');
+  renderLessonProgress();
+  renderLessonStep();
+  document.getElementById('lessonOverlay').classList.add('active');
+}
+
+function closeLesson(){
+  document.getElementById('lessonOverlay').classList.remove('active');
+}
+
+function renderLessonProgress(){
+  const wrap = document.getElementById('lessonProgress');
+  wrap.innerHTML = '';
+  lessonState.steps.forEach((_,i)=>{
+    const span = document.createElement('span');
+    if(i < lessonState.idx) span.classList.add('done');
+    wrap.appendChild(span);
+  });
+}
+
+function renderLessonStep(){
+  const container = document.getElementById('lessonSteps');
+  const step = lessonState.steps[lessonState.idx];
+  const isLast = lessonState.idx === lessonState.steps.length - 1;
+  let html = `<div class="lesson-step active">`;
+  if(step.h) html += `<h4>${step.h}</h4>`;
+  if(step.body) html += `<p>${step.body}</p>`;
+  if(step.quiz){
+    const q = step.quiz;
+    const answered = lessonState.quizAnswered[lessonState.idx];
+    html += `<div class="lesson-quiz"><div class="lesson-quiz-q">${q.q}</div>`;
+    q.opts.forEach((opt,i)=>{
+      let cls = 'lesson-quiz-opt';
+      if(answered !== undefined){
+        if(i === q.correct) cls += ' correct';
+        else if(i === answered) cls += ' wrong';
+      }
+      html += `<button class="${cls}" onclick="answerQuiz(${i})" ${answered!==undefined?'disabled':''}>${opt}</button>`;
+    });
+    html += `<div class="lesson-quiz-fb ${answered!==undefined?'show '+(answered===q.correct?'right':'wrong'):''}" id="quizFb">${answered!==undefined?q.fb:''}</div>`;
+    html += `</div>`;
+  }
+  html += `</div>`;
+  container.innerHTML = html;
+
+  document.getElementById('lessonPrevBtn').disabled = lessonState.idx === 0;
+  const nextBtn = document.getElementById('lessonNextBtn');
+  if(step.quiz && lessonState.quizAnswered[lessonState.idx] === undefined){
+    nextBtn.textContent = 'Answer to continue';
+    nextBtn.disabled = true;
+  } else {
+    nextBtn.disabled = false;
+    nextBtn.textContent = isLast ? 'Finish ✓' : 'Continue →';
+  }
+}
+
+function answerQuiz(i){
+  const step = lessonState.steps[lessonState.idx];
+  lessonState.quizAnswered[lessonState.idx] = i;
+  renderLessonStep();
+}
+
+function lessonNext(){
+  if(lessonState.idx < lessonState.steps.length - 1){
+    lessonState.idx++;
+    renderLessonProgress();
+    renderLessonStep();
+  } else {
+    showLessonComplete();
+  }
+}
+
+function lessonPrev(){
+  if(lessonState.idx > 0){
+    lessonState.idx--;
+    renderLessonProgress();
+    renderLessonStep();
+  }
+}
+
+function showLessonComplete(){
+  const container = document.getElementById('lessonSteps');
+  container.innerHTML = `<div class="lesson-complete">
+    <div class="lc-icon">🎉</div>
+    <h4>Module Complete!</h4>
+    <p>Great work. This module is now marked complete in your MSA learning record. Head back to the roadmap to continue your journey, or explore the next course.</p>
+  </div>`;
+  document.getElementById('lessonNav').style.display = 'none';
+  document.getElementById('lessonProgress').querySelectorAll('span').forEach(s=>s.classList.add('done'));
+}
 
 // ─── KEY SCREEN ──────────────────────────────────────────────
 function submitKey() {
@@ -419,12 +638,15 @@ function submitKey() {
   geminiApiKey = val;
   document.getElementById('keyScreen').style.display = 'none';
 }
+function skipKey(){
+  document.getElementById('keyScreen').style.display = 'none';
+}
 
 // ─── INIT ────────────────────────────────────────────────────
 window.onload = () => {
   renderCareers();
   initSpeakPro();
-  // Always show key screen on load
+  document.getElementById('lessonNav').style.display = 'flex';
   document.getElementById('keyScreen').style.display = 'flex';
 };
 
@@ -552,19 +774,18 @@ function showInterviewPrep() {
 function showCourses() {
   const c = currentCareer;
   const coursesHTML = `
-    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">These MSA-certified courses will take you from beginner to job-ready in <strong style="color:var(--gold)">${c.name}</strong>:</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">These MSA-certified courses will take you from beginner to job-ready in <strong style="color:var(--gold)">${c.name}</strong>. Tap any course to open the interactive lesson:</div>
     <div class="msa-offer">
       <div class="msa-offer-title">📚 Available on AcadBot</div>
-      <div class="offer-pills">${c.courses.map(course=>`<div class="offer-pill">${course}</div>`).join('')}</div>
+      <div class="offer-pills">${c.courses.map(course=>`<div class="offer-pill" onclick="openLesson('${course.replace(/'/g,"\\'")}')">${course} ▸</div>`).join('')}</div>
     </div>
-    <div style="font-size:13px;color:var(--muted);margin-top:14px;">All courses include <strong style="color:var(--gold)">MSA certification</strong> and career placement support. Ask me about any course or your next steps! 🎓</div>`;
+    <div style="font-size:13px;color:var(--muted);margin-top:14px;">All courses include <strong style="color:var(--gold)">MSA certification</strong> and career placement support. Tap a course above to try a live lesson right now! 🎓</div>`;
 
   addBotMsg(`Here is what MSA offers to help you master <strong>${c.name}</strong>: ${coursesHTML}`, false, true);
   setupJourneyChat();
 }
 
 function setupJourneyChat(isInterview = false) {
-  const sys = isInterview ? getInterviewSystem() : getGuideSystem();
   document.getElementById('chatInput').onkeydown = (e) => { if(e.key==='Enter') sendChat(); };
 }
 
@@ -717,12 +938,9 @@ function toggleMic(target) {
         interim += e.results[i][0].transcript;
       }
     }
-    // Show interim results in input so user sees what's being captured
     document.getElementById(inputId).value = finalTranscript || interim;
   };
-  rec.onspeechend = () => {
-    rec.stop();
-  };
+  rec.onspeechend = () => { rec.stop(); };
 
   rec.onerror = (e) => {
     btn.classList.remove('recording');
@@ -855,8 +1073,6 @@ function showScreen(id) {
   if (id === 'speakpro') document.querySelectorAll('.tab-btn')[1].classList.add('active');
 }
 
-
-
 async function callClaude(messages, system) {
   if (!geminiApiKey) {
     document.getElementById('keyScreen').style.display = 'flex';
@@ -873,7 +1089,7 @@ async function callClaude(messages, system) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + geminiApiKey,
-        'HTTP-Referer': 'https://kehindealx.github.io/acadbot_demo/',
+        'HTTP-Referer': 'https://kehindealx.github.io/acadbot-demo/',
         'X-Title': 'MSA AcadBot'
       },
       body: JSON.stringify({
