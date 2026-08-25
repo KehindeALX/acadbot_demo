@@ -1,0 +1,7 @@
+# Cloud/deployment specific - NOT pushed to git
+.env.production
+docker-compose.override.yml
+*.pem
+*.key
+*.crt
+secrets/
