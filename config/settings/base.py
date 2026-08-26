@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'django_filters',
-    'drf_spectacular',
+    # 'drf_spectacular',  # Temporarily disabled - requires PyYAML which needs MSVC on Python 3.14
 
     # Local apps (using explicit app configs to avoid label conflicts)
     'apps.accounts.apps.AccountsConfig',
@@ -126,28 +126,28 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # 'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',  # Temporarily disabled
     'EXCEPTION_HANDLER': 'apps.core.exceptions.custom_exception_handler',
 }
 
-# DRF Spectacular settings
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'MSA AcadBot API',
-    'DESCRIPTION': 'API for More Success Academy AcadBot - AI Career Guidance Platform',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SCHEMA_PATH_PREFIX': '/api/',
-    'TAGS': [
-        {'name': 'auth', 'description': 'Authentication endpoints'},
-        {'name': 'careers', 'description': 'Career paths, skills, roadmaps'},
-        {'name': 'courses', 'description': 'Courses, lessons, enrollment'},
-        {'name': 'matching', 'description': 'Student-mentor matching'},
-        {'name': 'sessions', 'description': 'Session scheduling and management'},
-        {'name': 'progress', 'description': 'Progress tracking and assessments'},
-        {'name': 'dashboard', 'description': 'Analytics and reporting'},
-    ],
-}
+# DRF Spectacular settings - Temporarily disabled (requires PyYAML)
+# SPECTACULAR_SETTINGS = {
+#     'TITLE': 'MSA AcadBot API',
+#     'DESCRIPTION': 'API for More Success Academy AcadBot - AI Career Guidance Platform',
+#     'VERSION': '1.0.0',
+#     'SERVE_INCLUDE_SCHEMA': False,
+#     'COMPONENT_SPLIT_REQUEST': True,
+#     'SCHEMA_PATH_PREFIX': '/api/',
+#     'TAGS': [
+#         {'name': 'auth', 'description': 'Authentication endpoints'},
+#         {'name': 'careers', 'description': 'Career paths, skills, roadmaps'},
+#         {'name': 'courses', 'description': 'Courses, lessons, enrollment'},
+#         {'name': 'matching', 'description': 'Student-mentor matching'},
+#         {'name': 'sessions', 'description': 'Session scheduling and management'},
+#         {'name': 'progress', 'description': 'Progress tracking and assessments'},
+#         {'name': 'dashboard', 'description': 'Analytics and reporting'},
+#     ],
+# }
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = config(
