@@ -67,7 +67,9 @@ if SENTRY_DSN:
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
         traces_sample_rate=0.1,
-        send_default_pii=True,
+        # send_default_pii=False: user context should be attached manually
+        # via sentry_sdk.set_user() where needed for privacy compliance
+        send_default_pii=False,
         environment='production',
     )
 
@@ -79,10 +81,6 @@ LOGGING = {
         'verbose': {
             'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
             'style': '{',
-        },
-        'json': {
-            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s',
         },
     },
     'handlers': {
@@ -114,18 +112,13 @@ LOGGING = {
     },
 }
 
-# Cache (Redis)
+# Cache - local memory cache for production (Redis not configured)
 CACHES = {
     'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config('REDIS_URL', default='redis://localhost:6379/1'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        },
-        'KEY_PREFIX': 'acadbot',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'acadbot-cache',
     }
 }
 
-# Session cache
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'default'
+# Session - database-backed sessions
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'

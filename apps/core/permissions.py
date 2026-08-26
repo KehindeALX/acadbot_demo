@@ -71,29 +71,27 @@ class IsMentorOrAdmin(permissions.BasePermission):
 class IsOwnerOrMentorOrAdmin(permissions.BasePermission):
     """
     Permission for objects that can be accessed by owner, their mentor, or admin.
+
+    Note: student and mentor fields are ForeignKeys directly to User (AUTH_USER_MODEL),
+    not to StudentProfile/MentorProfile, so compare directly to request.user.
     """
 
     def has_object_permission(self, request, view, obj):
-        # Determine if user is the owner (student), the mentor, or an admin
-        is_owner = False
-        is_mentor = False
-        is_admin = False
-
         # Check if user is the owner (student)
-        if hasattr(obj, 'student') and obj.student.user == request.user:
-            is_owner = True
-        if hasattr(obj, 'user') and obj.user == request.user:
-            is_owner = True
+        is_owner = getattr(obj, 'student', None) == request.user or getattr(obj, 'user', None) == request.user
 
         # Check if user is the mentor
-        if hasattr(obj, 'mentor') and obj.mentor.user == request.user:
-            is_mentor = True
-        if hasattr(obj, 'match') and obj.match.mentor.user == request.user:
-            is_mentor = True
+        is_mentor = getattr(obj, 'mentor', None) == request.user or (
+            hasattr(obj, 'match') and obj.match.mentor == request.user
+        )
 
         # Check if admin
-        if request.user.role == 'ADMIN':
-            is_admin = True
+        is_admin = request.user.role == 'ADMIN'
+
+        # Check SessionRecurrence: access via the underlying session
+        if not (is_owner or is_mentor) and hasattr(obj, 'session'):
+            is_owner = obj.session.student == request.user
+            is_mentor = obj.session.mentor == request.user
 
         # Read permissions: owner, mentor, or admin can view
         if request.method in permissions.SAFE_METHODS:
