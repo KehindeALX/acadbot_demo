@@ -42,15 +42,15 @@ CORS_ALLOW_ALL_ORIGINS = True
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
-# Debug toolbar - temporarily disabled (requires extra install)
-# INSTALLED_APPS += ['debug_toolbar']
-# MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
-#
-# INTERNAL_IPS = ['127.0.0.1', 'localhost']
-#
-# DEBUG_TOOLBAR_CONFIG = {
-#     'SHOW_TOOLBAR_CALLBACK': lambda request: True,
-# }
+# Debug toolbar
+INSTALLED_APPS += ['debug_toolbar']
+MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
+
+INTERNAL_IPS = ['127.0.0.1', 'localhost']
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+}
 
 # Logging
 LOGGING = {
