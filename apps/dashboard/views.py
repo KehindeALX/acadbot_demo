@@ -5,7 +5,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Count, Avg, Sum, Q
+from django.db.models import Count, Avg, Sum, Q, F, ExpressionWrapper, DurationField
+from django.db.models.functions import TruncDate
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
 from collections import defaultdict
@@ -248,7 +250,11 @@ class StudentDashboardViewSet(viewsets.GenericViewSet):
 
     def _calculate_streak(self, student):
         """Calculate consecutive days with learning activity."""
-        # This is a simplified version - in production, you'd track daily activity
+        # TODO: Implement real streak tracking.
+        # Currently returns 0 as a placeholder. Requires a daily activity log model
+        # (e.g., UserActivityLog with date + action_type) to compute consecutive days.
+        # See: Session.completed_at, LessonProgress.completed_at, Milestone.achieved_at
+        # as potential activity sources. Don't merge this as a working feature.
         return 0
 
 
@@ -541,9 +547,9 @@ class AdminDashboardViewSet(viewsets.GenericViewSet):
 
             # Average time to completion
             completed_enrollments = enrollments.filter(completed_at__isnull=False)
-            avg_days = completed_enrollments.aggregate(
-                avg=Avg((F('completed_at') - F('enrolled_at')).total_seconds() / 86400)
-            )['avg'] or 0
+            duration = ExpressionWrapper(F('completed_at') - F('enrolled_at'), output_field=DurationField())
+            avg_duration = completed_enrollments.aggregate(avg=Avg(duration))['avg']
+            avg_days = round(avg_duration.total_seconds() / 86400, 1) if avg_duration else 0
 
             results.append({
                 'career': career.name,
@@ -569,8 +575,8 @@ class AdminDashboardViewSet(viewsets.GenericViewSet):
 
         daily_active = User.objects.filter(
             last_login__gte=thirty_days_ago
-        ).extra(
-            select={'date': 'DATE(last_login)'}
+        ).annotate(
+            date=TruncDate('last_login')
         ).values('date').annotate(
             count=Count('id', distinct=True)
         ).order_by('date')
@@ -578,8 +584,8 @@ class AdminDashboardViewSet(viewsets.GenericViewSet):
         # Session volume (last 30 days)
         daily_sessions = Session.objects.filter(
             scheduled_at__gte=thirty_days_ago
-        ).extra(
-            select={'date': 'DATE(scheduled_at)'}
+        ).annotate(
+            date=TruncDate('scheduled_at')
         ).values('date').annotate(
             count=Count('id')
         ).order_by('date')
@@ -605,7 +611,3 @@ class AdminDashboardViewSet(viewsets.GenericViewSet):
         from .serializers import EngagementSerializer
         serializer = EngagementSerializer(data)
         return Response({'success': True, 'data': serializer.data})
-
-
-from django.shortcuts import get_object_or_404
-from django.db.models import F

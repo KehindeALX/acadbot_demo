@@ -133,7 +133,8 @@ class Enrollment(models.Model):
 
         if self.progress_percent >= 100 and self.status == self.Status.ACTIVE:
             self.status = self.Status.COMPLETED
-            self.completed_at = models.functions.Now()
+            from django.utils import timezone
+            self.completed_at = timezone.now()
 
         self.save(update_fields=['progress_percent', 'status', 'completed_at'])
 

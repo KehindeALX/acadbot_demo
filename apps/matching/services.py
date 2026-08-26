@@ -5,6 +5,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from apps.accounts.models import MentorProfile
 from apps.careers.models import Career
+from .models import Match, MentorMatch
 
 
 def calculate_compatibility_score(student, mentor_profile, match_request):
@@ -180,8 +181,6 @@ def create_match_suggestions(match_request):
     """
     Create mentor match suggestions for a match request.
     """
-    from .models import MentorMatch
-
     # Clear existing suggestions
     match_request.suggested_mentors.all().delete()
 
@@ -203,8 +202,6 @@ def auto_match(match_request):
     """
     Automatically create the best match for a match request.
     """
-    from .models import Match
-
     best_mentors = find_best_mentors(match_request, limit=1)
 
     if not best_mentors:
@@ -225,7 +222,3 @@ def auto_match(match_request):
     match_request.save(update_fields=['status', 'matched_at', 'updated_at'])
 
     return match
-
-
-# Import Match model here to avoid circular imports
-from .models import Match

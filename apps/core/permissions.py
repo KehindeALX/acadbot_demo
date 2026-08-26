@@ -74,19 +74,30 @@ class IsOwnerOrMentorOrAdmin(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
+        # Determine if user is the owner (student), the mentor, or an admin
+        is_owner = False
+        is_mentor = False
+        is_admin = False
+
+        # Check if user is the owner (student)
+        if hasattr(obj, 'student') and obj.student.user == request.user:
+            is_owner = True
+        if hasattr(obj, 'user') and obj.user == request.user:
+            is_owner = True
+
+        # Check if user is the mentor
+        if hasattr(obj, 'mentor') and obj.mentor.user == request.user:
+            is_mentor = True
+        if hasattr(obj, 'match') and obj.match.mentor.user == request.user:
+            is_mentor = True
+
+        # Check if admin
+        if request.user.role == 'ADMIN':
+            is_admin = True
+
+        # Read permissions: owner, mentor, or admin can view
         if request.method in permissions.SAFE_METHODS:
-            # Check if user is the owner
-            if hasattr(obj, 'student') and obj.student.user == request.user:
-                return True
-            if hasattr(obj, 'user') and obj.user == request.user:
-                return True
-            # Check if user is the mentor
-            if hasattr(obj, 'mentor') and obj.mentor.user == request.user:
-                return True
-            if hasattr(obj, 'match') and obj.match.mentor.user == request.user:
-                return True
-            # Check if admin
-            if request.user.role == 'ADMIN':
-                return True
-            return False
-        return False
+            return is_owner or is_mentor or is_admin
+
+        # Write permissions (PATCH/PUT/DELETE): owner, mentor, or admin can modify
+        return is_owner or is_mentor or is_admin
