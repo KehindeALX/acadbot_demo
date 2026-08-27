@@ -1,0 +1,1 @@
+# Core app - shared utilities and permissions

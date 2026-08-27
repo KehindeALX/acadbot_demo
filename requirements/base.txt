@@ -1,0 +1,8 @@
+Django>=5.0,<5.1
+djangorestframework>=3.15
+psycopg2-binary>=2.9
+python-decouple>=3.8
+Pillow>=10.0
+django-cors-headers>=4.3
+django-filter>=23.0
+drf-spectacular>=0.27
