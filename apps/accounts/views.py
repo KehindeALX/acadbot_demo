@@ -36,6 +36,22 @@ class AuthViewSet(viewsets.GenericViewSet):
 
     permission_classes = [AllowAny]
 
+    def get_permissions(self):
+        """
+        register/login are public; me/update_me/logout require authentication.
+
+        NOTE: these actions are wired directly via AuthViewSet.as_view({...})
+        in urls.py rather than through a DRF router. The per-action
+        `permission_classes` kwarg on @action only gets applied when a
+        router merges it into initkwargs before calling .as_view() -- it is
+        silently ignored for a manually-constructed .as_view() call like the
+        one used here. Enforcing it explicitly in get_permissions() avoids
+        relying on that mechanism.
+        """
+        if self.action in ('me', 'update_me', 'logout'):
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
     @action(detail=False, methods=['post'], url_path='register')
     def register(self, request):
         """Register a new user (student or mentor)."""
