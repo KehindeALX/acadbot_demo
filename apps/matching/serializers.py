@@ -17,7 +17,7 @@ class MatchRequestSerializer(serializers.ModelSerializer):
 
     preferred_careers = CareerSerializer(many=True, read_only=True)
     preferred_career_ids = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_careers,
+        queryset=get_active_careers(),
         source='preferred_careers',
         write_only=True,
         many=True,
@@ -41,7 +41,7 @@ class MatchRequestCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating match requests."""
 
     preferred_career_ids = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_careers,
+        queryset=get_active_careers(),
         source='preferred_careers',
         write_only=True,
         many=True,

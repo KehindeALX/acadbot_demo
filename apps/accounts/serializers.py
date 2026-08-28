@@ -120,7 +120,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
 
     career = CareerSerializer(read_only=True)
     career_id = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_careers,
+        queryset=get_active_careers(),
         source='career',
         write_only=True,
         required=False,
@@ -128,7 +128,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
     )
     current_stage = RoadmapStageSerializer(read_only=True)
     current_stage_id = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_roadmap_stages,
+        queryset=get_active_roadmap_stages(),
         source='current_stage',
         write_only=True,
         required=False,
@@ -151,7 +151,7 @@ class MentorProfileSerializer(serializers.ModelSerializer):
 
     expertise_careers = CareerSerializer(many=True, read_only=True)
     expertise_career_ids = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_careers,
+        queryset=get_active_careers(),
         source='expertise_careers',
         write_only=True,
         many=True,
