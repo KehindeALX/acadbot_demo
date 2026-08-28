@@ -26,7 +26,7 @@ class SkillAssessmentSerializer(serializers.ModelSerializer):
 
     career_skill = CareerSkillSerializer(read_only=True)
     career_skill_id = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_career_skills,
+        queryset=get_active_career_skills(),
         source='career_skill',
         write_only=True,
         required=True,
@@ -65,7 +65,7 @@ class SkillAssessmentCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating/updating skill assessments."""
 
     career_skill_id = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_career_skills,
+        queryset=get_active_career_skills(),
         source='career_skill',
         write_only=True,
         required=True,
@@ -101,7 +101,7 @@ class MilestoneSerializer(serializers.ModelSerializer):
 
     career = CareerSerializer(read_only=True)
     career_id = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_careers,
+        queryset=get_active_careers(),
         source='career',
         write_only=True,
         required=False,
@@ -124,7 +124,7 @@ class MilestoneCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating milestones."""
 
     career_id = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_careers,
+        queryset=get_active_careers(),
         source='career',
         write_only=True,
         required=False,
@@ -148,14 +148,14 @@ class LearningPathSerializer(serializers.ModelSerializer):
 
     career = CareerSerializer(read_only=True)
     career_id = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_careers,
+        queryset=get_active_careers(),
         source='career',
         write_only=True,
         required=True,
     )
     current_stage = RoadmapStageSerializer(read_only=True)
     current_stage_id = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_roadmap_stages,
+        queryset=get_active_roadmap_stages(),
         source='current_stage',
         write_only=True,
         required=False,
@@ -197,7 +197,7 @@ class LearningPathUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating learning path (advancing stages)."""
 
     current_stage_id = serializers.PrimaryKeyRelatedField(
-        queryset=get_active_roadmap_stages,
+        queryset=get_active_roadmap_stages(),
         source='current_stage',
         write_only=True,
         required=False,
