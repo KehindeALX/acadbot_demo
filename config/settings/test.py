@@ -13,4 +13,10 @@ DEBUG = False
 INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'debug_toolbar']
 MIDDLEWARE = [mw for mw in MIDDLEWARE if 'debug_toolbar' not in mw]
 
+# Explicitly disable debug toolbar test check
+DEBUG_TOOLBAR_CONFIG = {
+    'IS_RUNNING_TESTS': True,
+    'SHOW_TOOLBAR_CALLBACK': lambda request: False,
+}
+
 ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1']
