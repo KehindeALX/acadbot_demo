@@ -9,11 +9,6 @@ import dj_database_url
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# TEMPORARY DEBUG: set DEBUG_EXCEPTIONS=True in the Render env to make the
-# API return the real 500 traceback in the 'details' field instead of hiding
-# it. REMOVE this once the root cause is found.
-DEBUG_EXCEPTIONS = config('DEBUG_EXCEPTIONS', default=False, cast=bool)
-
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 
 # Security settings
