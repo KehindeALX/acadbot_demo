@@ -10,9 +10,10 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'', CourseViewSet, basename='course')
-router.register(r'lessons', LessonViewSet, basename='lesson')
+# Register specific routes FIRST to avoid conflicts with course-detail catch-all
 router.register(r'enrollments', EnrollmentViewSet, basename='enrollment')
+router.register(r'lessons', LessonViewSet, basename='lesson')
+router.register(r'', CourseViewSet, basename='course')
 
 urlpatterns = [
     path('', include(router.urls)),
