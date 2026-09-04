@@ -20,3 +20,12 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1']
+
+# Auth endpoints are throttled to 5/min in real settings. Raise the rates for
+# the test suite so unrelated tests (which hit /api/auth/* many times from a
+# single 127.0.0.1) don't trip 429. The rate-limit tests themselves force the
+# real tight rates via override_settings (see apps/accounts/tests/test_throttling.py).
+REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
+    'register': '10000/min',
+    'login': '10000/min',
+}

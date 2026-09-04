@@ -469,15 +469,21 @@ export function formatApiError(error) {
   if (error.details && typeof error.details === 'object') {
     const messages = [];
 
+    // Keys that render bare (no "field: " prefix): non_field_errors is a DRF
+    // validation convention, and detail is how the backend wraps throttle
+    // 429s ({ detail: 'Request was throttled. Expected available in 60
+    // seconds.' }).
+    const unprefixedFields = new Set(['non_field_errors', 'detail']);
+
     // Field-specific errors
     for (const [field, fieldErrors] of Object.entries(error.details)) {
       if (Array.isArray(fieldErrors)) {
         fieldErrors.forEach(msg => {
-          const fieldName = field === 'non_field_errors' ? '' : `${field}: `;
+          const fieldName = unprefixedFields.has(field) ? '' : `${field}: `;
           messages.push(`${fieldName}${msg}`);
         });
       } else if (typeof fieldErrors === 'string') {
-        const fieldName = field === 'non_field_errors' ? '' : `${field}: `;
+        const fieldName = unprefixedFields.has(field) ? '' : `${field}: `;
         messages.push(`${fieldName}${fieldErrors}`);
       }
     }

@@ -21,6 +21,7 @@ from .serializers import (
     MentorListSerializer,
 )
 from apps.core.permissions import IsOwnerOrReadOnly, IsStudent, IsMentor, IsMentorOrAdmin
+from .throttles import LoginRateThrottle, RegisterRateThrottle
 
 
 @ensure_csrf_cookie
@@ -51,6 +52,19 @@ class AuthViewSet(viewsets.GenericViewSet):
         if self.action in ('me', 'update_me', 'logout'):
             return [IsAuthenticated()]
         return [AllowAny()]
+
+    def get_throttles(self):
+        """
+        Rate-limit register and login to 5 requests/min per IP (rates come from
+        DEFAULT_THROTTLE_RATES in settings). All other actions stay unthrottled.
+        """
+        throttles = {
+            'register': RegisterRateThrottle,
+            'login': LoginRateThrottle,
+        }.get(self.action)
+        if throttles:
+            return [throttles()]
+        return super().get_throttles()
 
     @action(detail=False, methods=['post'], url_path='register')
     def register(self, request):
