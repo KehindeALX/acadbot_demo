@@ -128,6 +128,12 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'EXCEPTION_HANDLER': 'apps.core.exceptions.custom_exception_handler',
+    # Per-endpoint auth rate limits. Read live by apps/accounts/throttles.py so
+    # the test settings can raise them and rate-limit tests can tighten them.
+    'DEFAULT_THROTTLE_RATES': {
+        'register': '5/min',  # 5 registration attempts per minute per IP
+        'login': '5/min',     # 5 login attempts per minute per IP
+    },
 }
 
 # DRF Spectacular settings
