@@ -137,6 +137,7 @@ async function handleLogout() {
     enrollment = null;
     renderAuthNav();
     updateEnrollmentUI();
+    renderLessons(); // Lesson buttons flip back to "Preview" for the logged-out state.
     showToast('Logged out successfully', 'success');
   } catch (err) {
     showToast('Logout failed', 'error');
@@ -225,6 +226,9 @@ async function checkEnrollmentStatus() {
     enrollment = null;
   }
   updateEnrollmentUI();
+  // Lessons re-render now that enrollment status is known, so the list shows
+  // accurate "Preview" vs "Start" buttons (renderCourse() ran before this).
+  renderLessons();
 }
 
 function updateEnrollmentUI() {
@@ -267,6 +271,7 @@ async function handleEnroll() {
   isEnrolling = true;
   enrollBtn.disabled = true;
   enrollBtn.textContent = 'Enrolling...';
+  setLessonButtonsDisabled(true);
 
   try {
     const data = await enrollCourse(course.id);
@@ -277,6 +282,7 @@ async function handleEnroll() {
     if (data.success && data.data) {
       enrollment = data.data;
       updateEnrollmentUI();
+      renderLessons(); // Flip lesson buttons from "Preview" to "Start" immediately.
       showToast(data.message || 'Successfully enrolled!', 'success');
     } else {
       showToast(data.message || 'Enrollment failed', 'error');
@@ -287,6 +293,7 @@ async function handleEnroll() {
     isEnrolling = false;
     enrollBtn.disabled = false;
     enrollBtn.textContent = 'Enroll Now';
+    setLessonButtonsDisabled(false);
   }
 }
 
@@ -371,6 +378,7 @@ function createLessonElement(lesson, index) {
           class="btn btn--primary btn--sm"
           data-lesson-index="${index}"
           aria-label="Start lesson: ${escapeHtml(lesson.title)}"
+          ${isEnrolling ? 'disabled' : ''}
         >
           ${enrollment ? 'Start' : 'Preview'}
         </button>
@@ -379,9 +387,25 @@ function createLessonElement(lesson, index) {
   `;
 
   const startBtn = div.querySelector('button');
-  startBtn.addEventListener('click', () => openLessonViewer(lesson, index));
+  startBtn.addEventListener('click', () => {
+    // Enroll request in flight — enrollment state is stale, so don't open a
+    // lesson (it would render as an ungraded preview even when enrolled).
+    if (isEnrolling) return;
+    openLessonViewer(lesson, index);
+  });
 
   return div;
+}
+
+/**
+ * Disable or re-enable every lesson row button while an enroll request is in
+ * flight, so a lesson can't be opened against stale enrollment state (e.g. an
+ * ungraded preview quiz while the student is actually enrolled).
+ */
+function setLessonButtonsDisabled(disabled) {
+  lessonsList.querySelectorAll('[data-lesson-index]').forEach(btn => {
+    btn.disabled = disabled;
+  });
 }
 
 // ============================================================
@@ -626,6 +650,7 @@ async function refreshProgress() {
     if (data) {
       enrollment = { ...enrollment, ...data };
       updateEnrollmentUI();
+      renderLessons();
     }
   } catch (err) {
     // Non-blocking — the progress bar refresh is best-effort.
