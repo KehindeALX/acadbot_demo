@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ask AcadBot | MSA AcadBot</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="navbar__logo">
+      <span class="navbar__logo-text">MSA <span>AcadBot</span></span>
+      <!-- Swap for real logo: <img class="navbar__logo-img" src="assets/logo.svg" alt="MSA AcadBot"/> -->
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html" class="navbar__link">Home</a>
+      <a href="courses.html" class="navbar__link">Courses</a>
+      <a href="acadbot.html" class="navbar__link navbar__link--active">Ask AcadBot</a>
+      <a href="msa-guide.html" class="navbar__link">MSA Guide</a>
+      <div id="authNav">
+        <!-- Authenticated nav will be injected here -->
+      </div>
+    </div>
+  </nav>
+
+  <main class="chat" id="chatApp" aria-label="Ask AcadBot assistant">
+    <!-- Welcome / empty state — shown before the first message -->
+    <section class="chat__welcome" id="chatWelcome" aria-label="Welcome">
+      <div class="chat__brand" aria-hidden="true">🤖</div>
+      <h1 class="chat__title">Ask <span>AcadBot</span></h1>
+      <p class="chat__subtitle">Your AI co-pilot for career-path learning. Ask about courses, lessons, career paths, or what to learn next.</p>
+
+      <!-- Quick actions — ready-made prompts -->
+      <div class="chat__quick" role="group" aria-label="Suggested questions">
+        <button class="chat__quick-btn" type="button" data-prompt="Recommend a course to start my career in Data Science.">🎯 Recommend a course</button>
+        <button class="chat__quick-btn" type="button" data-prompt="What should I learn next after finishing Python fundamentals?">🧭 What to learn next</button>
+        <button class="chat__quick-btn" type="button" data-prompt="Explain how APIs work in simple terms.">💡 Explain a concept</button>
+        <button class="chat__quick-btn" type="button" data-prompt="Help me build a learning path toward Cybersecurity.">🗺️ Build my path</button>
+        <button class="chat__quick-btn" type="button" data-prompt="How do I find a mentor for Software Engineering?">🤝 Find a mentor</button>
+        <button class="chat__quick-btn" type="button" data-prompt="Quiz me on database fundamentals.">📝 Quiz me</button>
+      </div>
+    </section>
+
+    <!-- Message thread — revealed once the first message is sent -->
+    <section class="chat__thread hidden" id="chatThread" aria-label="Conversation" aria-live="polite">
+      <!-- Messages injected here -->
+    </section>
+
+    <!-- Composer -->
+    <div class="chat__composer">
+      <div class="chat__box">
+        <textarea
+          id="chatInput"
+          class="chat__input"
+          rows="1"
+          placeholder="Ask AcadBot anything…"
+          aria-label="Your message to AcadBot"
+        ></textarea>
+        <div class="chat__box-footer">
+          <span class="chat__hint">AcadBot helps you learn. It won't grade or replace your mentor.</span>
+          <button id="chatSend" class="btn btn--primary chat__send" type="button" aria-label="Send message">
+            <span aria-hidden="true">↑</span>
+          </button>
+        </div>
+      </div>
+      <p class="chat__disclaimer">AcadBot is an AI assistant. Verify important answers with your mentor.</p>
+    </div>
+  </main>
+
+  <!-- Toast container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="js/acadbot.js"></script>
+</body>
+</html>

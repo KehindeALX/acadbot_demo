@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MSA AI Guide | MSA AcadBot</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="navbar__logo">
+      <span class="navbar__logo-text">MSA <span>AcadBot</span></span>
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html" class="navbar__link">Home</a>
+      <a href="courses.html" class="navbar__link">Courses</a>
+      <a href="acadbot.html" class="navbar__link">Ask AcadBot</a>
+      <a href="msa-guide.html" class="navbar__link navbar__link--active">MSA Guide</a>
+      <div id="authNav">
+        <!-- Authenticated nav will be injected here -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       SCREEN 1: Welcome — Career Selection
+       ============================================================ -->
+  <main class="guide" id="guideApp" aria-label="MSA AI Guide">
+    <section class="guide__welcome" id="guideWelcome" aria-label="Choose a career path">
+      <div class="guide__brand" aria-hidden="true">🧭</div>
+      <h1 class="guide__title">Your <span>Career Journey</span></h1>
+      <p class="guide__subtitle">Pick a career path to explore your personalized roadmap, skills checklist, interview prep, and matching courses.</p>
+
+      <!-- Loading careers from API -->
+      <div id="careersLoading" class="loading">
+        <div class="loading__spinner"></div>
+        <span>Loading career paths...</span>
+      </div>
+
+      <!-- Career cards grid — populated by JS -->
+      <div class="guide__careers" id="careersGrid" role="list" aria-label="Career paths">
+      </div>
+
+      <!-- Empty state -->
+      <div id="careersEmpty" class="empty-state hidden">
+        <div class="empty-state__icon">🗺️</div>
+        <h3 class="empty-state__title">No Career Paths Yet</h3>
+        <p class="empty-state__message">Career paths haven't been added yet. Check back soon.</p>
+      </div>
+
+      <!-- Error state -->
+      <div id="careersError" class="empty-state hidden">
+        <div class="empty-state__icon">⚠️</div>
+        <h3 class="empty-state__title">Unable to Load Careers</h3>
+        <p class="empty-state__message">We couldn't reach the server. Please check your connection and try again.</p>
+        <button class="btn btn--secondary" id="retryCareersBtn">Try Again</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 2: Journey — Career Chat Interface
+         ============================================================ -->
+    <section class="guide__journey hidden" id="guideJourney" aria-label="Career journey">
+
+      <!-- Journey header -->
+      <div class="guide__header">
+        <button class="guide__back-btn" id="backBtn" aria-label="Back to career selection">
+          <span aria-hidden="true">←</span>
+        </button>
+        <div class="guide__header-info">
+          <span class="guide__header-icon" id="journeyIcon" aria-hidden="true"></span>
+          <div>
+            <h2 class="guide__header-name" id="journeyName"></h2>
+            <span class="guide__header-tag" id="journeyTag"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage tabs -->
+      <div class="guide__stage-tabs" role="tablist" aria-label="Journey stages">
+        <button class="guide__stage-tab guide__stage-tab--active" role="tab" aria-selected="true" data-stage="roadmap">🗺️ Roadmap</button>
+        <button class="guide__stage-tab" role="tab" aria-selected="false" data-stage="skills">✅ Skills</button>
+        <button class="guide__stage-tab" role="tab" aria-selected="false" data-stage="interview">🎤 Interview</button>
+        <button class="guide__stage-tab" role="tab" aria-selected="false" data-stage="courses">📚 Courses</button>
+      </div>
+
+      <!-- Message thread -->
+      <section class="guide__thread" id="guideThread" aria-label="Conversation" aria-live="polite">
+        <!-- Messages injected here -->
+      </section>
+
+      <!-- Composer -->
+      <div class="guide__composer">
+        <div class="guide__box">
+          <textarea
+            id="guideInput"
+            class="guide__input"
+            rows="1"
+            placeholder="Ask Abia anything about this career path…"
+            aria-label="Your message to Abia"
+          ></textarea>
+          <div class="guide__box-footer">
+            <span class="guide__hint">Abia is your AI career guide. It won't grade or replace your mentor.</span>
+            <button id="guideSend" class="btn btn--primary guide__send" type="button" aria-label="Send message">
+              <span aria-hidden="true">↑</span>
+            </button>
+          </div>
+        </div>
+        <p class="guide__disclaimer">Abia is an AI assistant. Verify important answers with your mentor.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="js/msa-guide.js"></script>
+</body>
+</html>
