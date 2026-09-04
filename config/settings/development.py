@@ -42,6 +42,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
+# Trust the frontend dev origin for Django 4.0+ CSRF origin-checking
+# (frontend served on :5500, backend on :8000 = cross-origin POSTs)
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5500', 'http://127.0.0.1:5500']
+
 # Debug toolbar
 INSTALLED_APPS += ['debug_toolbar']
 MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
