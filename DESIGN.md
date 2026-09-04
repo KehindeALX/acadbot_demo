@@ -1,18 +1,18 @@
 ---
 name: MSA AcadBot
-description: Career-path learning platform for More Success Academy — navy-night surfaces, gilded accents, warm and ambitious.
+description: Career-path learning platform for More Success Academy — near-black surfaces, champagne accents, premium and warm.
 colors:
-  midnight: "#050B2E"
-  midnight-deep: "#0A1445"
-  midnight-lifted: "#111A5A"
-  gilded: "#D4AF37"
-  gilded-bright: "#F0D060"
-  gilded-tint: "rgba(212, 175, 55, 0.15)"
-  lagoon: "#00C9B1"
-  lagoon-tint: "rgba(0, 201, 177, 0.15)"
+  midnight: "#08080F"
+  midnight-deep: "#0D0D18"
+  midnight-lifted: "#141423"
+  gilded: "#E6CB80"
+  gilded-bright: "#F5E2A9"
+  gilded-tint: "rgba(230, 203, 128, 0.13)"
+  lagoon: "#4FD8C6"
+  lagoon-tint: "rgba(79, 216, 198, 0.12)"
   white: "#FFFFFF"
-  muted: "#8A94B2"
-  border: "#1E2A5A"
+  muted: "#9AA3C0"
+  border: "#232330"
   red: "#FF6B6B"
   green: "#4CAF50"
 typography:
@@ -96,14 +96,15 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Gold-Standard Academy"**
+**Creative North Star: "The Champagne Academy at Black"**
 
-MSA AcadBot is a gold-standard academy at midnight: deep navy surfaces hold the authority and calm of a prestigious institution, while warm gilded gold — the accent for every action — carries the promise of achievement. The voice is warm and ambitious, not cold and corporate: it should feel like a confident, encouraging mentor standing beside a student working toward their career, with AI assistance (the "bot") as the co-pilot.
+MSA AcadBot is a premium academy set on a near-black stage: surfaces hold the calm authority of a prestigious institution and echo the black of the AI robot, while luminous champagne gold — the accent for every action — carries the light and the promise of achievement. The voice is warm and ambitious, not cold and corporate: it should feel like a confident, encouraging mentor standing beside a student working toward their career, with AI assistance (the "bot") as the co-pilot.
 
-Density is moderate and calm — generous 24px card padding, comfortable type, nothing crowded. Headlines set in the geometric warmth of Space Grotesk; body copy in the quiet readability of Inter. Depth is conveyed through layered navy surfaces (page → card → lifted accent) and soft, restrained shadows that appear only when a card lifts on hover. The interface stays consistent across pages: the same nav bar, the same card grammar, the same gold-voiced action buttons, so a student never re-learns a pattern from courses to dashboard.
+Density is moderate and calm — generous 24px card padding, comfortable type, nothing crowded. Headlines set in the geometric warmth of Space Grotesk; body copy in the quiet readability of Inter. Depth is conveyed through layered near-black surfaces (page → card → lifted accent) and soft, restrained shadows that appear only when a card lifts on hover. The interface stays consistent across pages: the same nav bar, the same card grammar, the same gold-voiced action buttons, so a student never re-learns a pattern from courses to dashboard.
 
 **Key Characteristics:**
-- Midnight-navy layered surfaces with gold as the singular action voice.
+- Near-black layered surfaces with luminous champagne gold as the singular action voice.
+- Premium-but-warm: dark enough to match the AI, lit by gold so it never reads as flat.
 - Warm, mentor-toned copy and an aspirational, achievement-forward mood.
 - Geometric display type (Space Grotesk) over quiet body type (Inter).
 - Flat at rest, gently lifted on hover — depth is earned, not constant.
@@ -111,30 +112,30 @@ Density is moderate and calm — generous 24px card padding, comfortable type, n
 
 ## Colors
 
-The palette is a nocturnal prestige scheme: three deep navy grounds, a metallic gold accent, and a fresh lagoon teal that adds life without competing with gold.
+The palette is a nocturnal prestige scheme: three near-black grounds, a luminous champagne gold accent, and a fresh lagoon teal that adds life without competing with gold.
 
 ### Primary
-- **Gilded Gold** (#D4AF37): The action voice. Used for primary buttons, the active nav state, progress bars, focus outlines, and the brand mark. On hover it brightens to Gilded Bright (#F0D060). Gold is warm against the navy and reads as "do this / you're progressing."
-- **Gilded Bright** (#F0D060): Hover/lit state of Gilded Gold — a brighter, more energetic gold for interactive lift.
+- **Champagne Gold** (#E6CB80): The action voice. Used for primary buttons, the active nav state, progress bars, focus outlines, and the brand mark. On hover it brightens to Champagne Bright (#F5E2A9). Gold carries the light against the near-black and reads as "do this / you're progressing."
+- **Champagne Bright** (#F5E2A9): Hover/lit state of Champagne Gold — a brighter, more luminous gold for interactive lift.
 
 ### Secondary
-- **Lagoon Teal** (#00C9B1): The guidance voice. Used for links, success/active status, and informational accents. Teal complements gold (complementary on the wheel) without competing — it signals "here's more / healthy state," while gold signals "act."
-- **Lagoon Tint** (rgba(0, 201, 177, 0.15)): Soft teal wash for badge backgrounds.
+- **Lagoon Teal** (#4FD8C6): The guidance voice. Used for links, success/active status, and informational accents. Teal complements gold (complementary on the wheel) without competing — it signals "here's more / healthy state," while gold signals "act."
+- **Lagoon Tint** (rgba(79, 216, 198, 0.12)): Soft teal wash for badge backgrounds.
 
 ### Neutral
-- **Midnight Navy** (#050B2E): The page ground — the night sky everything sits on.
-- **Midnight Deep** (#0A1445): Card surfaces, one step up from the ground.
-- **Midnight Lifted** (#111A5A): Elevated fills (thumbnails, placeholder bands).
-- **White** (#FFFFFF): Primary text on navy; headings.
-- **Muted** (#8A94B2): Secondary/tertiary text, placeholders, inactive labels.
-- **Border** (#1E2A5A): Hairline borders between layers and inside cards.
+- **Midnight Black** (#08080F): The page ground — the near-black stage everything sits on, echoing the AI robot.
+- **Midnight Deep** (#0D0D18): Card surfaces, one step up from the ground.
+- **Midnight Lifted** (#141423): Elevated fills (thumbnails, placeholder bands).
+- **White** (#FFFFFF): Primary text on black; headings.
+- **Muted** (#9AA3C0): Secondary/tertiary text, placeholders, inactive labels.
+- **Border** (#232330): Hairline borders between layers and inside cards.
 - **Red** (#FF6B6B): Errors and destructive actions.
 - **Green** (#4CAF50): Success states (with Lagoon for active/completed status where warmth suits).
 
 ### Named Rules
-**The Gold-Voice Rule.** Gold is the singular voice of action and progress — buttons, active nav, focus, progress. Everything else recedes to navy and muted. When two elements compete for gold, one must be demoted to teal or ghost.
+**The Gold-Voice Rule.** Gold is the singular voice of action and progress — buttons, active nav, focus, progress. Everything else recedes to black and muted. When two elements compete for gold, one must be demoted to teal or ghost.
 
-**The Night-Ground Rule.** Midnight Navy is the literal ground of every screen. No surface goes darker than the page; cards lift *up* from it in Midnight Deep, never darker.
+**The Night-Ground Rule.** Midnight Black is the literal ground of every screen. No surface goes darker than the page; cards lift *up* from it in Midnight Deep, never darker.
 
 ## Typography
 
@@ -147,7 +148,7 @@ The palette is a nocturnal prestige scheme: three deep navy grounds, a metallic 
 - **Display** (700, clamp(28px, 5vw, 44px), 1.2): Page-level headlines — the strongest statement on the screen.
 - **Headline** (700, clamp(22px, 4vw, 32px), 1.2): Section headings.
 - **Title** (700, clamp(18px, 3vw, 24px), 1.2): Card titles — course names, lesson titles.
-- **Body** (400, 15px, 1.65): Descriptive copy, set in Muted on navy for secondary emphasis.
+- **Body** (400, 15px, 1.65): Descriptive copy, set in Muted on black for secondary emphasis.
 - **Label** (600, 13px, 1.5): Form labels, small UI text, badges (which add uppercase + 0.5px letter-spacing at 11px).
 
 ### Named Rules
@@ -161,7 +162,7 @@ Spacing follows a strict 4-point rhythm: 4 / 8 / 16 / 24 / 32 / 48px. Card bodie
 
 ## Elevation & Depth
 
-The system is **layered, not shadow-driven.** Depth comes primarily from stacking navy surfaces (page → Midnight Deep cards → Midnight Lifted fills), with shadows used sparingly to signal interactivity. At rest, cards are flat — only a 1px Border hairline separates them from the page. On hover, a card lifts with a slight translateY and gains a soft shadow, making it feel tappable.
+The system is **layered, not shadow-driven.** Depth comes primarily from stacking near-black surfaces (page → Midnight Deep cards → Midnight Lifted fills), with shadows used sparingly to signal interactivity. At rest, cards are flat — only a 1px Border hairline separates them from the page. On hover, a card lifts with a slight translateY and gains a soft shadow, making it feel tappable.
 
 ### Shadow Vocabulary
 - **Ambient** (`0 2px 8px rgba(0,0,0,0.2)`): Small lift, minor interactive elements.
@@ -179,7 +180,7 @@ The form language is **softly rounded, approachable.** Cards and large surfaces 
 
 ### Buttons
 - **Shape:** Rounded (10px); small buttons at 12px, standard at 14px, large at 16px, full-width via `--block`.
-- **Primary (Gilded Gold):** Gold fill, Midnight Navy text, 8px × 24px padding. Hover brightens to Gilded Bright. This is the default CTA for enroll, continue, submit.
+- **Primary (Champagne Gold):** Gold fill, Midnight Black text, 8px × 24px padding. Hover brightens to Champagne Bright. This is the default CTA for enroll, continue, submit.
 - **Secondary (Outlined Gold):** Transparent fill, Gold border + text; hover washes in Gold Tint. Used for career filters and paired secondary actions.
 - **Ghost (Outlined Border):** Transparent, Muted text, Border hairline; hover borders gold. Low-emphasis tertiary actions.
 - **Danger / Success:** Red / Green fills for destructive and positive confirmations.
@@ -191,19 +192,19 @@ The form language is **softly rounded, approachable.** Cards and large surfaces 
 
 ### Cards / Containers
 - **Corner Style:** Rounded (14px).
-- **Background:** Midnight Deep (#0A1445) over the Midnight Navy page.
+- **Background:** Midnight Deep (#0D0D18) over the Midnight Black page.
 - **Shadow Strategy:** Flat at rest (see The Lift-on-Hover Rule); 1px Border hairline always separates surface from page.
 - **Internal Padding:** 24px body.
 
 ### Inputs / Fields
-- **Style:** Midnight Navy fill, 1px Border hairline, 10px radius, 8px × 16px padding, white text.
+- **Style:** Midnight Black fill, 1px Border hairline, 10px radius, 8px × 16px padding, white text.
 - **Focus:** Border shifts to Gilded Gold with a 3px Gold Tint ring (`0 0 0 3px`).
 - **Error / Disabled:** Field errors in Red below the field; disabled at 60% opacity.
 
 ### Navigation
 - **Style:** Sticky bar with 10px backdrop blur, 1px bottom Border, 16px × 32px padding.
 - **Logo:** Brand mark in Gilded Gold (Space Grotesk 700, 18px) with a white wordmark; a text placeholder stands in for the real logo today.
-- **Links:** Pill buttons (4px × 16px), Muted text, Border hairline; hover + focus border and text shift to Gold; active state fills Gold with Midnight Navy text.
+- **Links:** Pill buttons (4px × 16px), Muted text, Border hairline; hover + focus border and text shift to Gold; active state fills Gold with Midnight Black text.
 - **Mobile:** Padding tightens to 16px; the primary action ("Sign In"/"Sign Up") stays visible.
 
 ### Progress Bar
@@ -223,7 +224,7 @@ The form language is **softly rounded, approachable.** Cards and large surfaces 
 - **Do** keep one shared component grammar across courses, course-detail, and dashboard.
 
 ### Don't:
-- **Don't** add a surface darker than Midnight Navy — the page is the ground.
+- **Don't** add a surface darker than Midnight Black — the page is the ground.
 - **Don't** render primary buttons in teal or secondary buttons in gold; roles stay fixed.
 - **Don't** invent a logo — the styled-text placeholder stands in until a real logo is supplied.
 - **Don't** introduce a new radius outside the 6/10/14/18/pill family.

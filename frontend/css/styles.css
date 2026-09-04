@@ -9,17 +9,17 @@
 /* CSS Custom Properties — Design Tokens */
 :root {
   /* Core colors */
-  --navy: #050B2E;
-  --navy2: #0A1445;
-  --navy3: #111A5A;
-  --gold: #D4AF37;
-  --gold2: #F0D060;
-  --gold3: rgba(212, 175, 55, 0.15);
-  --teal: #00C9B1;
-  --teal2: rgba(0, 201, 177, 0.15);
+  --navy: #08080F;
+  --navy2: #0D0D18;
+  --navy3: #141423;
+  --gold: #E6CB80;
+  --gold2: #F5E2A9;
+  --gold3: rgba(230, 203, 128, 0.13);
+  --teal: #4FD8C6;
+  --teal2: rgba(79, 216, 198, 0.12);
   --white: #FFFFFF;
-  --muted: #8A94B2;
-  --border: #1E2A5A;
+  --muted: #9AA3C0;
+  --border: #232330;
   --red: #FF6B6B;
   --green: #4CAF50;
 
@@ -141,7 +141,7 @@ a:hover {
   justify-content: space-between;
   padding: var(--space-md) var(--space-xl);
   border-bottom: 1px solid var(--border);
-  background: rgba(5, 11, 46, 0.97);
+  background: rgba(8, 8, 15, 0.97);
   position: sticky;
   top: 0;
   z-index: var(--z-nav);
@@ -480,7 +480,7 @@ a:hover {
 }
 
 .card__badge--completed {
-  background: rgba(0, 201, 177, 0.15);
+  background: rgba(79, 216, 198, 0.12);
   color: var(--teal);
   border: 1px solid var(--teal);
 }
@@ -635,13 +635,13 @@ a:hover {
 }
 
 .alert--warning {
-  background: rgba(212, 175, 55, 0.15);
+  background: rgba(230, 203, 128, 0.13);
   border: 1px solid var(--gold);
   color: var(--gold);
 }
 
 .alert--info {
-  background: rgba(0, 201, 177, 0.15);
+  background: rgba(79, 216, 198, 0.12);
   border: 1px solid var(--teal);
   color: var(--teal);
 }
@@ -1870,7 +1870,7 @@ a:hover {
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  background: linear-gradient(135deg, var(--gold3), rgba(0, 201, 177, 0.15));
+  background: linear-gradient(135deg, var(--gold3), rgba(79, 216, 198, 0.12));
   border: 1px solid var(--gold);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
@@ -2108,7 +2108,7 @@ a:hover {
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  background: linear-gradient(135deg, var(--gold3), rgba(0, 201, 177, 0.15));
+  background: linear-gradient(135deg, var(--gold3), rgba(79, 216, 198, 0.12));
   border: 1px solid var(--gold);
   border-radius: var(--radius-pill);
 }

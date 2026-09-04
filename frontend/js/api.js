@@ -91,9 +91,15 @@ async function apiFetch(endpoint, options = {}) {
 
     // Handle non-OK responses
     if (!response.ok) {
-      const error = new Error(data?.message || data?.detail || 'Request failed');
+      // The backend wraps errors as { success: false, error: { code, message, details } }.
+      // Prefer the nested error.message (the real shape), but keep the flat
+      // data?.message / data?.detail as fallbacks for any unwrapped responses.
+      const error = new Error(
+        data?.error?.message || data?.message || data?.detail || 'Request failed'
+      );
       error.status = response.status;
       error.data = data;
+      error.details = data?.error?.details || null;
       throw error;
     }
 
@@ -457,12 +463,14 @@ export function formatApiError(error) {
     return 'Your session has expired. Please log in again.';
   }
 
-  // DRF validation errors: { field: ['message'], non_field_errors: ['message'] }
-  if (error.data && typeof error.data === 'object') {
+  // Field-level validation errors. apiFetch sets error.details to the backend's
+  // nested { field: ['message'] } dict (data.error.details) — iterate that, not
+  // error.data, which is the full { success, error } envelope.
+  if (error.details && typeof error.details === 'object') {
     const messages = [];
 
     // Field-specific errors
-    for (const [field, fieldErrors] of Object.entries(error.data)) {
+    for (const [field, fieldErrors] of Object.entries(error.details)) {
       if (Array.isArray(fieldErrors)) {
         fieldErrors.forEach(msg => {
           const fieldName = field === 'non_field_errors' ? '' : `${field}: `;
@@ -479,12 +487,9 @@ export function formatApiError(error) {
     }
   }
 
-  // Generic error message from server
-  if (error.data?.message) {
-    return error.data.message;
-  }
-  if (error.data?.detail) {
-    return error.data.detail;
+  // Generic error message from the nested envelope
+  if (error.data?.error?.message) {
+    return error.data.error.message;
   }
   if (error.message) {
     return error.message;

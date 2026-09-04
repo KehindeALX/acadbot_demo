@@ -118,10 +118,12 @@ async function handleSubmit(event) {
       showFormError(data.message || 'Login failed. Please try again.');
     }
   } catch (err) {
-    if (err.status === 400 || isAuthError(err)) {
-      // Bad credentials — show a clear, consistent message
-      showFormError('Invalid email or password.');
+    if (isAuthError(err)) {
+      showFormError('Your session has expired. Please log in again.');
     } else {
+      // Bad credentials, disabled account, etc. — surface the real backend
+      // message. UserLoginSerializer already returns "Invalid email or password."
+      // on bad credentials, so formatApiError surfaces it correctly.
       showFormError(formatApiError(err));
     }
   } finally {

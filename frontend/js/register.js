@@ -134,9 +134,11 @@ async function handleSubmit(event) {
   } catch (err) {
     const message = formatApiError(err);
 
-    // Handle field-specific validation errors from DRF
-    if (err.status === 400 && err.data) {
-      handleValidationErrors(err.data);
+    // Handle field-specific validation errors from DRF.
+    // err.details holds the backend's nested { field: ['msg'] } dict; fall back
+    // to an empty object so nothing silently no-ops against the envelope shape.
+    if (err.status === 400 && err.details) {
+      handleValidationErrors(err.details);
     } else if (isAuthError(err) || err.status === 400) {
       showFormError(message);
     } else {
