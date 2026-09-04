@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — MSA AcadBot</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="courses.html" class="navbar__logo">
+      <span class="navbar__logo-text">MSA <span>AcadBot</span></span>
+      <!-- Swap for real logo: <img class="navbar__logo-img" src="assets/logo.svg" alt="MSA AcadBot"/> -->
+    </a>
+    <div class="navbar__nav">
+      <a href="courses.html" class="navbar__link">Courses</a>
+      <a href="acadbot.html" class="navbar__link">Ask AcadBot</a>
+      <a href="msa-guide.html" class="navbar__link">MSA Guide</a>
+      <a href="login.html" class="navbar__link">Sign In</a>
+    </div>
+  </nav>
+
+  <main class="auth-main">
+    <div class="auth-card">
+      <div class="auth-card__logo">
+        <a href="courses.html" class="navbar__logo">
+          <span class="navbar__logo-text">MSA <span>AcadBot</span></span>
+        </a>
+      </div>
+      <h1 class="auth-card__title">Create Your Account</h1>
+      <p class="auth-card__subtitle">Join 3,200+ learners on their career journey</p>
+
+      <form id="registerForm" class="auth-card__form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name" class="form-label">First Name</label>
+            <input
+              type="text"
+              id="first_name"
+              name="first_name"
+              class="form-input"
+              placeholder="John"
+              autocomplete="given-name"
+              aria-describedby="firstNameError"
+            />
+            <div id="firstNameError" class="form-error" role="alert"></div>
+          </div>
+          <div class="form-group">
+            <label for="last_name" class="form-label">Last Name</label>
+            <input
+              type="text"
+              id="last_name"
+              name="last_name"
+              class="form-input"
+              placeholder="Doe"
+              autocomplete="family-name"
+              aria-describedby="lastNameError"
+            />
+            <div id="lastNameError" class="form-error" role="alert"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="form-label">Email</label>
+          <div class="input-wrapper">
+            <span class="input-wrapper__icon">📧</span>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+              aria-describedby="emailError"
+            />
+          </div>
+          <div id="emailError" class="form-error" role="alert"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="username" class="form-label">Username</label>
+          <div class="input-wrapper">
+            <span class="input-wrapper__icon">👤</span>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              class="form-input"
+              placeholder="johndoe"
+              autocomplete="username"
+              required
+              minlength="3"
+              maxlength="30"
+              pattern="[a-zA-Z0-9_]+"
+              aria-describedby="usernameError"
+            />
+          </div>
+          <div id="usernameError" class="form-error" role="alert"></div>
+          <p class="form-help">3-30 characters. Letters, numbers, and underscores only.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="phone" class="form-label">Phone (Optional)</label>
+          <div class="input-wrapper">
+            <span class="input-wrapper__icon">📱</span>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              class="form-input"
+              placeholder="+234 800 000 0000"
+              autocomplete="tel"
+              aria-describedby="phoneError"
+            />
+          </div>
+          <div id="phoneError" class="form-error" role="alert"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-wrapper">
+            <span class="input-wrapper__icon">🔒</span>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-input"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              required
+              minlength="8"
+              aria-describedby="passwordError"
+            />
+          </div>
+          <div id="passwordError" class="form-error" role="alert"></div>
+          <p class="form-help">At least 8 characters.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="password_confirm" class="form-label">Confirm Password</label>
+          <div class="input-wrapper">
+            <span class="input-wrapper__icon">🔒</span>
+            <input
+              type="password"
+              id="password_confirm"
+              name="password_confirm"
+              class="form-input"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              required
+              aria-describedby="passwordConfirmError"
+            />
+          </div>
+          <div id="passwordConfirmError" class="form-error" role="alert"></div>
+        </div>
+
+        <div id="formError" class="alert alert--error hidden" role="alert">
+          <span class="alert__icon">⚠</span>
+          <div class="alert__content">
+            <div class="alert__message" id="formErrorMessage"></div>
+          </div>
+          <button type="button" class="alert__dismiss" aria-label="Dismiss error">✕</button>
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--block btn--lg" id="submitBtn">
+          <span class="btn__text">Create Account</span>
+          <span class="btn__loading hidden">Creating account...</span>
+        </button>
+      </form>
+
+      <div class="auth-card__footer">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast container for notifications -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="js/register.js"></script>
+</body>
+</html>

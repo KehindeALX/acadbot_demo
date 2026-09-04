@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Course Detail — MSA AcadBot</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="courses.html" class="navbar__logo">
+      <span class="navbar__logo-text">MSA <span>AcadBot</span></span>
+      <!-- Swap for real logo: <img class="navbar__logo-img" src="assets/logo.svg" alt="MSA AcadBot"/> -->
+    </a>
+    <div class="navbar__nav">
+      <a href="courses.html" class="navbar__link">Courses</a>
+      <a href="acadbot.html" class="navbar__link">Ask AcadBot</a>
+      <a href="msa-guide.html" class="navbar__link">MSA Guide</a>
+      <div id="authNav">
+        <!-- Authenticated nav will be injected here -->
+      </div>
+    </div>
+  </nav>
+
+  <main class="page__main">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol class="breadcrumb__list">
+        <li class="breadcrumb__item"><a class="breadcrumb__link" href="courses.html">Courses</a></li>
+        <li class="breadcrumb__item"><span id="careerBreadcrumb" class="breadcrumb__link breadcrumb__link--career"></span></li>
+        <li class="breadcrumb__item"><span id="courseBreadcrumb" class="breadcrumb__current" aria-current="page"></span></li>
+      </ol>
+    </nav>
+
+    <!-- Course Header -->
+    <header class="page__section" id="courseHeader">
+      <div class="course-detail__badges">
+        <span id="courseCareerBadge" class="card__badge card__badge--published">Career</span>
+        <span id="courseModuleBadge" class="card__badge card__badge--draft">Module 1</span>
+      </div>
+      <h1 id="courseTitle" class="page__title course-detail__title"></h1>
+      <p id="courseDescription" class="page__subtitle course-detail__description"></p>
+      <div class="course-detail__meta">
+        <span id="courseLessonsMeta">📖 <span>0</span> lessons</span>
+        <span id="courseDurationMeta">⏱ <span>0</span> min total</span>
+        <span id="courseUpdatedMeta">📅 Updated <span></span></span>
+      </div>
+    </header>
+
+    <!-- Enrollment Action -->
+    <section class="page__section enrollment-panel" id="enrollmentSection">
+      <div class="enrollment-panel__inner">
+        <div>
+          <div id="enrollmentStatus" class="enrollment-panel__status">Not enrolled</div>
+          <div id="enrollmentProgress" class="hidden">
+            <div class="progress progress--sm">
+              <div class="progress__bar" id="progressBar"></div>
+            </div>
+            <div id="progressText" class="enrollment-panel__progress">0% complete</div>
+          </div>
+        </div>
+        <div class="enrollment-panel__actions">
+          <button id="enrollBtn" class="btn btn--primary btn--lg hidden">Enroll Now</button>
+          <button id="continueBtn" class="btn btn--success btn--lg hidden">Continue Learning</button>
+          <a id="loginPromptBtn" href="login.html" class="btn btn--secondary btn--lg hidden">Sign in to Enroll</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lessons List -->
+    <section class="page__section" aria-label="Course lessons">
+      <h2 class="section-title">Course Content</h2>
+
+      <div id="lessonsLoading" class="loading">
+        <div class="loading__spinner"></div>
+        <span>Loading lessons...</span>
+      </div>
+
+      <div id="lessonsList" class="hidden">
+        <!-- Lessons injected here -->
+      </div>
+
+      <div id="lessonsEmpty" class="empty-state hidden">
+        <div class="empty-state__icon">📝</div>
+        <h3 class="empty-state__title">No Lessons Yet</h3>
+        <p class="empty-state__message">This course doesn't have any lessons published yet. Check back soon!</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Lesson Viewer Modal (reused from index.html design) -->
+  <div id="lessonOverlay" class="lesson-overlay" role="dialog" aria-modal="true" aria-labelledby="lessonTitle" aria-hidden="true">
+    <div class="lesson-box">
+      <div class="lesson-head">
+        <div>
+          <h3 id="lessonTitle">Lesson</h3>
+          <p id="lessonMeta">Module 1 · MSA Course</p>
+        </div>
+        <button class="lesson-close" id="lessonCloseBtn" aria-label="Close lesson">✕</button>
+      </div>
+      <div class="lesson-body">
+        <div class="lesson-progress" id="lessonProgress"></div>
+        <div id="lessonSteps"></div>
+      </div>
+      <div class="lesson-nav" id="lessonNav">
+        <button class="lesson-btn" id="lessonPrevBtn" aria-label="Previous step">← Back</button>
+        <button class="lesson-btn primary" id="lessonNextBtn" aria-label="Next step">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/course-detail.js"></script>
+</body>
+</html>

@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MSA AcadBot — Your AI-Powered Career Guide</title>
+  <meta name="description" content="More Success Academy's AI-assisted learning platform. Explore career paths, enroll in courses, and get personalized guidance from Abia, your AI career guide.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       RESET & TOKENS
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --midnight: #050B2E;
+      --midnight-deep: #0A1445;
+      --midnight-lifted: #111A5A;
+      --gilded: #D4AF37;
+      --gilded-bright: #F0D060;
+      --gilded-tint: rgba(212, 175, 55, 0.12);
+      --lagoon: #00C9B1;
+      --lagoon-tint: rgba(0, 201, 177, 0.10);
+      --white: #FFFFFF;
+      --muted: #8A94B2;
+      --border: #1E2A5A;
+      --surface: #0D1640;
+      --font-display: 'Space Grotesk', system-ui, sans-serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+      --space-4xl: 96px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--midnight);
+      color: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================================
+       NAVBAR
+       ============================================================ */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-xl);
+      background: rgba(5, 11, 46, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(30, 42, 90, 0.5);
+    }
+
+    .navbar__brand {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .navbar__brand span {
+      color: var(--gilded);
+    }
+
+    .navbar__links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+
+    .navbar__link {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .navbar__link:hover {
+      color: var(--white);
+    }
+
+    .navbar__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 10px 20px;
+      background: var(--gilded);
+      color: var(--midnight);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .navbar__cta:hover {
+      background: var(--gilded-bright);
+      transform: translateY(-1px);
+    }
+
+    .navbar__mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--white);
+      cursor: pointer;
+      padding: var(--space-sm);
+    }
+
+    /* ============================================================
+       HERO
+       ============================================================ */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero__spotlight {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s;
+      opacity: 0;
+      z-index: 1;
+    }
+
+    .hero:hover .hero__spotlight {
+      opacity: 1;
+    }
+
+    .hero__glow {
+      position: absolute;
+      top: -200px;
+      left: -100px;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.06) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero__container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 120px var(--space-xl) var(--space-3xl);
+      gap: var(--space-3xl);
+    }
+
+    .hero__content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 6px 14px;
+      background: var(--gilded-tint);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gilded);
+      margin-bottom: var(--space-lg);
+    }
+
+    .hero__badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gilded);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero__title {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5.5vw, 64px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      margin-bottom: var(--space-lg);
+    }
+
+    .hero__title-accent {
+      color: var(--gilded);
+    }
+
+    .hero__subtitle {
+      font-size: clamp(16px, 2vw, 19px);
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .hero__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .hero__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 14px 28px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 15px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .hero__btn--primary {
+      background: var(--gilded);
+      color: var(--midnight);
+    }
+
+    .hero__btn--primary:hover {
+      background: var(--gilded-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(212, 175, 55, 0.25);
+    }
+
+    .hero__btn--ghost {
+      background: transparent;
+      color: var(--white);
+      border: 1px solid var(--border);
+    }
+
+    .hero__btn--ghost:hover {
+      border-color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .hero__3d {
+      flex: 1;
+      position: relative;
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero__3d-canvas {
+      width: 100%;
+      height: 420px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .hero__3d-canvas canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .hero__3d-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .hero__3d-fallback::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .hero__3d-fallback::after {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 201, 177, 0.1) 0%, transparent 70%);
+      animation: float 8s ease-in-out infinite reverse;
+      top: 30%;
+      left: 20%;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -20px) scale(1.05); }
+      66% { transform: translate(-20px, 15px) scale(0.95); }
+    }
+
+    .hero__3d-compass {
+      position: relative;
+      z-index: 1;
+      width: 120px;
+      height: 120px;
+      animation: spin-slow 20s linear infinite;
+    }
+
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .hero__3d-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid;
+      animation: orbit 12s linear infinite;
+    }
+
+    .hero__3d-ring--1 {
+      width: 280px;
+      height: 280px;
+      border-color: rgba(212, 175, 55, 0.15);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotateX(60deg);
+    }
+
+    .hero__3d-ring--2 {
+      width: 220px;
+      height: 220px;
+      border-color: rgba(0, 201, 177, 0.12);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotateX(60deg) rotateZ(45deg);
+      animation-duration: 16s;
+      animation-direction: reverse;
+    }
+
+    .hero__3d-ring--3 {
+      width: 340px;
+      height: 340px;
+      border-color: rgba(212, 175, 55, 0.08);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotateX(75deg) rotateZ(20deg);
+      animation-duration: 24s;
+    }
+
+    @keyframes orbit {
+      from { transform: translate(-50%, -50%) rotateX(60deg) rotateZ(0deg); }
+      to { transform: translate(-50%, -50%) rotateX(60deg) rotateZ(360deg); }
+    }
+
+    /* ============================================================
+       FEATURES
+       ============================================================ */
+    .features {
+      position: relative;
+      padding: var(--space-4xl) var(--space-xl);
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .features__header {
+      text-align: center;
+      margin-bottom: var(--space-3xl);
+    }
+
+    .features__title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-md);
+    }
+
+    .features__subtitle {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .features__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .feature-card {
+      position: relative;
+      padding: var(--space-xl);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      text-decoration: none;
+      color: var(--white);
+      transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gilded), transparent);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(212, 175, 55, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-card__icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .feature-card__icon--gold {
+      background: var(--gilded-tint);
+      color: var(--gilded);
+    }
+
+    .feature-card__icon--teal {
+      background: var(--lagoon-tint);
+      color: var(--lagoon);
+    }
+
+    .feature-card__icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .feature-card__title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      letter-spacing: -0.01em;
+    }
+
+    .feature-card__desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .feature-card__arrow {
+      position: absolute;
+      bottom: var(--space-xl);
+      right: var(--space-xl);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+
+    .feature-card:hover .feature-card__arrow {
+      background: var(--gilded-tint);
+      color: var(--gilded);
+      transform: translateX(4px);
+    }
+
+    /* ============================================================
+       STATS
+       ============================================================ */
+    .stats {
+      padding: var(--space-3xl) var(--space-xl);
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .stats__grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-lg);
+      padding: var(--space-2xl);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat__value {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.5vw, 40px);
+      font-weight: 700;
+      color: var(--gilded);
+      letter-spacing: -0.02em;
+    }
+
+    .stat__label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: var(--space-xs);
+    }
+
+    /* ============================================================
+       CTA
+       ============================================================ */
+    .cta {
+      padding: var(--space-4xl) var(--space-xl);
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .cta__inner {
+      position: relative;
+      padding: var(--space-3xl) var(--space-2xl);
+      background: linear-gradient(135deg, var(--midnight-deep), var(--midnight-lifted));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .cta__inner::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta__title {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-md);
+      position: relative;
+    }
+
+    .cta__subtitle {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto var(--space-xl);
+      position: relative;
+    }
+
+    .cta__actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      position: relative;
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer {
+      padding: var(--space-2xl) var(--space-xl);
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .footer__text {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .footer__text a {
+      color: var(--gilded);
+      text-decoration: none;
+    }
+
+    .footer__text a:hover {
+      text-decoration: underline;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 900px) {
+      .hero__container {
+        flex-direction: column;
+        text-align: center;
+        padding-top: 100px;
+      }
+
+      .hero__subtitle {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero__actions {
+        justify-content: center;
+      }
+
+      .hero__3d {
+        width: 100%;
+        min-height: 300px;
+      }
+
+      .hero__3d-canvas {
+        height: 300px;
+      }
+
+      .stats__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .navbar__links {
+        display: none;
+      }
+
+      .navbar__mobile-toggle {
+        display: block;
+      }
+
+      .navbar__links--open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(5, 11, 46, 0.98);
+        backdrop-filter: blur(20px);
+        padding: var(--space-lg);
+        border-bottom: 1px solid var(--border);
+        gap: var(--space-md);
+      }
+
+      .features__grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats__grid {
+        grid-template-columns: 1fr 1fr;
+        padding: var(--space-lg);
+      }
+
+      .cta__inner {
+        padding: var(--space-2xl) var(--space-lg);
+      }
+
+      .cta__actions {
+        flex-direction: column;
+      }
+
+      .hero__3d-ring--1 { width: 200px; height: 200px; }
+      .hero__3d-ring--2 { width: 160px; height: 160px; }
+      .hero__3d-ring--3 { width: 240px; height: 240px; }
+    }
+
+    /* ============================================================
+       SELECTION & SCROLLBAR
+       ============================================================ */
+    ::selection {
+      background: rgba(212, 175, 55, 0.3);
+      color: var(--white);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--midnight);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--midnight-lifted);
+    }
+
+    /* ============================================================
+       LOADING STATE
+       ============================================================ */
+    .hero__3d-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      z-index: 2;
+      transition: opacity 0.5s;
+    }
+
+    .hero__3d-loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .hero__3d-spinner {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--border);
+      border-top-color: var(--gilded);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hero__3d-loading-text {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ============================================================
+       ENTRANCE ANIMATIONS
+       ============================================================ */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .fade-up--d1 { animation-delay: 0.1s; }
+    .fade-up--d2 { animation-delay: 0.2s; }
+    .fade-up--d3 { animation-delay: 0.35s; }
+    .fade-up--d4 { animation-delay: 0.5s; }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .feature-card {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .feature-card.visible {
+      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       NAVBAR
+       ============================================================ -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="navbar__brand">MSA<span>AcadBot</span></a>
+
+    <button class="navbar__mobile-toggle" aria-label="Toggle navigation menu" onclick="document.querySelector('.navbar__links').classList.toggle('navbar__links--open')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+
+    <ul class="navbar__links">
+      <li><a href="courses.html" class="navbar__link">Courses</a></li>
+      <li><a href="msa-guide.html" class="navbar__link">MSA Guide</a></li>
+      <li><a href="acadbot.html" class="navbar__link">Ask AcadBot</a></li>
+      <li><a href="login.html" class="navbar__cta">Sign In</a></li>
+    </ul>
+  </nav>
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <section class="hero" id="hero">
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="hero__spotlight" id="spotlight" aria-hidden="true"></div>
+
+    <div class="hero__container">
+      <div class="hero__content">
+        <div class="hero__badge fade-up">
+          <span class="hero__badge-dot" aria-hidden="true"></span>
+          AI-Powered Learning
+        </div>
+
+        <h1 class="hero__title fade-up fade-up--d1">
+          Your career starts<br>with the right <span class="hero__title-accent">guide</span>
+        </h1>
+
+        <p class="hero__subtitle fade-up fade-up--d2">
+          Explore 8 career paths, enroll in structured courses, and get personalized guidance from Abia — your AI career guide at More Success Academy.
+        </p>
+
+        <div class="hero__actions fade-up fade-up--d3">
+          <a href="register.html" class="hero__btn hero__btn--primary">
+            Get Started
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <a href="courses.html" class="hero__btn hero__btn--ghost">
+            Browse Courses
+          </a>
+        </div>
+      </div>
+
+      <div class="hero__3d fade-up fade-up--d4">
+        <div class="hero__3d-fallback" id="scene3d">
+          <!-- Orbiting rings -->
+          <div class="hero__3d-ring hero__3d-ring--1" aria-hidden="true"></div>
+          <div class="hero__3d-ring hero__3d-ring--2" aria-hidden="true"></div>
+          <div class="hero__3d-ring hero__3d-ring--3" aria-hidden="true"></div>
+          <!-- Compass icon -->
+          <svg class="hero__3d-compass" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+            <circle cx="60" cy="60" r="56" stroke="rgba(212,175,55,0.3)" stroke-width="1.5"/>
+            <circle cx="60" cy="60" r="44" stroke="rgba(212,175,55,0.15)" stroke-width="1"/>
+            <circle cx="60" cy="60" r="4" fill="#D4AF37"/>
+            <path d="M60 16 L64 56 L60 60 L56 56 Z" fill="#D4AF37" opacity="0.9"/>
+            <path d="M60 104 L56 64 L60 60 L64 64 Z" fill="#8A94B2" opacity="0.6"/>
+            <path d="M16 60 L56 56 L60 60 L56 64 Z" fill="#8A94B2" opacity="0.4"/>
+            <path d="M104 60 L64 64 L60 60 L64 56 Z" fill="#D4AF37" opacity="0.5"/>
+            <text x="60" y="12" text-anchor="middle" fill="#D4AF37" font-size="8" font-family="Space Grotesk, sans-serif" font-weight="600">N</text>
+            <text x="60" y="116" text-anchor="middle" fill="#8A94B2" font-size="8" font-family="Space Grotesk, sans-serif">S</text>
+            <text x="8" y="63" text-anchor="middle" fill="#8A94B2" font-size="8" font-family="Space Grotesk, sans-serif">W</text>
+            <text x="112" y="63" text-anchor="middle" fill="#D4AF37" font-size="8" font-family="Space Grotesk, sans-serif">E</text>
+          </svg>
+        </div>
+        <!-- Spline canvas (loaded dynamically) -->
+        <div class="hero__3d-canvas" id="splineContainer" style="display:none;"></div>
+        <div class="hero__3d-loading" id="splineLoading">
+          <div class="hero__3d-spinner"></div>
+          <span class="hero__3d-loading-text">Loading 3D scene...</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FEATURES
+       ============================================================ -->
+  <section class="features" id="features">
+    <div class="features__header">
+      <h2 class="features__title">Everything you need to launch your career</h2>
+      <p class="features__subtitle">From exploring career paths to landing your first role — AcadBot guides you every step of the way.</p>
+    </div>
+
+    <div class="features__grid">
+      <a href="msa-guide.html" class="feature-card" data-reveal>
+        <div class="feature-card__icon feature-card__icon--gold">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        </div>
+        <h3 class="feature-card__title">MSA AI Guide</h3>
+        <p class="feature-card__desc">Chat with Abia to explore career paths, build a personalized roadmap, assess your skills, and prep for interviews.</p>
+        <span class="feature-card__arrow" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </span>
+      </a>
+
+      <a href="courses.html" class="feature-card" data-reveal>
+        <div class="feature-card__icon feature-card__icon--teal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>
+        </div>
+        <h3 class="feature-card__title">Structured Courses</h3>
+        <p class="feature-card__desc">8 career paths with curated courses, lessons, and quizzes — built by mentors who know what employers want.</p>
+        <span class="feature-card__arrow" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </span>
+      </a>
+
+      <a href="acadbot.html" class="feature-card" data-reveal>
+        <div class="feature-card__icon feature-card__icon--gold">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+        </div>
+        <h3 class="feature-card__title">Ask AcadBot</h3>
+        <p class="feature-card__desc">Got questions about your learning journey? AcadBot is your AI assistant — always available, never judges.</p>
+        <span class="feature-card__arrow" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </span>
+      </a>
+
+      <a href="dashboard.html" class="feature-card" data-reveal>
+        <div class="feature-card__icon feature-card__icon--teal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <h3 class="feature-card__title">Your Dashboard</h3>
+        <p class="feature-card__desc">Track enrolled courses, monitor progress, and see how far you've come — all in one place.</p>
+        <span class="feature-card__arrow" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       STATS
+       ============================================================ -->
+  <section class="stats">
+    <div class="stats__grid">
+      <div class="stat">
+        <div class="stat__value">8</div>
+        <div class="stat__label">Career Paths</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value">50+</div>
+        <div class="stat__label">Courses</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value">200+</div>
+        <div class="stat__label">Lessons</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value">1:1</div>
+        <div class="stat__label">AI Mentorship</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CTA
+       ============================================================ -->
+  <section class="cta">
+    <div class="cta__inner">
+      <h2 class="cta__title">Ready to start your career journey?</h2>
+      <p class="cta__subtitle">Join More Success Academy and get personalized AI guidance from day one.</p>
+      <div class="cta__actions">
+        <a href="register.html" class="hero__btn hero__btn--primary">
+          Create Free Account
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+        <a href="courses.html" class="hero__btn hero__btn--ghost">Explore Courses</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    <p class="footer__text">
+      Built for <a href="https://www.moresuccessacademy.com" target="_blank" rel="noopener">More Success Academy</a> &middot; MSA AcadBot &copy; 2025
+    </p>
+  </footer>
+
+  <!-- ============================================================
+       SCRIPTS
+       ============================================================ -->
+  <script>
+    // ============================================================
+    // Spotlight effect (vanilla JS — from 21st.dev Splite component)
+    // ============================================================
+    (function() {
+      const hero = document.getElementById('hero');
+      const spotlight = document.getElementById('spotlight');
+      if (!hero || !spotlight) return;
+
+      hero.addEventListener('mousemove', function(e) {
+        const rect = hero.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        spotlight.style.left = x + 'px';
+        spotlight.style.top = y + 'px';
+      });
+    })();
+
+    // ============================================================
+    // Scroll reveal for feature cards
+    // ============================================================
+    (function() {
+      const cards = document.querySelectorAll('[data-reveal]');
+      if (!cards.length) return;
+
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+      cards.forEach(function(card) { observer.observe(card); });
+    })();
+
+  </script>
+
+  <!-- ============================================================
+       Spline 3D robot scene (lazy-loaded)
+       @splinetool/runtime@1.9.82 exports the ESM `Application` class.
+       We import it as a module, mount it on a fresh canvas, and load
+       the .splinecode scene. If anything fails, the CSS compass
+       animation (#scene3d) remains as a graceful fallback.
+       ============================================================ -->
+  <script type="module">
+    import { Application } from 'https://unpkg.com/@splinetool/runtime@1.9.82/build/runtime.js';
+
+    (function() {
+      const container = document.getElementById('splineContainer');
+      const fallback = document.getElementById('scene3d');
+      const loading = document.getElementById('splineLoading');
+      if (!container || !fallback || !loading) return;
+
+      // Make the canvas transparent so the robot floats over the navy hero
+      const canvas = document.createElement('canvas');
+      container.appendChild(canvas);
+
+      let app;
+      try {
+        app = new Application(canvas);
+      } catch (e) {
+        // Runtime init failed — keep the CSS fallback
+        loading.classList.add('hidden');
+        return;
+      }
+
+      app.load('https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode')
+        .then(() => {
+          // Scene ready — swap the compass fallback for the live canvas
+          fallback.style.display = 'none';
+          container.style.display = 'block';
+          loading.classList.add('hidden');
+        })
+        .catch(() => {
+          // Scene load failed — keep the CSS fallback
+          loading.classList.add('hidden');
+          canvas.remove();
+        });
+    })();
+  </script>
+
+</body>
+</html>

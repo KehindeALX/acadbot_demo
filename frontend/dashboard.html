@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — MSA AcadBot</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="courses.html" class="navbar__logo">
+      <span class="navbar__logo-text">MSA <span>AcadBot</span></span>
+      <!-- Swap for real logo: <img class="navbar__logo-img" src="assets/logo.svg" alt="MSA AcadBot"/> -->
+    </a>
+    <div class="navbar__nav">
+      <a href="courses.html" class="navbar__link">Courses</a>
+      <a href="acadbot.html" class="navbar__link">Ask AcadBot</a>
+      <a href="msa-guide.html" class="navbar__link">MSA Guide</a>
+      <div id="authNav">
+        <!-- Authenticated nav will be injected here -->
+      </div>
+    </div>
+  </nav>
+
+  <main class="page__main">
+    <header class="page__header">
+      <h1 class="page__title">My Dashboard</h1>
+      <p class="page__subtitle">Welcome back<span id="dashboardUserName"></span>. Track your enrollments and continue learning.</p>
+    </header>
+
+    <!-- Stats Overview -->
+    <section class="page__section" id="statsSection" aria-label="Enrollment statistics">
+      <div class="grid grid--3" id="statsGrid">
+        <!-- Stat cards injected here -->
+      </div>
+    </section>
+
+    <!-- Enrollments List -->
+    <section class="page__section" aria-label="Your enrolled courses">
+      <h2 class="section-title">My Courses</h2>
+
+      <div id="enrollmentsLoading" class="loading">
+        <div class="loading__spinner"></div>
+        <span>Loading your courses...</span>
+      </div>
+
+      <div id="enrollmentsList" class="hidden">
+        <!-- Enrollment cards injected here -->
+      </div>
+
+      <div id="emptyState" class="empty-state hidden">
+        <div class="empty-state__icon">🎓</div>
+        <h3 class="empty-state__title">No Courses Yet</h3>
+        <p class="empty-state__message">You haven't enrolled in any courses yet. Browse our catalog and start your learning journey today.</p>
+        <a href="courses.html" class="btn btn--primary empty-state__action">Browse Courses</a>
+      </div>
+    </section>
+
+    <!-- Pagination -->
+    <nav id="pagination" class="pagination hidden" aria-label="Enrollment pagination">
+      <!-- Pagination links injected here -->
+    </nav>
+  </main>
+
+  <!-- Toast container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
