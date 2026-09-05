@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Count, Avg, Sum, Q, F, ExpressionWrapper, DurationField
+from django.db.models import Count, Avg, Sum, Q, F, ExpressionWrapper, DurationField, OuterRef, Subquery
 from django.db.models.functions import TruncDate
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -62,10 +62,17 @@ class StudentDashboardViewSet(viewsets.GenericViewSet):
         in_progress_courses = enrollments.filter(completed_at__isnull=True)[:3]
         completed_courses = enrollments.filter(completed_at__isnull=False)[:3]
 
-        # Skill assessments
+        # Skill assessments - latest per career_skill. `.distinct('career_skill')`
+        # is Postgres-only (DISTINCT ON), so pick the latest row per skill with a
+        # correlated subquery that works identically on SQLite and Postgres.
+        latest_ids = SkillAssessment.objects.filter(
+            career_skill=OuterRef('career_skill'),
+            student=student,
+        ).order_by('-assessed_at').values('id')[:1]
+
         latest_assessments = SkillAssessment.objects.select_related('career_skill__career').filter(
             student=student
-        ).order_by('career_skill', '-assessed_at').distinct('career_skill')
+        ).filter(id__in=Subquery(latest_ids))
 
         assessed_skills = latest_assessments.exclude(assessed_level__isnull=True).count()
         avg_skill_level = latest_assessments.exclude(assessed_level__isnull=True).aggregate(
