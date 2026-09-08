@@ -605,6 +605,14 @@ a:hover {
   color: var(--muted);
   font-size: 18px;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.input-wrapper__icon svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 .input-wrapper .form-input {
   padding-left: 48px;
@@ -792,6 +800,13 @@ a:hover {
   flex-shrink: 0;
   font-size: 20px;
   margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.alert__icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .alert__content {
@@ -818,6 +833,14 @@ a:hover {
   opacity: 0.7;
   transition: opacity var(--transition-fast);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+.alert__dismiss svg {
+  width: 18px;
+  height: 18px;
 }
 .alert__dismiss:hover {
   opacity: 1;
@@ -873,13 +896,25 @@ a:hover {
 
 .auth-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   background: var(--navy2);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: var(--space-2xl);
+  padding: var(--space-2xl) var(--space-2xl) var(--space-xl);
   box-shadow: none;
   transition: transform var(--transition-base), box-shadow var(--transition-base);
+  position: relative;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+  opacity: 0.4;
 }
 
 .auth-card:hover {
@@ -889,7 +924,7 @@ a:hover {
 
 .auth-card__logo {
   text-align: center;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-lg);
 }
 
 .auth-card__logo .navbar__logo {
@@ -900,12 +935,14 @@ a:hover {
 .auth-card__title {
   text-align: center;
   margin-bottom: var(--space-xs);
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .auth-card__subtitle {
   text-align: center;
   color: var(--muted);
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-xl);
+  font-size: 14px;
 }
 
 .auth-card__form {
@@ -925,6 +962,12 @@ a:hover {
 
 .auth-card__footer a {
   font-weight: 600;
+  color: var(--gold);
+  transition: color var(--transition-fast);
+}
+
+.auth-card__footer a:hover {
+  color: var(--gold2);
 }
 
 /* ============================================================

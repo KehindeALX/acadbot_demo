@@ -16,12 +16,10 @@
  */
 
 import {
-  getMe,
   formatApiError,
-  isAuthError,
-  isNetworkError
 } from './api.js';
 import { askAcadBot } from './api.js';
+import { initNavbar } from './navbar.js';
 
 // ============================================================
 // DOM Elements
@@ -30,7 +28,6 @@ const chatWelcome = document.getElementById('chatWelcome');
 const chatThread = document.getElementById('chatThread');
 const chatInput = document.getElementById('chatInput');
 const chatSend = document.getElementById('chatSend');
-const authNav = document.getElementById('authNav');
 const toastContainer = document.getElementById('toastContainer');
 
 // ============================================================
@@ -48,58 +45,10 @@ const INPUT_MAX_HEIGHT = 150;
 // Init
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
-  await checkAuthState();
+  user = await initNavbar();
   setupEventListeners();
   focusInput();
 });
-
-// ============================================================
-// Auth State
-// ============================================================
-async function checkAuthState() {
-  try {
-    const data = await getMe();
-    if (data.success && data.data) {
-      user = data.data;
-      renderAuthNav();
-    }
-  } catch (err) {
-    if (isAuthError(err)) {
-      renderAuthNav(); // Not logged in — chat stays available
-    } else if (isNetworkError(err)) {
-      showToast('Unable to check login status', 'warning');
-    }
-  }
-}
-
-function renderAuthNav() {
-  if (user) {
-    const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username;
-    authNav.innerHTML = `
-      <span class="navbar__user-name">${displayName}</span>
-      <a href="dashboard.html" class="navbar__link">Dashboard</a>
-      <button id="logoutBtn" class="navbar__btn">Logout</button>
-    `;
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-  } else {
-    authNav.innerHTML = `
-      <a href="login.html" class="navbar__link navbar__btn">Sign In</a>
-      <a href="register.html" class="navbar__link navbar__btn">Sign Up</a>
-    `;
-  }
-}
-
-async function handleLogout() {
-  const { logout } = await import('./api.js');
-  try {
-    await logout();
-    user = null;
-    renderAuthNav();
-    showToast('Logged out successfully', 'success');
-  } catch (err) {
-    showToast('Logout failed', 'error');
-  }
-}
 
 // ============================================================
 // Composer (auto-resize)

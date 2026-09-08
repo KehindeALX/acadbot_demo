@@ -2,7 +2,7 @@
  * MSA AcadBot — Login Page Logic
  */
 
-import { login, getMe, formatApiError, isAuthError } from './api.js';
+import { login, getMe, safeErrorMessage, isAuthError } from './api.js';
 
 // ============================================================
 // DOM Elements
@@ -121,14 +121,8 @@ async function handleSubmit(event) {
       showFormError(data.message || 'Login failed. Please try again.');
     }
   } catch (err) {
-    if (isAuthError(err)) {
-      showFormError('Your session has expired. Please log in again.');
-    } else {
-      // Bad credentials, disabled account, etc. — surface the real backend
-      // message. UserLoginSerializer already returns "Invalid username or
-      // password." on bad credentials, so formatApiError surfaces it correctly.
-      showFormError(formatApiError(err));
-    }
+    // Never expose backend details — safeErrorMessage masks all internal info
+    showFormError(safeErrorMessage(err));
   } finally {
     setSubmitting(false);
   }

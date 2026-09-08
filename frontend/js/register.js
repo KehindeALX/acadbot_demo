@@ -2,7 +2,7 @@
  * MSA AcadBot — Register Page Logic
  */
 
-import { register, getMe, formatApiError, isAuthError } from './api.js';
+import { register, getMe, safeErrorMessage, isAuthError } from './api.js';
 
 // ============================================================
 // DOM Elements
@@ -149,17 +149,12 @@ async function handleSubmit(event) {
       showFormError(data.message || 'Registration failed. Please try again.');
     }
   } catch (err) {
-    const message = formatApiError(err);
-
-    // Handle field-specific validation errors from DRF.
-    // err.details holds the backend's nested { field: ['msg'] } dict; fall back
-    // to an empty object so nothing silently no-ops against the envelope shape.
+    // Field-level validation errors — show on each field (safe messages only)
     if (err.status === 400 && err.details) {
       handleValidationErrors(err.details);
-    } else if (isAuthError(err) || err.status === 400) {
-      showFormError(message);
     } else {
-      showFormError(message);
+      // Network, server, or unexpected errors — never expose backend details
+      showFormError(safeErrorMessage(err));
     }
   } finally {
     setSubmitting(false);
@@ -257,6 +252,17 @@ function validatePasswordMatch() {
 }
 
 function handleValidationErrors(errors) {
+  // Safe, user-friendly messages for each field — never uses raw backend text.
+  const safeMessages = {
+    first_name: 'Please enter a valid first name.',
+    last_name: 'Please enter a valid last name.',
+    email: 'Please enter a valid email address.',
+    username: 'Please choose a different username.',
+    phone: 'Please enter a valid phone number.',
+    password: 'Password does not meet the requirements. Use 8+ characters with an uppercase letter, a number, and a special character.',
+    password_confirm: 'Passwords do not match.',
+  };
+
   // Map DRF field names to our form fields
   const fieldMap = {
     first_name: { input: firstNameInput, error: firstNameError },
@@ -266,22 +272,22 @@ function handleValidationErrors(errors) {
     phone: { input: phoneInput, error: phoneError },
     password: { input: passwordInput, error: passwordError },
     password_confirm: { input: passwordConfirmInput, error: passwordConfirmError },
-    non_field_errors: null, // Handled separately
+    non_field_errors: null,
   };
 
   let hasFieldErrors = false;
 
   for (const [field, messages] of Object.entries(errors)) {
     if (field === 'non_field_errors') {
-      // Non-field errors (like password mismatch)
-      showFormError(Array.isArray(messages) ? messages.join('\n') : messages);
+      // Non-field errors — show as form-level error, safe message only
+      showFormError('Registration failed. Please check your details and try again.');
       continue;
     }
 
     const mapping = fieldMap[field];
     if (mapping) {
-      const message = Array.isArray(messages) ? messages[0] : messages;
-      showFieldError(mapping.input, mapping.error, message);
+      // Always use the safe static message, never the raw backend message
+      showFieldError(mapping.input, mapping.error, safeMessages[field] || 'Please check this field.');
       hasFieldErrors = true;
     }
   }

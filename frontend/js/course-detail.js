@@ -16,6 +16,7 @@ import {
   isAuthError,
   isNetworkError
 } from './api.js';
+import { initNavbar } from './navbar.js';
 
 // ============================================================
 // DOM Elements
@@ -44,7 +45,6 @@ const lessonsLoading = document.getElementById('lessonsLoading');
 const lessonsList = document.getElementById('lessonsList');
 const lessonsEmpty = document.getElementById('lessonsEmpty');
 
-const authNav = document.getElementById('authNav');
 const toastContainer = document.getElementById('toastContainer');
 
 // Lesson Viewer Modal
@@ -89,60 +89,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  await checkAuthState();
+  user = await initNavbar();
   await loadCourse(courseId);
   setupEventListeners();
 });
-
-// ============================================================
-// Auth State
-// ============================================================
-async function checkAuthState() {
-  try {
-    const data = await getMe();
-    if (data.success && data.data) {
-      user = data.data;
-      renderAuthNav();
-    }
-  } catch (err) {
-    if (isAuthError(err)) {
-      renderAuthNav(); // Not logged in
-    } else if (isNetworkError(err)) {
-      showToast('Unable to check login status', 'warning');
-    }
-  }
-}
-
-function renderAuthNav() {
-  if (user) {
-    authNav.innerHTML = `
-      <span class="navbar__user-name">${user.first_name || user.username}</span>
-      <a href="dashboard.html" class="navbar__link">Dashboard</a>
-      <button id="logoutBtn" class="navbar__btn">Logout</button>
-    `;
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-  } else {
-    authNav.innerHTML = `
-      <a href="login.html" class="navbar__link navbar__btn">Sign In</a>
-      <a href="register.html" class="navbar__link navbar__btn">Sign Up</a>
-    `;
-  }
-}
-
-async function handleLogout() {
-  const { logout } = await import('./api.js');
-  try {
-    await logout();
-    user = null;
-    enrollment = null;
-    renderAuthNav();
-    updateEnrollmentUI();
-    renderLessons(); // Lesson buttons flip back to "Preview" for the logged-out state.
-    showToast('Logged out successfully', 'success');
-  } catch (err) {
-    showToast('Logout failed', 'error');
-  }
-}
 
 // ============================================================
 // Load Course
@@ -219,9 +169,9 @@ async function checkEnrollmentStatus() {
     enrollment = results.find(enr => enr.course?.id === course.id) || null;
   } catch (err) {
     if (isAuthError(err)) {
-      // Session expired — treat as logged out
+      // Session expired — treat as logged out and re-render navbar as guest
       user = null;
-      renderAuthNav();
+      initNavbar();
     }
     enrollment = null;
   }

@@ -17,7 +17,7 @@
       <a href="courses.html" class="navbar__link">Courses</a>
       <a href="acadbot.html" class="navbar__link">Ask AcadBot</a>
       <a href="msa-guide.html" class="navbar__link">MSA Guide</a>
-      <a href="register.html" class="navbar__link">Sign Up</a>
+      <div id="authNav"></div>
     </div>
   </nav>
 
@@ -35,7 +35,12 @@
         <div class="form-group">
           <label for="email" class="form-label">Username or Email</label>
           <div class="input-wrapper">
-            <span class="input-wrapper__icon">👤</span>
+            <span class="input-wrapper__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </span>
             <input
               type="text"
               id="email"
@@ -53,7 +58,12 @@
         <div class="form-group">
           <label for="password" class="form-label">Password</label>
           <div class="input-wrapper">
-            <span class="input-wrapper__icon">🔒</span>
+            <span class="input-wrapper__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
             <input
               type="password"
               id="password"
@@ -81,11 +91,22 @@
         </div>
 
         <div id="formError" class="alert alert--error hidden" role="alert">
-          <span class="alert__icon">⚠</span>
+          <span class="alert__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </span>
           <div class="alert__content">
             <div class="alert__message" id="formErrorMessage"></div>
           </div>
-          <button type="button" class="alert__dismiss" aria-label="Dismiss error">✕</button>
+          <button type="button" class="alert__dismiss" aria-label="Dismiss error">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
         </div>
 
         <button type="submit" class="btn btn--primary btn--block btn--lg" id="submitBtn">
@@ -104,5 +125,11 @@
   <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
   <script type="module" src="js/login.js"></script>
+
+  <!-- Auth-aware navbar -->
+  <script type="module">
+    import { initNavbar } from './js/navbar.js';
+    initNavbar();
+  </script>
 </body>
 </html>

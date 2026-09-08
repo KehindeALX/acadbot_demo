@@ -505,6 +505,55 @@ export function formatApiError(error) {
 }
 
 /**
+ * Safe error message for display — NEVER exposes backend internals.
+ *
+ * Returns a generic user-friendly string. Never leaks:
+ *   - Backend URLs, stack traces, or server details
+ *   - Field names (email, password, identifier…)
+ *   - DRF-specific patterns ("non_field_errors", "This field is required")
+ *   - Internal error codes or messages
+ *
+ * @param {Error} error - Error thrown by apiFetch
+ * @returns {string} Safe, user-friendly error message
+ */
+export function safeErrorMessage(error) {
+  // Network / connection failures
+  if (error.isNetworkError) {
+    return 'Unable to connect to the server. Please check your connection and try again.';
+  }
+
+  // Session expired
+  if (error.isAuthError) {
+    return 'Your session has expired. Please log in again.';
+  }
+
+  const msg = (error.message || '').toLowerCase();
+
+  // Throttling (429) — don't reveal timing details
+  if (msg.includes('throttl') || error.status === 429) {
+    return 'Too many attempts. Please wait a minute and try again.';
+  }
+
+  // Authentication failures (wrong password, unknown user, disabled account)
+  if (msg.includes('invalid username or password') || msg.includes('disabled')) {
+    return 'Invalid username or password. Please try again.';
+  }
+
+  // Duplicate account (registration)
+  if (msg.includes('already exists') || msg.includes('already registered')) {
+    return 'An account with that information already exists. Please try different details.';
+  }
+
+  // Password validation (registration)
+  if (msg.includes('password')) {
+    return 'Password does not meet the requirements. Please choose a stronger password.';
+  }
+
+  // Catch-all — never leak the raw message
+  return 'Something went wrong. Please try again.';
+}
+
+/**
  * Check if error is a validation error (400)
  * @param {Error} error
  * @returns {boolean}
@@ -573,6 +622,7 @@ export const api = {
 
   // Error helpers
   formatApiError,
+  safeErrorMessage,
   isValidationError,
   isAuthError,
   isNetworkError,

@@ -33,5 +33,8 @@ htmlcov/
 .pytest_cache/
 .tox/
 
+# Local browser session exports — never commit live session tokens
+cookies.txt
+
 # Migrations - keep but don't commit initial empty migrations
 # *.py migration files are committed
