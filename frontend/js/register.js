@@ -224,7 +224,7 @@ function validateForm() {
     valid = false;
   } else {
     const strength = getPasswordStrength(password);
-    if (strength < 5) {
+    if (strength < 4) {
       showFieldError(passwordInput, passwordError, 'Password does not meet all strength requirements');
       valid = false;
     }
