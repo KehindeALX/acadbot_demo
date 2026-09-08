@@ -3,6 +3,7 @@ Serializers for the Accounts app.
 """
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from django.db.models import Q
 from .models import User, StudentProfile, MentorProfile
 from apps.careers.serializers import CareerSerializer, RoadmapStageSerializer
 
@@ -52,23 +53,42 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerializer(serializers.Serializer):
-    """Serializer for user login."""
+    """Serializer for user login.
 
-    email = serializers.EmailField()
+    Accepts a single ``identifier`` that can be either a username or an email,
+    plus a password. Mirrors Google-style sign-in where one field handles both.
+    """
+
+    identifier = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        email = attrs.get('email')
+        identifier = attrs.get('identifier')
         password = attrs.get('password')
 
-        if email and password:
-            user = authenticate(request=self.context.get('request'), username=email, password=password)
-            if not user:
-                raise serializers.ValidationError('Invalid email or password.')
-            if not user.is_active:
-                raise serializers.ValidationError('User account is disabled.')
-        else:
-            raise serializers.ValidationError('Must include email and password.')
+        if not identifier or not password:
+            raise serializers.ValidationError('Must include identifier and password.')
+
+        # Resolve the user by username OR email (case-insensitive). Email is
+        # this model's USERNAME_FIELD, so Django's authenticate() keys on email;
+        # we resolve to the real account first, then authenticate with its email
+        # so password hashing is verified against the correct record.
+        user = User.objects.filter(
+            Q(username__iexact=identifier) | Q(email__iexact=identifier)
+        ).first()
+
+        if user is None:
+            raise serializers.ValidationError('Invalid username or password.')
+
+        user = authenticate(
+            request=self.context.get('request'),
+            username=user.email,
+            password=password,
+        )
+        if not user:
+            raise serializers.ValidationError('Invalid username or password.')
+        if not user.is_active:
+            raise serializers.ValidationError('User account is disabled.')
 
         attrs['user'] = user
         return attrs

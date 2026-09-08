@@ -126,16 +126,52 @@
               type="password"
               id="password"
               name="password"
-              class="form-input"
+              class="form-input form-input--has-toggle"
               placeholder="••••••••"
               autocomplete="new-password"
               required
               minlength="8"
-              aria-describedby="passwordError"
+              aria-describedby="passwordError passwordStrengthCount"
             />
+            <button type="button" class="password-toggle" id="passwordToggle" aria-label="Show password">
+              <!-- Eye open -->
+              <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <!-- Eye closed (hidden by default) -->
+              <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
           </div>
           <div id="passwordError" class="form-error" role="alert"></div>
-          <p class="form-help">At least 8 characters.</p>
+          <!-- Strength indicator -->
+          <div class="password-strength" id="passwordStrength" style="display:none">
+            <div class="password-strength__bar-wrap">
+              <div class="password-strength__bar" id="strengthBar" data-level="0"></div>
+            </div>
+            <div class="password-strength__count" id="passwordStrengthCount" data-level="0">0 of 4 requirements met</div>
+            <div class="password-strength__rules" id="strengthRules">
+              <div class="password-strength__rule" data-rule="length">
+                <span class="password-strength__rule-icon">✓</span>
+                <span>At least 8 characters</span>
+              </div>
+              <div class="password-strength__rule" data-rule="uppercase">
+                <span class="password-strength__rule-icon">✓</span>
+                <span>At least 1 uppercase letter</span>
+              </div>
+              <div class="password-strength__rule" data-rule="number">
+                <span class="password-strength__rule-icon">✓</span>
+                <span>At least 1 number</span>
+              </div>
+              <div class="password-strength__rule" data-rule="special">
+                <span class="password-strength__rule-icon">✓</span>
+                <span>At least 1 special character (!@#$%^&amp;*)</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -146,12 +182,24 @@
               type="password"
               id="password_confirm"
               name="password_confirm"
-              class="form-input"
+              class="form-input form-input--has-toggle"
               placeholder="••••••••"
               autocomplete="new-password"
               required
               aria-describedby="passwordConfirmError"
             />
+            <button type="button" class="password-toggle" id="passwordConfirmToggle" aria-label="Show confirm password">
+              <!-- Eye open -->
+              <svg class="eye-open-confirm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <!-- Eye closed -->
+              <svg class="eye-closed-confirm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
           </div>
           <div id="passwordConfirmError" class="form-error" role="alert"></div>
         </div>

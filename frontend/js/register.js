@@ -29,6 +29,18 @@ const passwordError = document.getElementById('passwordError');
 const passwordConfirmError = document.getElementById('passwordConfirmError');
 const toastContainer = document.getElementById('toastContainer');
 
+// Password toggle & strength elements
+const passwordToggle = document.getElementById('passwordToggle');
+const passwordEyeOpen = document.getElementById('eyeOpen');
+const passwordEyeClosed = document.getElementById('eyeClosed');
+const passwordConfirmToggle = document.getElementById('passwordConfirmToggle');
+const passwordConfirmEyeOpen = passwordConfirmToggle.querySelector('.eye-open-confirm');
+const passwordConfirmEyeClosed = passwordConfirmToggle.querySelector('.eye-closed-confirm');
+const passwordStrength = document.getElementById('passwordStrength');
+const strengthBar = document.getElementById('strengthBar');
+const passwordStrengthCount = document.getElementById('passwordStrengthCount');
+const strengthRules = document.querySelectorAll('#strengthRules .password-strength__rule');
+
 // ============================================================
 // State
 // ============================================================
@@ -52,12 +64,17 @@ document.addEventListener('DOMContentLoaded', () => {
   phoneInput.addEventListener('input', () => clearFieldError(phoneInput, phoneError));
   passwordInput.addEventListener('input', () => {
     clearFieldError(passwordInput, passwordError);
+    updatePasswordStrength(passwordInput.value);
     // Also validate confirm if it has a value
     if (passwordConfirmInput.value) {
       validatePasswordMatch();
     }
   });
   passwordConfirmInput.addEventListener('input', validatePasswordMatch);
+
+  // Password toggle buttons
+  passwordToggle.addEventListener('click', () => togglePasswordVisibility(passwordInput, passwordEyeOpen, passwordEyeClosed));
+  passwordConfirmToggle.addEventListener('click', () => togglePasswordVisibility(passwordConfirmInput, passwordConfirmEyeOpen, passwordConfirmEyeClosed));
 
   formError.querySelector('.alert__dismiss').addEventListener('click', () => hideFormError());
 });
@@ -205,6 +222,12 @@ function validateForm() {
   } else if (password.length < 8) {
     showFieldError(passwordInput, passwordError, 'Password must be at least 8 characters');
     valid = false;
+  } else {
+    const strength = getPasswordStrength(password);
+    if (strength < 5) {
+      showFieldError(passwordInput, passwordError, 'Password does not meet all strength requirements');
+      valid = false;
+    }
   }
 
   // Confirm password
@@ -333,6 +356,59 @@ function showToast(message, type = 'info') {
     toast.style.animation = 'slideIn 0.3s ease reverse';
     setTimeout(() => toast.remove(), 300);
   }, 4000);
+}
+
+// ============================================================
+// Password Toggle & Strength
+// ============================================================
+function togglePasswordVisibility(input, eyeOpen, eyeClosed) {
+  const isPassword = input.type === 'password';
+  input.type = isPassword ? 'text' : 'password';
+  eyeOpen.style.display = isPassword ? 'none' : '';
+  eyeClosed.style.display = isPassword ? '' : 'none';
+}
+
+function getPasswordStrength(password) {
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+  return score;
+}
+
+function updatePasswordStrength(password) {
+  if (!password) {
+    passwordStrength.style.display = 'none';
+    return;
+  }
+
+  passwordStrength.style.display = '';
+  const score = getPasswordStrength(password);
+
+  // Update bar
+  strengthBar.setAttribute('data-level', score);
+
+  // Update count text
+  passwordStrengthCount.setAttribute('data-level', score);
+  passwordStrengthCount.textContent = `${score} of 4 requirements met`;
+
+  // Update individual rules
+  const checks = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[^A-Za-z0-9]/.test(password),
+  };
+
+  strengthRules.forEach((rule) => {
+    const ruleName = rule.getAttribute('data-rule');
+    if (checks[ruleName]) {
+      rule.classList.add('password-strength__rule--met');
+    } else {
+      rule.classList.remove('password-strength__rule--met');
+    }
+  });
 }
 
 function isValidEmail(email) {

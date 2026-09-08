@@ -67,7 +67,7 @@ All error responses follow this structure:
 | Method | Endpoint | Description | Permissions |
 |--------|----------|-------------|-------------|
 | POST | `/register/` | Register new user (student or mentor) | Public |
-| POST | `/login/` | Login with email/password | Public |
+| POST | `/login/` | Login with username/email + password | Public |
 | POST | `/logout/` | Logout current user | Authenticated |
 | GET | `/me/` | Get current user profile | Authenticated |
 | PATCH | `/me/` | Update current user profile | Authenticated |
@@ -83,6 +83,16 @@ All error responses follow this structure:
   "first_name": "John",
   "last_name": "Doe",
   "phone": "+1234567890"
+}
+```
+
+#### Login Request
+The `identifier` field accepts either a username or an email (Google-style single-field login).
+
+```json
+{
+  "identifier": "johndoe",   // or "john@example.com"
+  "password": "securepass123"
 }
 ```
 

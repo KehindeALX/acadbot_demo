@@ -19,6 +19,11 @@ const emailError = document.getElementById('emailError');
 const passwordError = document.getElementById('passwordError');
 const toastContainer = document.getElementById('toastContainer');
 
+// Password toggle elements
+const passwordToggle = document.getElementById('passwordToggle');
+const passwordEyeOpen = document.getElementById('eyeOpen');
+const passwordEyeClosed = document.getElementById('eyeClosed');
+
 // ============================================================
 // State
 // ============================================================
@@ -43,6 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', handleSubmit);
   emailInput.addEventListener('input', () => clearFieldError(emailInput, emailError));
   passwordInput.addEventListener('input', () => clearFieldError(passwordInput, passwordError));
+
+  // Password toggle
+  passwordToggle.addEventListener('click', () => togglePasswordVisibility(passwordInput, passwordEyeOpen, passwordEyeClosed));
+
   formError.querySelector('.alert__dismiss').addEventListener('click', () => hideFormError());
 });
 
@@ -80,18 +89,12 @@ async function handleSubmit(event) {
   clearFieldError(emailInput, emailError);
   clearFieldError(passwordInput, passwordError);
 
-  // Validate
-  const email = emailInput.value.trim();
+  // Validate — identifier may be a username or an email
+  const identifier = emailInput.value.trim();
   const password = passwordInput.value;
 
-  if (!email) {
-    showFieldError(emailInput, emailError, 'Email is required');
-    emailInput.focus();
-    return;
-  }
-
-  if (!isValidEmail(email)) {
-    showFieldError(emailInput, emailError, 'Please enter a valid email address');
+  if (!identifier) {
+    showFieldError(emailInput, emailError, 'Username or email is required');
     emailInput.focus();
     return;
   }
@@ -106,7 +109,7 @@ async function handleSubmit(event) {
   setSubmitting(true);
 
   try {
-    const data = await login({ email, password });
+    const data = await login({ identifier, password });
 
     if (data.success) {
       showToast('Welcome back!', 'success');
@@ -122,8 +125,8 @@ async function handleSubmit(event) {
       showFormError('Your session has expired. Please log in again.');
     } else {
       // Bad credentials, disabled account, etc. — surface the real backend
-      // message. UserLoginSerializer already returns "Invalid email or password."
-      // on bad credentials, so formatApiError surfaces it correctly.
+      // message. UserLoginSerializer already returns "Invalid username or
+      // password." on bad credentials, so formatApiError surfaces it correctly.
       showFormError(formatApiError(err));
     }
   } finally {
@@ -186,7 +189,12 @@ function showToast(message, type = 'info') {
   }, 4000);
 }
 
-function isValidEmail(email) {
-  // Simple but effective email validation
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+// ============================================================
+// Password Toggle
+// ============================================================
+function togglePasswordVisibility(input, eyeOpen, eyeClosed) {
+  const isPassword = input.type === 'password';
+  input.type = isPassword ? 'text' : 'password';
+  eyeOpen.style.display = isPassword ? 'none' : '';
+  eyeClosed.style.display = isPassword ? '' : 'none';
 }

@@ -102,10 +102,21 @@ class TestRegistration:
 class TestLogin:
     url = '/api/auth/login/'
 
-    def test_login_with_valid_credentials_succeeds(self, api_client, student_user):
+    def test_login_with_valid_email_succeeds(self, api_client, student_user):
         response = api_client.post(
             self.url,
-            {'email': student_user.email, 'password': 'TestPass123'},
+            {'identifier': student_user.email, 'password': 'TestPass123'},
+            format='json',
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['success'] is True
+        assert response.data['data']['email'] == student_user.email
+
+    def test_login_with_username_succeeds(self, api_client, student_user):
+        response = api_client.post(
+            self.url,
+            {'identifier': student_user.username, 'password': 'TestPass123'},
             format='json',
         )
 
@@ -116,16 +127,25 @@ class TestLogin:
     def test_login_with_wrong_password_returns_400(self, api_client, student_user):
         response = api_client.post(
             self.url,
-            {'email': student_user.email, 'password': 'WrongPassword'},
+            {'identifier': student_user.email, 'password': 'WrongPassword'},
             format='json',
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_login_with_unknown_email_returns_400(self, api_client):
+    def test_login_with_unknown_identifier_returns_400(self, api_client):
         response = api_client.post(
             self.url,
-            {'email': 'doesnotexist@test.com', 'password': 'TestPass123'},
+            {'identifier': 'doesnotexist', 'password': 'TestPass123'},
+            format='json',
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_login_missing_identifier_returns_400(self, api_client):
+        response = api_client.post(
+            self.url,
+            {'password': 'TestPass123'},
             format='json',
         )
 
@@ -135,7 +155,7 @@ class TestLogin:
         """A logged-in user should be able to hit an IsAuthenticated endpoint afterward."""
         api_client.post(
             self.url,
-            {'email': student_user.email, 'password': 'TestPass123'},
+            {'identifier': student_user.username, 'password': 'TestPass123'},
             format='json',
         )
         response = api_client.get('/api/auth/me/')
@@ -165,7 +185,7 @@ class TestMeAndLogout:
     def test_logout_ends_the_session(self, api_client, student_user):
         api_client.post(
             '/api/auth/login/',
-            {'email': student_user.email, 'password': 'TestPass123'},
+            {'identifier': student_user.email, 'password': 'TestPass123'},
             format='json',
         )
         logout_response = api_client.post('/api/auth/logout/')

@@ -224,7 +224,7 @@ class TestEnrollmentFlow:
         # ============================================================
         login_response = api_client.post(
             self.LOGIN_URL,
-            {'email': 'flowstudent@example.com', 'password': 'TestPass123'},
+            {'identifier': 'flowstudent@example.com', 'password': 'TestPass123'},
             format='json',
         )
 
@@ -340,7 +340,7 @@ class TestEnrollmentFlow:
         """
         # Register and login
         api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
-        api_client.post(self.LOGIN_URL, {'email': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
 
         # First enrollment
         enroll_url = self.ENROLL_URL.format(course_id=cyber_course.id)
@@ -363,7 +363,7 @@ class TestEnrollmentFlow:
         """
         # Register and login
         api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
-        api_client.post(self.LOGIN_URL, {'email': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
 
         # Create a DROPPED enrollment directly
         user = User.objects.get(email='teststudent@example.com')
@@ -412,7 +412,7 @@ class TestEnrollmentFlow:
 
         # Need to be authenticated as student
         api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
-        api_client.post(self.LOGIN_URL, {'email': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
 
         response = api_client.get(detail_url)
         assert response.status_code == status.HTTP_200_OK
