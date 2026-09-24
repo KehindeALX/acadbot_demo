@@ -75,8 +75,6 @@ class LessonViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated, IsStudent]
 
     def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return LessonDetailSerializer
         return LessonSerializer
 
     @action(detail=True, methods=['post'], url_path='complete')

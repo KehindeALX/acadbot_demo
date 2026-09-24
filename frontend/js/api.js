@@ -15,8 +15,7 @@
 // ============================================================
 // Configuration
 // ============================================================
-// TODO: Update for deployed backend URL during integration phase
-const API_BASE = 'http://localhost:8000';
+const API_BASE = window.location.hostname.endsWith('moresuccessacademy.com.ng') ? 'https://api.moresuccessacademy.com.ng' : 'http://localhost:8000';
 
 // In-memory CSRF token (never persisted to localStorage)
 let csrfToken = null;
@@ -314,10 +313,10 @@ export async function getEnrollmentDetail(enrollmentId) {
 }
 
 /**
- * Get a single lesson's full detail — includes the quiz answer key and
- * feedback, which the course-detail list deliberately omits.
+ * Get a single lesson's full detail. The quiz answer key is never returned here,
+ * grading comes from the quiz submission response.
  * @param {string|number} lessonId - Lesson ID
- * @returns {Promise<Object>} Lesson with quiz_correct_index, quiz_feedback
+ * @returns {Promise<Object>} Lesson
  */
 export async function getLessonDetail(lessonId) {
   return apiFetch(`/api/courses/lessons/${lessonId}/`, {

@@ -400,13 +400,13 @@ class TestEnrollmentFlow:
         assert lesson1['has_quiz'] is True
         assert lesson1['quiz_question'] == 'Which layer handles routing?'
         assert lesson1['quiz_options'] == ['Physical', 'Data Link', 'Network', 'Transport']
-        # quiz_correct_index and quiz_feedback NOT included in list view (only detail)
+        # quiz_correct_index and quiz_feedback are never exposed by any read endpoint
 
         lesson3 = course_data['lessons'][2]
         assert lesson3['has_quiz'] is False
 
-    def test_lesson_detail_includes_quiz_answer(self, api_client, cyber_course):
-        """Lesson detail should include quiz_correct_index and quiz_feedback."""
+    def test_lesson_detail_hides_quiz_answer(self, api_client, cyber_course):
+        """Lesson detail must not expose the quiz answer key or feedback."""
         lesson = cyber_course.lessons.get(order=1)  # Has quiz
         detail_url = f'/api/courses/lessons/{lesson.id}/'
 
@@ -419,8 +419,11 @@ class TestEnrollmentFlow:
 
         # Lesson detail returns direct object (no success/data wrapper)
         lesson_data = response.data
-        assert lesson_data['quiz_correct_index'] == 2
-        assert lesson_data['quiz_feedback'] == 'The Network Layer (Layer 3) handles routing.'
+        assert 'quiz_correct_index' not in lesson_data
+        assert 'quiz_feedback' not in lesson_data
+        # The question itself is still served so the student can answer it
+        assert lesson_data['quiz_question'] == 'Which layer handles routing?'
+        assert lesson_data['quiz_options'] == ['Physical', 'Data Link', 'Network', 'Transport']
 
     def test_unauthenticated_cannot_enroll(self, api_client, cyber_course):
         """Anonymous users cannot enroll."""

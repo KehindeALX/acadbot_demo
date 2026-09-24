@@ -9,7 +9,6 @@ import {
   getMe,
   listEnrollments,
   getEnrollmentDetail,
-  getLessonDetail,
   completeLesson,
   submitQuiz,
   formatApiError,
@@ -362,8 +361,8 @@ function setLessonButtonsDisabled(disabled) {
 // Lesson Viewer (adapted from index.html)
 // ============================================================
 function openLessonViewer(lesson, index) {
-  // Build steps. If the student is enrolled, we fetch the lesson detail so the
-  // quiz can be graded against the real answer key; otherwise it's a preview.
+  // Build steps. The quiz answer key is never fetched here, it only comes back
+  // from the quiz submission, so an unenrolled student sees an ungraded preview.
   lessonState = {
     lessonId: lesson.id,
     isGraded: false,
@@ -386,30 +385,6 @@ function openLessonViewer(lesson, index) {
   lessonLastFocus = document.activeElement;
   lessonOverlay.setAttribute('aria-hidden', 'false');
   (lessonCloseBtn || lessonOverlay).focus();
-
-  // Enrolled students get the real quiz answer key + feedback from the
-  // lesson-detail endpoint (the list endpoint deliberately omits it).
-  if (enrollment?.id && lesson.has_quiz) {
-    loadLessonDetail(lesson.id);
-  }
-}
-
-async function loadLessonDetail(lessonId) {
-  try {
-    const detail = await getLessonDetail(lessonId);
-    lessonState.isGraded = true;
-    lessonState.correctIndex = detail.quiz_correct_index;
-    lessonState.quizFeedback = detail.quiz_feedback || '';
-    // Re-render only if we're still on this lesson and a quiz is visible
-    if (lessonState.lessonId === lessonId && lessonOverlay.classList.contains('active')) {
-      renderLessonStep();
-    }
-  } catch (err) {
-    // Preview fallback — quiz stays ungraded rather than blocking the lesson.
-    if (!isNetworkError(err)) {
-      showToast(formatApiError(err), 'error');
-    }
-  }
 }
 
 function parseLessonContent(lesson) {
@@ -541,13 +516,24 @@ window.answerQuiz = function(i) {
   lessonState.quizAnswered[lessonState.idx] = i;
   renderLessonStep();
 
-  // Persist the answer for enrolled students so their progress reflects it.
-  // Grading is shown locally from the answer key; this records it server-side.
-  if (enrollment?.id && lessonState.isGraded) {
-    submitQuiz(lessonState.lessonId, i).catch(() => {
-      // Best-effort — a failed submission shouldn't block the lesson.
+  if (!enrollment?.id) return;
+
+  // Enrolled students post the answer; the server grades it and is the only
+  // source of the correct index and feedback.
+  submitQuiz(lessonState.lessonId, i)
+    .then((response) => {
+      const result = response?.data?.result;
+      if (!result || !lessonOverlay.classList.contains('active')) return;
+      lessonState.isGraded = true;
+      lessonState.correctIndex = result.correct_index;
+      lessonState.quizFeedback = result.feedback || '';
+      renderLessonStep();
+    })
+    .catch((err) => {
+      if (!isNetworkError(err)) {
+        showToast(formatApiError(err), 'error');
+      }
     });
-  }
 };
 
 function lessonNext() {

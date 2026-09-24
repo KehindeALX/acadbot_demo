@@ -1,5 +1,6 @@
 # MSA AcadBot API Documentation
 
+**Base URL:** `https://api.moresuccessacademy.com.ng/api/` (production)  
 **Base URL:** `http://localhost:8000/api/` (development)  
 **Authentication:** Session-based with CSRF protection  
 **Content-Type:** `application/json`
@@ -317,9 +318,9 @@ POST /api/courses/{id}/enroll/
 | Method | Endpoint | Description | Permissions |
 |--------|----------|-------------|-------------|
 | GET | `/` | List lessons (filtered by course) | Student |
-| GET | `/{id}/` | Get lesson with quiz answer | Student |
+| GET | `/{id}/` | Get lesson detail (no quiz answer) | Student |
 | POST | `/{id}/complete/` | Mark lesson complete | Student |
-| POST | `/{id}/quiz/` | Submit quiz answer | Student |
+| POST | `/{id}/quiz/` | Submit quiz answer, returns grading | Student |
 
 #### Complete Lesson
 ```http

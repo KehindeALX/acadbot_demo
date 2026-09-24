@@ -186,6 +186,7 @@ class LessonProgress(models.Model):
 
         return {
             'correct': self.quiz_correct,
+            'correct_index': self.lesson.quiz_correct_index,
             'feedback': self.lesson.quiz_feedback,
         }
 
