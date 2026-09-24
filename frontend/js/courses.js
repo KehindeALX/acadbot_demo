@@ -6,11 +6,9 @@
 import {
   listCourses,
   listCareers,
-  getMe,
   formatApiError,
-  isAuthError,
-  isNetworkError
 } from './api.js';
+import { initNavbar } from './navbar.js';
 
 // ============================================================
 // DOM Elements
@@ -21,7 +19,6 @@ const loadingState = document.getElementById('loadingState');
 const emptyState = document.getElementById('emptyState');
 const clearFilterBtn = document.getElementById('clearFilterBtn');
 const pagination = document.getElementById('pagination');
-const authNav = document.getElementById('authNav');
 const toastContainer = document.getElementById('toastContainer');
 
 // ============================================================
@@ -32,13 +29,12 @@ let currentCareerFilter = '';
 let allCourses = [];
 let allCareers = [];
 let isLoading = false;
-let user = null;
 
 // ============================================================
 // Init
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
-  await checkAuthState();
+  initNavbar();
 
   // Restore a shared/direct-linked filter from the URL (?career=slug)
   const careerParam = new URLSearchParams(window.location.search).get('career');
@@ -50,55 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadCourses();
   setupEventListeners();
 });
-
-// ============================================================
-// Auth State
-// ============================================================
-async function checkAuthState() {
-  try {
-    const data = await getMe();
-    if (data.success && data.data) {
-      user = data.data;
-      renderAuthNav();
-    }
-  } catch (err) {
-    if (isAuthError(err)) {
-      // Not logged in - that's fine for courses page
-      renderAuthNav();
-    } else if (isNetworkError(err)) {
-      showToast('Unable to check login status', 'warning');
-    }
-  }
-}
-
-function renderAuthNav() {
-  if (user) {
-    authNav.innerHTML = `
-      <span class="navbar__user-name">${user.first_name || user.username}</span>
-      <a href="dashboard.html" class="navbar__link">Dashboard</a>
-      <button id="logoutBtn" class="navbar__btn">Logout</button>
-    `;
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-  } else {
-    authNav.innerHTML = `
-      <a href="login.html" class="navbar__link navbar__btn">Sign In</a>
-      <a href="register.html" class="navbar__link navbar__btn">Sign Up</a>
-    `;
-  }
-}
-
-async function handleLogout() {
-  // Import logout dynamically to avoid circular deps
-  const { logout } = await import('./api.js');
-  try {
-    await logout();
-    user = null;
-    renderAuthNav();
-    showToast('Logged out successfully', 'success');
-  } catch (err) {
-    showToast('Logout failed', 'error');
-  }
-}
 
 // ============================================================
 // Load Courses

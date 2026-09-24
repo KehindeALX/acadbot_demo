@@ -1,5 +1,6 @@
 # MSA AcadBot API Documentation
 
+**Base URL:** `https://api.moresuccessacademy.com.ng/api/` (production)  
 **Base URL:** `http://localhost:8000/api/` (development)  
 **Authentication:** Session-based with CSRF protection  
 **Content-Type:** `application/json`
@@ -67,7 +68,7 @@ All error responses follow this structure:
 | Method | Endpoint | Description | Permissions |
 |--------|----------|-------------|-------------|
 | POST | `/register/` | Register new user (student or mentor) | Public |
-| POST | `/login/` | Login with email/password | Public |
+| POST | `/login/` | Login with username/email + password | Public |
 | POST | `/logout/` | Logout current user | Authenticated |
 | GET | `/me/` | Get current user profile | Authenticated |
 | PATCH | `/me/` | Update current user profile | Authenticated |
@@ -83,6 +84,16 @@ All error responses follow this structure:
   "first_name": "John",
   "last_name": "Doe",
   "phone": "+1234567890"
+}
+```
+
+#### Login Request
+The `identifier` field accepts either a username or an email (Google-style single-field login).
+
+```json
+{
+  "identifier": "johndoe",   // or "john@example.com"
+  "password": "securepass123"
 }
 ```
 
@@ -307,9 +318,9 @@ POST /api/courses/{id}/enroll/
 | Method | Endpoint | Description | Permissions |
 |--------|----------|-------------|-------------|
 | GET | `/` | List lessons (filtered by course) | Student |
-| GET | `/{id}/` | Get lesson with quiz answer | Student |
+| GET | `/{id}/` | Get lesson detail (no quiz answer) | Student |
 | POST | `/{id}/complete/` | Mark lesson complete | Student |
-| POST | `/{id}/quiz/` | Submit quiz answer | Student |
+| POST | `/{id}/quiz/` | Submit quiz answer, returns grading | Student |
 
 #### Complete Lesson
 ```http

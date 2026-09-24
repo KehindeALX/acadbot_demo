@@ -20,10 +20,7 @@ class LessonSerializer(serializers.ModelSerializer):
 
 
 class LessonDetailSerializer(LessonSerializer):
-    """Detailed serializer for lesson including quiz answer (for completion)."""
-
-    class Meta(LessonSerializer.Meta):
-        fields = LessonSerializer.Meta.fields + ['quiz_correct_index', 'quiz_feedback']
+    """Detailed serializer for lesson. The quiz answer key is never exposed here."""
 
 
 class CourseSerializer(serializers.ModelSerializer):

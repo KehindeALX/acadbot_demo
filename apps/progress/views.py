@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from django.db.models import Avg, Count, Q, Sum
+from django.db.models import Avg, Count, Q, Sum, OuterRef, Subquery
 from django.utils import timezone
 
 from .models import SkillAssessment, Milestone, LearningPath, ProgressSnapshot
@@ -70,8 +70,13 @@ class SkillAssessmentViewSet(viewsets.ModelViewSet):
         """Get skill assessment summary statistics."""
         queryset = self.get_queryset()
 
-        # Get latest assessment per skill
-        latest_assessments = queryset.order_by('career_skill', '-assessed_at').distinct('career_skill')
+        # Get latest assessment per skill (subquery avoids Postgres-only DISTINCT ON)
+        latest_ids = SkillAssessment.objects.filter(
+            career_skill=OuterRef('career_skill'),
+            student=request.user,
+        ).order_by('-assessed_at').values('id')[:1]
+
+        latest_assessments = queryset.filter(id__in=Subquery(latest_ids))
 
         total_assessed = latest_assessments.exclude(assessed_level__isnull=True).count()
         total_self_rated = latest_assessments.exclude(self_rated_level__isnull=True).count()
@@ -271,7 +276,13 @@ class StudentProgressViewSet(viewsets.GenericViewSet):
             sessions_completed = 0
             learning_path_progress = 0
 
-        latest_assessments = skill_assessments.order_by('career_skill', '-assessed_at').distinct('career_skill')
+        # Latest assessment per skill (subquery avoids Postgres-only DISTINCT ON)
+        latest_ids = SkillAssessment.objects.filter(
+            career_skill=OuterRef('career_skill'),
+            student=student,
+        ).order_by('-assessed_at').values('id')[:1]
+
+        latest_assessments = skill_assessments.filter(id__in=Subquery(latest_ids))
         avg_level = latest_assessments.exclude(assessed_level__isnull=True).aggregate(
             avg=Avg('assessed_level')
         )['avg'] or 0
@@ -329,7 +340,7 @@ class StudentProgressViewSet(viewsets.GenericViewSet):
 
         total_lesson_time = LessonProgress.objects.filter(
             enrollment__student=student, enrollment__course__career=career, completed_at__isnull=False
-        ).aggregate(total=models.Sum('lesson__duration_minutes'))['total'] or 0
+        ).aggregate(total=Sum('lesson__duration_minutes'))['total'] or 0
 
         sessions_completed = Session.objects.filter(
             student=student, status=Session.Status.COMPLETED
@@ -337,11 +348,19 @@ class StudentProgressViewSet(viewsets.GenericViewSet):
 
         total_session_minutes = Session.objects.filter(
             student=student, status=Session.Status.COMPLETED
-        ).aggregate(total=models.Sum('duration_minutes'))['total'] or 0
+        ).aggregate(total=Sum('duration_minutes'))['total'] or 0
+
+        # Latest assessment per skill in this career (subquery avoids
+        # Postgres-only DISTINCT ON, which would raise NotSupportedError on SQLite)
+        latest_ids = SkillAssessment.objects.filter(
+            career_skill=OuterRef('career_skill'),
+            student=student,
+            career_skill__career=career,
+        ).order_by('-assessed_at').values('id')[:1]
 
         latest_assessments = SkillAssessment.objects.filter(
             student=student, career_skill__career=career
-        ).order_by('career_skill', '-assessed_at').distinct('career_skill')
+        ).filter(id__in=Subquery(latest_ids))
 
         skills_assessed = latest_assessments.exclude(assessed_level__isnull=True).count()
         avg_skill = latest_assessments.exclude(assessed_level__isnull=True).aggregate(

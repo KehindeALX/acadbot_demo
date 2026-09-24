@@ -11,6 +11,7 @@ import {
   isAuthError,
   isNetworkError
 } from './api.js';
+import { initNavbar } from './navbar.js';
 
 // ============================================================
 // DOM Elements
@@ -21,7 +22,6 @@ const enrollmentsLoading = document.getElementById('enrollmentsLoading');
 const enrollmentsList = document.getElementById('enrollmentsList');
 const emptyState = document.getElementById('emptyState');
 const pagination = document.getElementById('pagination');
-const authNav = document.getElementById('authNav');
 const toastContainer = document.getElementById('toastContainer');
 
 // ============================================================
@@ -36,45 +36,14 @@ let isLoading = false;
 // Init
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
-  const authenticated = await requireAuth();
-  if (!authenticated) return; // Redirected to login
+  const userData = await initNavbar();
+  if (!userData) return; // Not authenticated — initNavbar handled redirect
 
+  user = userData;
+  renderUser();
   setupEventListeners();
   await loadEnrollments(1);
 });
-
-// ============================================================
-// Auth Guard
-// ============================================================
-async function requireAuth() {
-  try {
-    const data = await getMe();
-    if (data.success && data.data) {
-      user = data.data;
-      renderUser();
-      return true;
-    }
-    // Unexpected: no user in response but no error
-    redirectToLogin();
-    return false;
-  } catch (err) {
-    if (isAuthError(err)) {
-      redirectToLogin();
-      return false;
-    }
-    if (isNetworkError(err)) {
-      showToast('Unable to connect to the server. Please check your connection.', 'error');
-      return false;
-    }
-    showToast('Something went wrong loading your account. Please try again.', 'error');
-    return false;
-  }
-}
-
-function redirectToLogin() {
-  // Preserve current page as redirect target
-  window.location.href = 'login.html';
-}
 
 // ============================================================
 // Render User
@@ -84,23 +53,6 @@ function renderUser() {
 
   const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username;
   dashboardUserName.textContent = `, ${displayName}`;
-
-  authNav.innerHTML = `
-    <span class="navbar__user-name">${displayName}</span>
-    <a href="dashboard.html" class="navbar__link">Dashboard</a>
-    <button id="logoutBtn" class="navbar__btn">Logout</button>
-  `;
-  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-}
-
-async function handleLogout() {
-  const { logout } = await import('./api.js');
-  try {
-    await logout();
-    window.location.href = 'login.html';
-  } catch (err) {
-    showToast('Logout failed', 'error');
-  }
 }
 
 // ============================================================

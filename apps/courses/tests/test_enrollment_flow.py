@@ -224,7 +224,7 @@ class TestEnrollmentFlow:
         # ============================================================
         login_response = api_client.post(
             self.LOGIN_URL,
-            {'email': 'flowstudent@example.com', 'password': 'TestPass123'},
+            {'identifier': 'flowstudent@example.com', 'password': 'TestPass123'},
             format='json',
         )
 
@@ -340,7 +340,7 @@ class TestEnrollmentFlow:
         """
         # Register and login
         api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
-        api_client.post(self.LOGIN_URL, {'email': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
 
         # First enrollment
         enroll_url = self.ENROLL_URL.format(course_id=cyber_course.id)
@@ -363,7 +363,7 @@ class TestEnrollmentFlow:
         """
         # Register and login
         api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
-        api_client.post(self.LOGIN_URL, {'email': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
 
         # Create a DROPPED enrollment directly
         user = User.objects.get(email='teststudent@example.com')
@@ -400,27 +400,76 @@ class TestEnrollmentFlow:
         assert lesson1['has_quiz'] is True
         assert lesson1['quiz_question'] == 'Which layer handles routing?'
         assert lesson1['quiz_options'] == ['Physical', 'Data Link', 'Network', 'Transport']
-        # quiz_correct_index and quiz_feedback NOT included in list view (only detail)
+        # quiz_correct_index and quiz_feedback are never exposed by any read endpoint
 
         lesson3 = course_data['lessons'][2]
         assert lesson3['has_quiz'] is False
 
-    def test_lesson_detail_includes_quiz_answer(self, api_client, cyber_course):
-        """Lesson detail should include quiz_correct_index and quiz_feedback."""
+    def test_lesson_detail_hides_quiz_answer(self, api_client, cyber_course):
+        """Lesson detail must not expose the quiz answer key or feedback."""
         lesson = cyber_course.lessons.get(order=1)  # Has quiz
         detail_url = f'/api/courses/lessons/{lesson.id}/'
 
         # Need to be authenticated as student
         api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
-        api_client.post(self.LOGIN_URL, {'email': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
 
         response = api_client.get(detail_url)
         assert response.status_code == status.HTTP_200_OK
 
         # Lesson detail returns direct object (no success/data wrapper)
         lesson_data = response.data
-        assert lesson_data['quiz_correct_index'] == 2
-        assert lesson_data['quiz_feedback'] == 'The Network Layer (Layer 3) handles routing.'
+        assert 'quiz_correct_index' not in lesson_data
+        assert 'quiz_feedback' not in lesson_data
+        # The question itself is still served so the student can answer it
+        assert lesson_data['quiz_question'] == 'Which layer handles routing?'
+        assert lesson_data['quiz_options'] == ['Physical', 'Data Link', 'Network', 'Transport']
+
+    def test_quiz_submission_returns_grading(self, api_client, cyber_course):
+        """An enrolled student's quiz submission is graded server-side."""
+        lesson = cyber_course.lessons.get(order=1)  # Correct answer is index 2
+        quiz_url = f'/api/courses/lessons/{lesson.id}/quiz/'
+
+        api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+        api_client.post(self.ENROLL_URL.format(course_id=cyber_course.id), format='json')
+
+        response = api_client.post(quiz_url, {'answer_index': 2}, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['success'] is True
+
+        result = response.data['data']['result']
+        assert result['correct'] is True
+        assert result['correct_index'] == 2
+        assert result['feedback'] == 'The Network Layer (Layer 3) handles routing.'
+
+    def test_quiz_submission_wrong_answer_is_graded(self, api_client, cyber_course):
+        """A wrong answer still comes back graded, with the correct index."""
+        lesson = cyber_course.lessons.get(order=1)  # Correct answer is index 2
+        quiz_url = f'/api/courses/lessons/{lesson.id}/quiz/'
+
+        api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+        api_client.post(self.ENROLL_URL.format(course_id=cyber_course.id), format='json')
+
+        response = api_client.post(quiz_url, {'answer_index': 0}, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        result = response.data['data']['result']
+        assert result['correct'] is False
+        assert result['correct_index'] == 2
+
+    def test_quiz_submission_requires_enrollment(self, api_client, cyber_course):
+        """A student who is not enrolled gets 404 on quiz submission."""
+        lesson = cyber_course.lessons.get(order=1)
+        quiz_url = f'/api/courses/lessons/{lesson.id}/quiz/'
+
+        api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+
+        response = api_client.post(quiz_url, {'answer_index': 2}, format='json')
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert Enrollment.objects.filter(student__username='teststudent').count() == 0
 
     def test_unauthenticated_cannot_enroll(self, api_client, cyber_course):
         """Anonymous users cannot enroll."""
@@ -432,6 +481,15 @@ class TestEnrollmentFlow:
         """Anonymous users cannot view enrollments list."""
         response = api_client.get(self.ENROLLMENTS_URL)
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_enrollments_endpoint_is_read_only(self, api_client, cyber_course):
+        """The enrollments list endpoint must reject writes: enrolling goes through the course enroll action."""
+        api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+
+        response = api_client.post(self.ENROLLMENTS_URL, {'course': cyber_course.id}, format='json')
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        assert Enrollment.objects.filter(student__username='teststudent').count() == 0
 
     def test_course_filter_by_career(self, api_client, cyber_course, ai_course):
         """Courses can be filtered by career slug."""

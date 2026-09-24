@@ -70,7 +70,7 @@ def flush_throttle_cache():
 def post_login(client, email='student@test.com'):
     return client.post(
         LOGIN_URL,
-        {'email': email, 'password': 'TestPass123'},
+        {'identifier': email, 'password': 'TestPass123'},
         format='json',
     )
 

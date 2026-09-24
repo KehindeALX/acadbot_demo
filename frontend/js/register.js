@@ -2,7 +2,7 @@
  * MSA AcadBot — Register Page Logic
  */
 
-import { register, getMe, formatApiError, isAuthError } from './api.js';
+import { register, getMe, safeErrorMessage, isAuthError } from './api.js';
 
 // ============================================================
 // DOM Elements
@@ -29,6 +29,18 @@ const passwordError = document.getElementById('passwordError');
 const passwordConfirmError = document.getElementById('passwordConfirmError');
 const toastContainer = document.getElementById('toastContainer');
 
+// Password toggle & strength elements
+const passwordToggle = document.getElementById('passwordToggle');
+const passwordEyeOpen = document.getElementById('eyeOpen');
+const passwordEyeClosed = document.getElementById('eyeClosed');
+const passwordConfirmToggle = document.getElementById('passwordConfirmToggle');
+const passwordConfirmEyeOpen = passwordConfirmToggle.querySelector('.eye-open-confirm');
+const passwordConfirmEyeClosed = passwordConfirmToggle.querySelector('.eye-closed-confirm');
+const passwordStrength = document.getElementById('passwordStrength');
+const strengthBar = document.getElementById('strengthBar');
+const passwordStrengthCount = document.getElementById('passwordStrengthCount');
+const strengthRules = document.querySelectorAll('#strengthRules .password-strength__rule');
+
 // ============================================================
 // State
 // ============================================================
@@ -52,12 +64,17 @@ document.addEventListener('DOMContentLoaded', () => {
   phoneInput.addEventListener('input', () => clearFieldError(phoneInput, phoneError));
   passwordInput.addEventListener('input', () => {
     clearFieldError(passwordInput, passwordError);
+    updatePasswordStrength(passwordInput.value);
     // Also validate confirm if it has a value
     if (passwordConfirmInput.value) {
       validatePasswordMatch();
     }
   });
   passwordConfirmInput.addEventListener('input', validatePasswordMatch);
+
+  // Password toggle buttons
+  passwordToggle.addEventListener('click', () => togglePasswordVisibility(passwordInput, passwordEyeOpen, passwordEyeClosed));
+  passwordConfirmToggle.addEventListener('click', () => togglePasswordVisibility(passwordConfirmInput, passwordConfirmEyeOpen, passwordConfirmEyeClosed));
 
   formError.querySelector('.alert__dismiss').addEventListener('click', () => hideFormError());
 });
@@ -132,17 +149,12 @@ async function handleSubmit(event) {
       showFormError(data.message || 'Registration failed. Please try again.');
     }
   } catch (err) {
-    const message = formatApiError(err);
-
-    // Handle field-specific validation errors from DRF.
-    // err.details holds the backend's nested { field: ['msg'] } dict; fall back
-    // to an empty object so nothing silently no-ops against the envelope shape.
+    // Field-level validation errors — show on each field (safe messages only)
     if (err.status === 400 && err.details) {
       handleValidationErrors(err.details);
-    } else if (isAuthError(err) || err.status === 400) {
-      showFormError(message);
     } else {
-      showFormError(message);
+      // Network, server, or unexpected errors — never expose backend details
+      showFormError(safeErrorMessage(err));
     }
   } finally {
     setSubmitting(false);
@@ -205,6 +217,12 @@ function validateForm() {
   } else if (password.length < 8) {
     showFieldError(passwordInput, passwordError, 'Password must be at least 8 characters');
     valid = false;
+  } else {
+    const strength = getPasswordStrength(password);
+    if (strength < 4) {
+      showFieldError(passwordInput, passwordError, 'Password does not meet all strength requirements');
+      valid = false;
+    }
   }
 
   // Confirm password
@@ -234,6 +252,17 @@ function validatePasswordMatch() {
 }
 
 function handleValidationErrors(errors) {
+  // Safe, user-friendly messages for each field — never uses raw backend text.
+  const safeMessages = {
+    first_name: 'Please enter a valid first name.',
+    last_name: 'Please enter a valid last name.',
+    email: 'Please enter a valid email address.',
+    username: 'Please choose a different username.',
+    phone: 'Please enter a valid phone number.',
+    password: 'Password does not meet the requirements. Use 8+ characters with an uppercase letter, a number, and a special character.',
+    password_confirm: 'Passwords do not match.',
+  };
+
   // Map DRF field names to our form fields
   const fieldMap = {
     first_name: { input: firstNameInput, error: firstNameError },
@@ -243,22 +272,22 @@ function handleValidationErrors(errors) {
     phone: { input: phoneInput, error: phoneError },
     password: { input: passwordInput, error: passwordError },
     password_confirm: { input: passwordConfirmInput, error: passwordConfirmError },
-    non_field_errors: null, // Handled separately
+    non_field_errors: null,
   };
 
   let hasFieldErrors = false;
 
   for (const [field, messages] of Object.entries(errors)) {
     if (field === 'non_field_errors') {
-      // Non-field errors (like password mismatch)
-      showFormError(Array.isArray(messages) ? messages.join('\n') : messages);
+      // Non-field errors — show as form-level error, safe message only
+      showFormError('Registration failed. Please check your details and try again.');
       continue;
     }
 
     const mapping = fieldMap[field];
     if (mapping) {
-      const message = Array.isArray(messages) ? messages[0] : messages;
-      showFieldError(mapping.input, mapping.error, message);
+      // Always use the safe static message, never the raw backend message
+      showFieldError(mapping.input, mapping.error, safeMessages[field] || 'Please check this field.');
       hasFieldErrors = true;
     }
   }
@@ -333,6 +362,59 @@ function showToast(message, type = 'info') {
     toast.style.animation = 'slideIn 0.3s ease reverse';
     setTimeout(() => toast.remove(), 300);
   }, 4000);
+}
+
+// ============================================================
+// Password Toggle & Strength
+// ============================================================
+function togglePasswordVisibility(input, eyeOpen, eyeClosed) {
+  const isPassword = input.type === 'password';
+  input.type = isPassword ? 'text' : 'password';
+  eyeOpen.style.display = isPassword ? 'none' : '';
+  eyeClosed.style.display = isPassword ? '' : 'none';
+}
+
+function getPasswordStrength(password) {
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+  return score;
+}
+
+function updatePasswordStrength(password) {
+  if (!password) {
+    passwordStrength.style.display = 'none';
+    return;
+  }
+
+  passwordStrength.style.display = '';
+  const score = getPasswordStrength(password);
+
+  // Update bar
+  strengthBar.setAttribute('data-level', score);
+
+  // Update count text
+  passwordStrengthCount.setAttribute('data-level', score);
+  passwordStrengthCount.textContent = `${score} of 4 requirements met`;
+
+  // Update individual rules
+  const checks = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[^A-Za-z0-9]/.test(password),
+  };
+
+  strengthRules.forEach((rule) => {
+    const ruleName = rule.getAttribute('data-rule');
+    if (checks[ruleName]) {
+      rule.classList.add('password-strength__rule--met');
+    } else {
+      rule.classList.remove('password-strength__rule--met');
+    }
+  });
 }
 
 function isValidEmail(email) {

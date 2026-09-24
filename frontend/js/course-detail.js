@@ -9,13 +9,13 @@ import {
   getMe,
   listEnrollments,
   getEnrollmentDetail,
-  getLessonDetail,
   completeLesson,
   submitQuiz,
   formatApiError,
   isAuthError,
   isNetworkError
 } from './api.js';
+import { initNavbar } from './navbar.js';
 
 // ============================================================
 // DOM Elements
@@ -44,7 +44,6 @@ const lessonsLoading = document.getElementById('lessonsLoading');
 const lessonsList = document.getElementById('lessonsList');
 const lessonsEmpty = document.getElementById('lessonsEmpty');
 
-const authNav = document.getElementById('authNav');
 const toastContainer = document.getElementById('toastContainer');
 
 // Lesson Viewer Modal
@@ -89,59 +88,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  await checkAuthState();
+  user = await initNavbar();
   await loadCourse(courseId);
   setupEventListeners();
 });
-
-// ============================================================
-// Auth State
-// ============================================================
-async function checkAuthState() {
-  try {
-    const data = await getMe();
-    if (data.success && data.data) {
-      user = data.data;
-      renderAuthNav();
-    }
-  } catch (err) {
-    if (isAuthError(err)) {
-      renderAuthNav(); // Not logged in
-    } else if (isNetworkError(err)) {
-      showToast('Unable to check login status', 'warning');
-    }
-  }
-}
-
-function renderAuthNav() {
-  if (user) {
-    authNav.innerHTML = `
-      <span class="navbar__user-name">${user.first_name || user.username}</span>
-      <a href="dashboard.html" class="navbar__link">Dashboard</a>
-      <button id="logoutBtn" class="navbar__btn">Logout</button>
-    `;
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-  } else {
-    authNav.innerHTML = `
-      <a href="login.html" class="navbar__link navbar__btn">Sign In</a>
-      <a href="register.html" class="navbar__link navbar__btn">Sign Up</a>
-    `;
-  }
-}
-
-async function handleLogout() {
-  const { logout } = await import('./api.js');
-  try {
-    await logout();
-    user = null;
-    enrollment = null;
-    renderAuthNav();
-    updateEnrollmentUI();
-    showToast('Logged out successfully', 'success');
-  } catch (err) {
-    showToast('Logout failed', 'error');
-  }
-}
 
 // ============================================================
 // Load Course
@@ -218,13 +168,16 @@ async function checkEnrollmentStatus() {
     enrollment = results.find(enr => enr.course?.id === course.id) || null;
   } catch (err) {
     if (isAuthError(err)) {
-      // Session expired — treat as logged out
+      // Session expired — treat as logged out and re-render navbar as guest
       user = null;
-      renderAuthNav();
+      initNavbar();
     }
     enrollment = null;
   }
   updateEnrollmentUI();
+  // Lessons re-render now that enrollment status is known, so the list shows
+  // accurate "Preview" vs "Start" buttons (renderCourse() ran before this).
+  renderLessons();
 }
 
 function updateEnrollmentUI() {
@@ -267,6 +220,7 @@ async function handleEnroll() {
   isEnrolling = true;
   enrollBtn.disabled = true;
   enrollBtn.textContent = 'Enrolling...';
+  setLessonButtonsDisabled(true);
 
   try {
     const data = await enrollCourse(course.id);
@@ -277,6 +231,7 @@ async function handleEnroll() {
     if (data.success && data.data) {
       enrollment = data.data;
       updateEnrollmentUI();
+      renderLessons(); // Flip lesson buttons from "Preview" to "Start" immediately.
       showToast(data.message || 'Successfully enrolled!', 'success');
     } else {
       showToast(data.message || 'Enrollment failed', 'error');
@@ -287,6 +242,7 @@ async function handleEnroll() {
     isEnrolling = false;
     enrollBtn.disabled = false;
     enrollBtn.textContent = 'Enroll Now';
+    setLessonButtonsDisabled(false);
   }
 }
 
@@ -371,6 +327,7 @@ function createLessonElement(lesson, index) {
           class="btn btn--primary btn--sm"
           data-lesson-index="${index}"
           aria-label="Start lesson: ${escapeHtml(lesson.title)}"
+          ${isEnrolling ? 'disabled' : ''}
         >
           ${enrollment ? 'Start' : 'Preview'}
         </button>
@@ -379,17 +336,33 @@ function createLessonElement(lesson, index) {
   `;
 
   const startBtn = div.querySelector('button');
-  startBtn.addEventListener('click', () => openLessonViewer(lesson, index));
+  startBtn.addEventListener('click', () => {
+    // Enroll request in flight — enrollment state is stale, so don't open a
+    // lesson (it would render as an ungraded preview even when enrolled).
+    if (isEnrolling) return;
+    openLessonViewer(lesson, index);
+  });
 
   return div;
+}
+
+/**
+ * Disable or re-enable every lesson row button while an enroll request is in
+ * flight, so a lesson can't be opened against stale enrollment state (e.g. an
+ * ungraded preview quiz while the student is actually enrolled).
+ */
+function setLessonButtonsDisabled(disabled) {
+  lessonsList.querySelectorAll('[data-lesson-index]').forEach(btn => {
+    btn.disabled = disabled;
+  });
 }
 
 // ============================================================
 // Lesson Viewer (adapted from index.html)
 // ============================================================
 function openLessonViewer(lesson, index) {
-  // Build steps. If the student is enrolled, we fetch the lesson detail so the
-  // quiz can be graded against the real answer key; otherwise it's a preview.
+  // Build steps. The quiz answer key is never fetched here, it only comes back
+  // from the quiz submission, so an unenrolled student sees an ungraded preview.
   lessonState = {
     lessonId: lesson.id,
     isGraded: false,
@@ -412,30 +385,6 @@ function openLessonViewer(lesson, index) {
   lessonLastFocus = document.activeElement;
   lessonOverlay.setAttribute('aria-hidden', 'false');
   (lessonCloseBtn || lessonOverlay).focus();
-
-  // Enrolled students get the real quiz answer key + feedback from the
-  // lesson-detail endpoint (the list endpoint deliberately omits it).
-  if (enrollment?.id && lesson.has_quiz) {
-    loadLessonDetail(lesson.id);
-  }
-}
-
-async function loadLessonDetail(lessonId) {
-  try {
-    const detail = await getLessonDetail(lessonId);
-    lessonState.isGraded = true;
-    lessonState.correctIndex = detail.quiz_correct_index;
-    lessonState.quizFeedback = detail.quiz_feedback || '';
-    // Re-render only if we're still on this lesson and a quiz is visible
-    if (lessonState.lessonId === lessonId && lessonOverlay.classList.contains('active')) {
-      renderLessonStep();
-    }
-  } catch (err) {
-    // Preview fallback — quiz stays ungraded rather than blocking the lesson.
-    if (!isNetworkError(err)) {
-      showToast(formatApiError(err), 'error');
-    }
-  }
 }
 
 function parseLessonContent(lesson) {
@@ -567,13 +516,28 @@ window.answerQuiz = function(i) {
   lessonState.quizAnswered[lessonState.idx] = i;
   renderLessonStep();
 
-  // Persist the answer for enrolled students so their progress reflects it.
-  // Grading is shown locally from the answer key; this records it server-side.
-  if (enrollment?.id && lessonState.isGraded) {
-    submitQuiz(lessonState.lessonId, i).catch(() => {
-      // Best-effort — a failed submission shouldn't block the lesson.
+  if (!enrollment?.id) return;
+
+  const answeredLesson = lessonState.lessonId;
+  const answeredStep = lessonState.idx;
+
+  // Enrolled students post the answer; the server grades it and is the only
+  // source of the correct index and feedback.
+  submitQuiz(answeredLesson, i)
+    .then((response) => {
+      const result = response?.data?.result;
+      if (!result || !lessonOverlay.classList.contains('active')) return;
+      if (lessonState.lessonId !== answeredLesson || lessonState.idx !== answeredStep) return;
+      lessonState.isGraded = true;
+      lessonState.correctIndex = result.correct_index;
+      lessonState.quizFeedback = result.feedback || '';
+      renderLessonStep();
+    })
+    .catch((err) => {
+      if (!isNetworkError(err)) {
+        showToast(formatApiError(err), 'error');
+      }
     });
-  }
 };
 
 function lessonNext() {
@@ -626,6 +590,7 @@ async function refreshProgress() {
     if (data) {
       enrollment = { ...enrollment, ...data };
       updateEnrollmentUI();
+      renderLessons();
     }
   } catch (err) {
     // Non-blocking — the progress bar refresh is best-effort.

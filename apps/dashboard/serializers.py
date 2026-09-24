@@ -3,12 +3,32 @@ Serializers for the Dashboard app.
 """
 from rest_framework import serializers
 from apps.accounts.serializers import StudentListSerializer, MentorListSerializer
-from apps.careers.serializers import CareerSerializer, CourseSerializer, CareerSkillSerializer, RoadmapStageSerializer
+from apps.careers.serializers import CareerSerializer, CareerSkillSerializer, RoadmapStageSerializer
+from apps.courses.serializers import CourseSerializer
 from apps.matching.serializers import MatchRequestSerializer, MatchSerializer
 from apps.sessions.serializers import SessionSerializer, AvailabilitySerializer
 from apps.accounts.models import MentorProfile
 from apps.courses.models import Enrollment
 from apps.careers.models import Career
+
+
+class EnrollmentSerializer(serializers.ModelSerializer):
+    """Serializer for enrollment in dashboard."""
+
+    course = CourseSerializer()
+    progress_percent = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Enrollment
+        fields = ['id', 'course', 'enrolled_at', 'completed_at', 'progress_percent']
+
+    def get_progress_percent(self, obj):
+        from apps.courses.models import LessonProgress
+        lessons = obj.course.lessons.count()
+        if lessons == 0:
+            return 0
+        completed = LessonProgress.objects.filter(enrollment=obj, completed_at__isnull=False).count()
+        return round((completed / lessons * 100), 1)
 
 
 class StudentDashboardSerializer(serializers.Serializer):
@@ -31,25 +51,6 @@ class StudentDashboardSerializer(serializers.Serializer):
         if obj.get('learning_path'):
             return LearningPathSerializer(obj['learning_path']).data
         return None
-
-
-class EnrollmentSerializer(serializers.ModelSerializer):
-    """Serializer for enrollment in dashboard."""
-
-    course = CourseSerializer()
-    progress_percent = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Enrollment
-        fields = ['id', 'course', 'enrolled_at', 'completed_at', 'progress_percent']
-
-    def get_progress_percent(self, obj):
-        from apps.courses.models import LessonProgress
-        lessons = obj.course.lessons.count()
-        if lessons == 0:
-            return 0
-        completed = LessonProgress.objects.filter(enrollment=obj, completed_at__isnull=False).count()
-        return round((completed / lessons * 100), 1)
 
 
 class CareerProgressSerializer(serializers.Serializer):

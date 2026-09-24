@@ -605,9 +605,159 @@ a:hover {
   color: var(--muted);
   font-size: 18px;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.input-wrapper__icon svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 .input-wrapper .form-input {
   padding-left: 48px;
+}
+
+.input-wrapper .form-input--has-toggle {
+  padding-right: 48px;
+}
+
+/* Password toggle button */
+.password-toggle {
+  position: absolute;
+  right: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  transition: color var(--transition-fast);
+  z-index: 1;
+}
+
+.password-toggle:hover {
+  color: var(--gold);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.password-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ============================================================
+   Password Strength Indicator
+   ============================================================ */
+.password-strength {
+  margin-top: var(--space-sm);
+}
+
+.password-strength__bar-wrap {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: var(--space-sm);
+}
+
+.password-strength__bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.35s ease, background 0.35s ease;
+}
+
+.password-strength__bar[data-level="0"] {
+  width: 0%;
+  background: transparent;
+}
+
+.password-strength__bar[data-level="1"] {
+  width: 20%;
+  background: var(--red);
+}
+
+.password-strength__bar[data-level="2"] {
+  width: 40%;
+  background: #FFA726;
+}
+
+.password-strength__bar[data-level="3"] {
+  width: 60%;
+  background: var(--gold);
+}
+
+.password-strength__bar[data-level="4"] {
+  width: 80%;
+  background: var(--teal);
+}
+
+.password-strength__bar[data-level="5"] {
+  width: 100%;
+  background: var(--green);
+}
+
+.password-strength__count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: var(--space-sm);
+  transition: color 0.3s ease;
+}
+
+.password-strength__count[data-level="1"] { color: var(--red); }
+.password-strength__count[data-level="2"] { color: #FFA726; }
+.password-strength__count[data-level="3"] { color: var(--gold); }
+.password-strength__count[data-level="4"] { color: var(--teal); }
+.password-strength__count[data-level="5"] { color: var(--green); }
+
+.password-strength__rules {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.password-strength__rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 12px;
+  color: var(--muted);
+  transition: color 0.25s ease;
+}
+
+.password-strength__rule-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+  font-size: 8px;
+  color: transparent;
+}
+
+.password-strength__rule--met {
+  color: var(--green);
+}
+
+.password-strength__rule--met .password-strength__rule-icon {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--white);
 }
 
 /* ============================================================
@@ -650,6 +800,13 @@ a:hover {
   flex-shrink: 0;
   font-size: 20px;
   margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.alert__icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .alert__content {
@@ -676,6 +833,14 @@ a:hover {
   opacity: 0.7;
   transition: opacity var(--transition-fast);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+.alert__dismiss svg {
+  width: 18px;
+  height: 18px;
 }
 .alert__dismiss:hover {
   opacity: 1;
@@ -731,13 +896,25 @@ a:hover {
 
 .auth-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   background: var(--navy2);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: var(--space-2xl);
+  padding: var(--space-2xl) var(--space-2xl) var(--space-xl);
   box-shadow: none;
   transition: transform var(--transition-base), box-shadow var(--transition-base);
+  position: relative;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+  opacity: 0.4;
 }
 
 .auth-card:hover {
@@ -747,7 +924,7 @@ a:hover {
 
 .auth-card__logo {
   text-align: center;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-lg);
 }
 
 .auth-card__logo .navbar__logo {
@@ -758,12 +935,14 @@ a:hover {
 .auth-card__title {
   text-align: center;
   margin-bottom: var(--space-xs);
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .auth-card__subtitle {
   text-align: center;
   color: var(--muted);
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-xl);
+  font-size: 14px;
 }
 
 .auth-card__form {
@@ -783,6 +962,12 @@ a:hover {
 
 .auth-card__footer a {
   font-weight: 600;
+  color: var(--gold);
+  transition: color var(--transition-fast);
+}
+
+.auth-card__footer a:hover {
+  color: var(--gold2);
 }
 
 /* ============================================================
