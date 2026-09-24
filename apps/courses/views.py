@@ -135,7 +135,7 @@ class LessonViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class EnrollmentViewSet(viewsets.ModelViewSet):
+class EnrollmentViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for student enrollments."""
 
     serializer_class = EnrollmentSerializer

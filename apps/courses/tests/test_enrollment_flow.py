@@ -433,6 +433,15 @@ class TestEnrollmentFlow:
         response = api_client.get(self.ENROLLMENTS_URL)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    def test_enrollments_endpoint_is_read_only(self, api_client, cyber_course):
+        """The enrollments list endpoint must reject writes: enrolling goes through the course enroll action."""
+        api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+
+        response = api_client.post(self.ENROLLMENTS_URL, {'course': cyber_course.id}, format='json')
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        assert Enrollment.objects.filter(student__username='teststudent').count() == 0
+
     def test_course_filter_by_career(self, api_client, cyber_course, ai_course):
         """Courses can be filtered by career slug."""
         response = api_client.get(f'{self.COURSES_URL}?career=cyber')
