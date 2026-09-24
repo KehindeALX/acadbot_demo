@@ -61,6 +61,24 @@ All endpoints live under `/api/`:
 
 Interactive docs: `/api/docs/` (Swagger UI), `/api/redoc/` (ReDoc), `/api/schema/` (OpenAPI JSON).
 
+### Enrollments
+
+`/api/courses/enrollments/` is read only. It lists and retrieves the current student's enrollments and returns progress through `/api/courses/enrollments/{id}/progress/`. Posting to it returns 405; use the enroll action instead:
+
+`POST /api/courses/{id}/enroll/` enrolls the current student in that course. Re-enrolling in a course that was previously dropped reactivates the existing enrollment.
+
+### Quizzes
+
+`GET /api/courses/lessons/{id}/` returns the lesson with `quiz_question` and `quiz_options`, but never the answer key. Grading happens server-side on submission:
+
+`POST /api/courses/lessons/{id}/quiz/` takes a body of `{"answer_index": 2}`. The response carries the grading result under `data.result`:
+
+| Field | Description |
+|-------|-------------|
+| `correct` | Whether the submitted answer was right |
+| `correct_index` | Index of the correct option |
+| `feedback` | The lesson's quiz feedback text |
+
 ---
 
 ## Authentication Flow
@@ -156,6 +174,19 @@ Server starts at `http://localhost:8000/`. API at `http://localhost:8000/api/`.
 
 ---
 
+## Frontend
+
+The frontend resolves its API base URL at runtime in `frontend/js/api.js`:
+
+| Host | Base URL |
+|------|----------|
+| `*.moresuccessacademy.com.ng` | `https://api.moresuccessacademy.com.ng` |
+| anything else (local development) | `http://localhost:8000` |
+
+So local development needs the Django server running on port 8000, and production requests go to the deployed API subdomain.
+
+---
+
 ## Production Deployment
 
 Key production settings in `config/settings/production.py`:
@@ -175,6 +206,16 @@ Deploy checklist:
 3. Run migrations
 4. Ensure `ALLOWED_HOSTS` and CORS/CSRF origins match your domain
 5. Configure reverse proxy (nginx) + gunicorn/uvicorn
+
+### Deploying to Render
+
+Render's free tier ignores the `Procfile`, so the `release_command` and the migrations it contains never run. Run migrations from the Build Command instead:
+
+```
+pip install -r requirements/production.txt && python manage.py collectstatic --no-input && python manage.py migrate
+```
+
+Keep the `Procfile` as the plain gunicorn web command, since that is what Render's web process uses.
 
 ---
 
@@ -214,6 +255,9 @@ python manage.py makemigrations --check --dry-run
 
 | Commit | Description |
 |--------|-------------|
+| `8060421` | Guard quiz grading against stale responses and cover the quiz endpoint |
+| `2d02808` | Hide the quiz answer key from lesson detail; grade server-side on `POST /api/courses/lessons/{id}/quiz/` |
+| `bcca5f1` | Make `EnrollmentViewSet` read-only so `POST /api/courses/enrollments/` returns 405 |
 | `cb50b8e` | Add comprehensive API documentation |
 | `2e7a465` | Revert workaround commit 9a1266c; restore DRF Spectacular, Debug Toolbar, PostgreSQL |
 | `e53cf09` | Fix `IsOwnerOrMentorOrAdmin` permission logic; production hardening (LocMemCache, DB sessions, Sentry `send_default_pii=False`) |
