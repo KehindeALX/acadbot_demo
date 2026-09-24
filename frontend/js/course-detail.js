@@ -518,12 +518,16 @@ window.answerQuiz = function(i) {
 
   if (!enrollment?.id) return;
 
+  const answeredLesson = lessonState.lessonId;
+  const answeredStep = lessonState.idx;
+
   // Enrolled students post the answer; the server grades it and is the only
   // source of the correct index and feedback.
-  submitQuiz(lessonState.lessonId, i)
+  submitQuiz(answeredLesson, i)
     .then((response) => {
       const result = response?.data?.result;
       if (!result || !lessonOverlay.classList.contains('active')) return;
+      if (lessonState.lessonId !== answeredLesson || lessonState.idx !== answeredStep) return;
       lessonState.isGraded = true;
       lessonState.correctIndex = result.correct_index;
       lessonState.quizFeedback = result.feedback || '';

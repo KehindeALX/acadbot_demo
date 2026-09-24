@@ -425,6 +425,52 @@ class TestEnrollmentFlow:
         assert lesson_data['quiz_question'] == 'Which layer handles routing?'
         assert lesson_data['quiz_options'] == ['Physical', 'Data Link', 'Network', 'Transport']
 
+    def test_quiz_submission_returns_grading(self, api_client, cyber_course):
+        """An enrolled student's quiz submission is graded server-side."""
+        lesson = cyber_course.lessons.get(order=1)  # Correct answer is index 2
+        quiz_url = f'/api/courses/lessons/{lesson.id}/quiz/'
+
+        api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+        api_client.post(self.ENROLL_URL.format(course_id=cyber_course.id), format='json')
+
+        response = api_client.post(quiz_url, {'answer_index': 2}, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['success'] is True
+
+        result = response.data['data']['result']
+        assert result['correct'] is True
+        assert result['correct_index'] == 2
+        assert result['feedback'] == 'The Network Layer (Layer 3) handles routing.'
+
+    def test_quiz_submission_wrong_answer_is_graded(self, api_client, cyber_course):
+        """A wrong answer still comes back graded, with the correct index."""
+        lesson = cyber_course.lessons.get(order=1)  # Correct answer is index 2
+        quiz_url = f'/api/courses/lessons/{lesson.id}/quiz/'
+
+        api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+        api_client.post(self.ENROLL_URL.format(course_id=cyber_course.id), format='json')
+
+        response = api_client.post(quiz_url, {'answer_index': 0}, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        result = response.data['data']['result']
+        assert result['correct'] is False
+        assert result['correct_index'] == 2
+
+    def test_quiz_submission_requires_enrollment(self, api_client, cyber_course):
+        """A student who is not enrolled gets 404 on quiz submission."""
+        lesson = cyber_course.lessons.get(order=1)
+        quiz_url = f'/api/courses/lessons/{lesson.id}/quiz/'
+
+        api_client.post(self.REGISTER_URL, self.valid_student_payload(), format='json')
+        api_client.post(self.LOGIN_URL, {'identifier': 'teststudent@example.com', 'password': 'TestPass123'}, format='json')
+
+        response = api_client.post(quiz_url, {'answer_index': 2}, format='json')
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert Enrollment.objects.filter(student__username='teststudent').count() == 0
+
     def test_unauthenticated_cannot_enroll(self, api_client, cyber_course):
         """Anonymous users cannot enroll."""
         enroll_url = self.ENROLL_URL.format(course_id=cyber_course.id)
