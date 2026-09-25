@@ -275,8 +275,6 @@ function handleValidationErrors(errors) {
     non_field_errors: null,
   };
 
-  let hasFieldErrors = false;
-
   for (const [field, messages] of Object.entries(errors)) {
     if (field === 'non_field_errors') {
       // Non-field errors — show as form-level error, safe message only
@@ -288,13 +286,7 @@ function handleValidationErrors(errors) {
     if (mapping) {
       // Always use the safe static message, never the raw backend message
       showFieldError(mapping.input, mapping.error, safeMessages[field] || 'Please check this field.');
-      hasFieldErrors = true;
     }
-  }
-
-  // If only non-field errors, show form error
-  if (!hasFieldErrors && errors.non_field_errors) {
-    showFormError(Array.isArray(errors.non_field_errors) ? errors.non_field_errors.join('\n') : errors.non_field_errors);
   }
 }
 

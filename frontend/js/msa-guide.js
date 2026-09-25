@@ -19,7 +19,7 @@ import {
   listCareers,
   getCareer,
   guideAbia,
-  formatApiError,
+  safeErrorMessage,
   isNetworkError
 } from './api.js';
 import { initNavbar } from './navbar.js';
@@ -91,7 +91,7 @@ async function loadCareers() {
     careersError.classList.remove('hidden');
     careersGrid.classList.add('hidden');
     if (!isNetworkError(err)) {
-      showToast(formatApiError(err), 'error');
+      showToast(safeErrorMessage(err), 'error');
     }
   } finally {
     showCareersLoading(false);
@@ -487,7 +487,7 @@ function handleSend() {
       if (isNetworkError(err)) {
         showToast('Unable to connect to the server.', 'warning');
       } else {
-        showToast(formatApiError(err), 'error');
+        showToast(safeErrorMessage(err), 'error');
       }
     })
     .finally(() => {

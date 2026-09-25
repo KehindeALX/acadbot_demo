@@ -76,7 +76,7 @@ async function loadCourses(page = 1) {
       renderCourses();
     }
   } catch (err) {
-    const message = formatApiError(err);
+    const message = safeErrorMessage(err);
     showToast(message, 'error');
     renderCourses(); // Will show empty state
   } finally {
@@ -96,7 +96,7 @@ async function loadCareerFilters() {
     // the first page already returned so the filter still renders.
     allCareers = extractCareers(allCourses);
     if (!isNetworkError(err)) {
-      showToast(formatApiError(err), 'error');
+      showToast(safeErrorMessage(err), 'error');
     }
   }
   renderCareerFilters();

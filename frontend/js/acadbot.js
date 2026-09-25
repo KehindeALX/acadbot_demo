@@ -16,7 +16,7 @@
  */
 
 import {
-  formatApiError,
+  safeErrorMessage,
   isNetworkError,
 } from './api.js';
 import { askAcadBot } from './api.js';
@@ -114,7 +114,7 @@ function handleSend() {
       if (isNetworkError(err)) {
         showToast('Unable to connect to the server.', 'warning');
       } else {
-        showToast(formatApiError(err), 'error');
+        showToast(safeErrorMessage(err), 'error');
       }
     })
     .finally(() => {
