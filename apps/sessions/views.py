@@ -1,7 +1,7 @@
 """
 Views for the Sessions app.
 """
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db.models import Q
 
+from apps.accounts.models import User
 from .models import Session, SessionRecurrence, Availability, SessionFeedback
 from .serializers import (
     SessionSerializer,
@@ -326,7 +327,22 @@ class MentorAvailabilityViewSet(viewsets.ReadOnlyModelViewSet):
 class SessionFeedbackViewSet(viewsets.ModelViewSet):
     """ViewSet for session feedback."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrMentorOrAdmin]
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        if request.method in permissions.SAFE_METHODS:
+            return
+
+        session_id = self.kwargs.get('session_pk')
+        if not session_id:
+            return
+
+        session = get_object_or_404(Session, id=session_id)
+        is_participant = session.student == request.user or session.mentor == request.user
+        if not is_participant and request.user.role != User.Role.ADMIN:
+            self.permission_denied(request, message='You are not a participant in this session.')
 
     def get_serializer_class(self):
         if self.action == 'create':

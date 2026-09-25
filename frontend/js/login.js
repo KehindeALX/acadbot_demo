@@ -37,7 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Read optional redirect target from URL (?redirect=...)
   const urlParams = new URLSearchParams(window.location.search);
   const redirect = urlParams.get('redirect');
-  if (redirect && redirect.startsWith('.html')) {
+  const isSafeRedirect = redirect && /^[a-zA-Z0-9_-]+\.html(\?[a-zA-Z0-9_=&-]*)?$/.test(redirect);
+  if (isSafeRedirect) {
     redirectTarget = redirect;
   }
 
