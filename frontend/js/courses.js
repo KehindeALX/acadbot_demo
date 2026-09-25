@@ -6,7 +6,8 @@
 import {
   listCourses,
   listCareers,
-  formatApiError,
+  safeErrorMessage,
+  isNetworkError
 } from './api.js';
 import { initNavbar } from './navbar.js';
 

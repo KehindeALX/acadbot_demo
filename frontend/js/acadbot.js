@@ -17,6 +17,7 @@
 
 import {
   formatApiError,
+  isNetworkError,
 } from './api.js';
 import { askAcadBot } from './api.js';
 import { initNavbar } from './navbar.js';

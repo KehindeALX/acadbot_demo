@@ -20,6 +20,7 @@ import {
   getCareer,
   guideAbia,
   formatApiError,
+  isNetworkError
 } from './api.js';
 import { initNavbar } from './navbar.js';
 
