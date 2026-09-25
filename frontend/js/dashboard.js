@@ -7,7 +7,7 @@
 import {
   getMe,
   listEnrollments,
-  formatApiError,
+  safeErrorMessage,
   isAuthError,
   isNetworkError
 } from './api.js';
@@ -83,7 +83,7 @@ async function loadEnrollments(page = 1) {
       enrollmentsList.classList.remove('hidden');
     }
   } catch (err) {
-    const message = formatApiError(err);
+    const message = safeErrorMessage(err);
     showToast(message, 'error');
     enrollmentsList.classList.remove('hidden');
     renderEnrollments(); // Will show empty

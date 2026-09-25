@@ -11,7 +11,7 @@ import {
   getEnrollmentDetail,
   completeLesson,
   submitQuiz,
-  formatApiError,
+  safeErrorMessage,
   isAuthError,
   isNetworkError
 } from './api.js';
@@ -103,7 +103,7 @@ async function loadCourse(courseId) {
     renderCourse();
     await checkEnrollmentStatus();
   } catch (err) {
-    const message = formatApiError(err);
+    const message = safeErrorMessage(err);
     showToast(message, 'error');
     if (err.status === 404) {
       setTimeout(() => window.location.href = 'courses.html', 2000);
@@ -237,7 +237,7 @@ async function handleEnroll() {
       showToast(data.message || 'Enrollment failed', 'error');
     }
   } catch (err) {
-    showToast(formatApiError(err), 'error');
+    showToast(safeErrorMessage(err), 'error');
   } finally {
     isEnrolling = false;
     enrollBtn.disabled = false;
@@ -269,7 +269,7 @@ async function openResumeLesson() {
     } catch (err) {
       // Fall through — without progress data we start at lesson 1.
       if (!isNetworkError(err)) {
-        showToast(formatApiError(err), 'error');
+        showToast(safeErrorMessage(err), 'error');
       }
     }
   }
@@ -535,7 +535,7 @@ window.answerQuiz = function(i) {
     })
     .catch((err) => {
       if (!isNetworkError(err)) {
-        showToast(formatApiError(err), 'error');
+        showToast(safeErrorMessage(err), 'error');
       }
     });
 };
