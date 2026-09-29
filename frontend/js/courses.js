@@ -280,6 +280,17 @@ function showLoading(show) {
 }
 
 function showEmptyState() {
+  const title = emptyState.querySelector('.empty-state__title');
+  const message = emptyState.querySelector('.empty-state__message');
+
+  if (currentCareerFilter) {
+    title.textContent = 'Coming soon';
+    message.textContent = 'Courses for this path are coming soon. Try another career in the meantime.';
+  } else {
+    title.textContent = 'No Courses Found';
+    message.textContent = 'No published courses match your current filter. Try selecting a different career or check back later.';
+  }
+
   emptyState.classList.remove('hidden');
   coursesGrid.classList.add('hidden');
   pagination.classList.add('hidden');
