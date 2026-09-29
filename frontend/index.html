@@ -634,11 +634,17 @@
       padding: var(--space-2xl) var(--space-xl);
       border-top: 1px solid var(--border);
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-md);
     }
 
     .footer__text {
       font-size: 13px;
       color: var(--muted);
+      max-width: 480px;
+      line-height: 1.8;
     }
 
     .footer__text a {
@@ -684,6 +690,11 @@
     }
 
     @media (max-width: 640px) {
+      .footer {
+        padding: var(--space-xl) var(--space-md);
+        gap: var(--space-sm);
+      }
+
       .navbar__links {
         display: none;
       }
@@ -1003,7 +1014,7 @@
        ============================================================ -->
   <footer class="footer">
     <p class="footer__text">
-      Built for <a href="https://www.moresuccessacademy.com" target="_blank" rel="noopener">More Success Academy</a> &middot; MSA AcadBot &copy; 2025
+      Built for <a href="https://www.moresuccessacademy.com" target="_blank" rel="noopener">More Success Academy</a> &middot; MSA AcadBot &copy; 2026
     </p>
   </footer>
 
