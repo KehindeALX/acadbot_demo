@@ -18,6 +18,8 @@ import { getMe, isAuthError } from './api.js';
  * @returns {Promise<object|null>} The current user object, or null if not authenticated.
  */
 export async function initNavbar() {
+  setupNavToggle();
+
   const authNav = document.getElementById('authNav');
   if (!authNav) return null;
 
@@ -35,6 +37,26 @@ export async function initNavbar() {
     // Network errors — leave authNav empty, don't block page
   }
   return null;
+}
+
+function setupNavToggle() {
+  const toggle = document.getElementById('navToggle');
+  const nav = document.getElementById('mainNav');
+  if (!toggle || !nav) return;
+
+  toggle.addEventListener('click', () => {
+    const isOpen = nav.classList.toggle('navbar__nav--open');
+    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    toggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  });
+
+  nav.addEventListener('click', (e) => {
+    if (e.target.closest('a')) {
+      nav.classList.remove('navbar__nav--open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open menu');
+    }
+  });
 }
 
 /**

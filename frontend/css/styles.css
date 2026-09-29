@@ -240,6 +240,56 @@ a:hover {
   color: var(--navy);
 }
 
+.navbar__toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 31px;
+  margin-left: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--white);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .navbar__toggle {
+    display: inline-flex;
+  }
+  .navbar__nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background: var(--navy2);
+    border-bottom: 1px solid var(--border);
+  }
+  .navbar__nav--open {
+    display: flex;
+  }
+  #authNav {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+  }
+  .navbar__link,
+  .navbar__btn,
+  .navbar__user-name {
+    text-align: center;
+  }
+}
+
 /* ============================================================
    Buttons
    ============================================================ */
@@ -1005,6 +1055,7 @@ a:hover {
   }
   .page__main { padding: var(--space-md); }
   .navbar { padding: var(--space-md); }
+  .pagination { flex-wrap: wrap; }
 }
 
 /* ============================================================
@@ -1549,6 +1600,7 @@ a:hover {
 .mb-5 { margin-bottom: var(--space-xl); }
 
 .d-flex { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
 .d-none { display: none; }
 .d-block { display: block; }
 .flex-1 { flex: 1; }
