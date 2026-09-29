@@ -15,7 +15,6 @@ MENTOR_DATA = [
         'email': 'sarah.chen@acadbot.demo',
         'first_name': 'Sarah',
         'last_name': 'Chen',
-        'password': 'MentorPass123!',
         'career_slugs': ['cyber'],
         'hourly_rate': '150.00',
         'bio': (
@@ -38,7 +37,6 @@ MENTOR_DATA = [
         'email': 'marcus.rodriguez@acadbot.demo',
         'first_name': 'Marcus',
         'last_name': 'Rodriguez',
-        'password': 'MentorPass123!',
         'career_slugs': ['cyber'],
         'hourly_rate': '175.00',
         'bio': (
@@ -61,7 +59,6 @@ MENTOR_DATA = [
         'email': 'priya.sharma@acadbot.demo',
         'first_name': 'Priya',
         'last_name': 'Sharma',
-        'password': 'MentorPass123!',
         'career_slugs': ['cyber', 'ai'],
         'hourly_rate': '200.00',
         'bio': (
@@ -84,7 +81,6 @@ MENTOR_DATA = [
         'email': 'david.okonkwo@acadbot.demo',
         'first_name': 'David',
         'last_name': 'Okonkwo',
-        'password': 'MentorPass123!',
         'career_slugs': ['ai'],
         'hourly_rate': '180.00',
         'bio': (
@@ -107,7 +103,6 @@ MENTOR_DATA = [
         'email': 'elena.volkova@acadbot.demo',
         'first_name': 'Elena',
         'last_name': 'Volkova',
-        'password': 'MentorPass123!',
         'career_slugs': ['ai'],
         'hourly_rate': '220.00',
         'bio': (
@@ -130,7 +125,6 @@ MENTOR_DATA = [
         'email': 'james.miller@acadbot.demo',
         'first_name': 'James',
         'last_name': 'Miller',
-        'password': 'MentorPass123!',
         'career_slugs': ['cyber', 'ai'],
         'hourly_rate': '160.00',
         'bio': (
@@ -196,7 +190,7 @@ class Command(BaseCommand):
             )
 
             if user_created:
-                user.set_password(mentor_data['password'])
+                user.set_unusable_password()
                 user.save()
                 created_count += 1
                 self.stdout.write(f'Created mentor user: {user.get_full_name()} ({user.email})')
@@ -204,7 +198,6 @@ class Command(BaseCommand):
                 # Update existing user fields
                 for key, value in mentor_data.items():
                     setattr(user, key, value)
-                user.set_password(mentor_data['password'])
                 user.save()
                 updated_count += 1
                 self.stdout.write(f'Updated mentor user: {user.get_full_name()} ({user.email})')
