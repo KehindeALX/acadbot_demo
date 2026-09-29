@@ -257,6 +257,10 @@ a:hover {
 }
 
 @media (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+    padding: var(--space-md);
+  }
   .navbar__toggle {
     display: inline-flex;
   }
@@ -272,6 +276,8 @@ a:hover {
     padding: var(--space-md);
     background: var(--navy2);
     border-bottom: 1px solid var(--border);
+    max-height: calc(100dvh - 60px);
+    overflow-y: auto;
   }
   .navbar__nav--open {
     display: flex;
@@ -287,6 +293,7 @@ a:hover {
   .navbar__btn,
   .navbar__user-name {
     text-align: center;
+    white-space: normal;
   }
 }
 
@@ -1056,6 +1063,26 @@ a:hover {
   .page__main { padding: var(--space-md); }
   .navbar { padding: var(--space-md); }
   .pagination { flex-wrap: wrap; }
+  .chat,
+  .guide {
+    padding: var(--space-md);
+  }
+  .toast-container {
+    left: var(--space-md);
+    right: var(--space-md);
+    bottom: var(--space-md);
+  }
+  .toast {
+    min-width: 0;
+    max-width: none;
+  }
+  .modal-overlay,
+  .lesson-overlay {
+    padding: var(--space-md);
+  }
+  .progress--sm {
+    width: 100%;
+  }
 }
 
 /* ============================================================
@@ -1614,6 +1641,22 @@ a:hover {
 .gap-4 { gap: var(--space-lg); }
 
 .w-full { width: 100%; }
+
+#careerFilters {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+}
+#careerFilters > button {
+  flex-shrink: 0;
+}
+@media (max-width: 640px) {
+  #careerFilters {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
 
 /* ============================================================
    Page-Specific Components

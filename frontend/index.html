@@ -695,6 +695,16 @@
         gap: var(--space-sm);
       }
 
+      .footer__text {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
+
+      .navbar {
+        flex-wrap: wrap;
+        padding: var(--space-md) var(--space-lg);
+      }
+
       .navbar__links {
         display: none;
       }
@@ -715,6 +725,8 @@
         padding: var(--space-lg);
         border-bottom: 1px solid var(--border);
         gap: var(--space-md);
+        max-height: calc(100dvh - 60px);
+        overflow-y: auto;
       }
 
       .features__grid {
