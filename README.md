@@ -188,7 +188,7 @@ Environment variables (managed via `python-decouple`):
 | `SUBSCRIPTION_AMOUNT_KOBO` | Price in kobo | `500000` |
 | `SUBSCRIPTION_DAYS` | Access window length | `30` |
 | `FREE_LESSONS_PER_COURSE` | Lessons open before payment | `2` |
-| `FRONTEND_BASE_URL` | Paystack return URL origin | `https://acadbot-demo.onrender.com` |
+| `FRONTEND_BASE_URL` | Paystack return URL origin | `https://app.moresuccessacademy.com.ng` |
 | `CERT_PASS_MARK` | Average quiz score needed to certify | `70` |
 | `CERT_VERIFY_BASE_URL` | Verify URL printed on the PDF | `https://app.moresuccessacademy.com.ng/verify.html` |
 
