@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SpeakPro | MSA AcadBot</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body class="speakpro-body">
+  <nav class="navbar">
+    <a href="index.html" class="navbar__logo">
+      <span class="navbar__logo-text">MSA <span>AcadBot</span></span>
+    </a>
+    <button class="navbar__toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mainNav">
+      <span aria-hidden="true">☰</span>
+    </button>
+    <div class="navbar__nav" id="mainNav">
+      <a href="index.html" class="navbar__link">Home</a>
+      <a href="courses.html" class="navbar__link">Courses</a>
+      <a href="acadbot.html" class="navbar__link">Ask AcadBot</a>
+      <a href="msa-guide.html" class="navbar__link">MSA Guide</a>
+      <a href="speakpro.html" class="navbar__link navbar__link--active">SpeakPro</a>
+      <div id="authNav">
+      </div>
+    </div>
+  </nav>
+
+  <main class="speakpro">
+    <header class="speakpro__header">
+      <h1 class="speakpro__title">Speak<span>Pro</span></h1>
+      <p class="speakpro__subtitle">You know the work. This finds the words that are not keeping up. Tell us what you do, get scored on how clearly you explain it, practise three questions, and leave with a pitch for your project.</p>
+      <p class="speakpro__disclaimer">This is AI generated feedback, not a human coach. Do not enter private or sensitive personal details.</p>
+    </header>
+
+    <ol class="sp-steps" id="spSteps" aria-label="Progress">
+      <li class="sp-step sp-step--active" id="spStep1" aria-current="step">
+        <span class="sp-step__num">1</span>
+        <span class="sp-step__label">Your work</span>
+      </li>
+      <li class="sp-step" id="spStep2">
+        <span class="sp-step__num">2</span>
+        <span class="sp-step__label">Your score and practice</span>
+      </li>
+      <li class="sp-step" id="spStep3">
+        <span class="sp-step__num">3</span>
+        <span class="sp-step__label">Your feedback and pitch</span>
+      </li>
+    </ol>
+
+    <section class="sp-panel" id="spForm" aria-label="Tell us about your work">
+      <form id="spFormEl" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="spSkills">What are you good at?</label>
+          <textarea class="form-input sp-input" id="spSkills" name="skills" rows="3" maxlength="400" required placeholder="Data analysis, Excel, customer service, tailoring, plumbing, teaching, photography. Anything you have actually done."></textarea>
+          <div class="sp-counter"><span id="spSkillsCount">0</span> / 400</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="spProject">Tell us about one project you did</label>
+          <textarea class="form-input sp-input" id="spProject" name="project" rows="5" maxlength="600" required placeholder="What it was, what you did in it, who it was for, and what changed because of it."></textarea>
+          <div class="sp-counter"><span id="spProjectCount">0</span> / 600</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="spGoal">Where do you want this to take you?</label>
+          <input class="form-input" id="spGoal" name="goal" type="text" maxlength="200" required placeholder="An interview, a bigger contract, a promotion, your first client."/>
+          <div class="sp-counter"><span id="spGoalCount">0</span> / 200</div>
+        </div>
+
+        <p class="form-error" id="spFormError" role="alert"></p>
+        <button class="btn btn--primary btn--lg sp-submit" id="spSubmit" type="submit">Find my gaps</button>
+        <p class="sp-loading" id="spLoading" hidden>Reading your answers, one moment.</p>
+      </form>
+    </section>
+
+    <section class="sp-panel hidden" id="spResult" aria-label="Your score and practice questions"></section>
+
+    <section class="sp-panel hidden" id="spPractice" aria-label="Answer the practice questions"></section>
+
+    <section class="sp-panel hidden" id="spFeedback" aria-label="Your feedback and pitch"></section>
+  </main>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="js/speakpro.js"></script>
+</body>
+</html>

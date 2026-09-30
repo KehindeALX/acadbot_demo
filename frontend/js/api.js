@@ -436,6 +436,20 @@ export async function guideAbia(messages) {
   });
 }
 
+export async function speakProAnalyze(payload) {
+  return apiFetch('/api/guide/speakpro/analyze/', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function speakProFeedback(answers) {
+  return apiFetch('/api/guide/speakpro/feedback/', {
+    method: 'POST',
+    body: JSON.stringify({ answers }),
+  });
+}
+
 // ============================================================
 // Error Handling Helpers
 // ============================================================
@@ -626,6 +640,9 @@ export const api = {
   // Chat
   askAcadBot,
   guideAbia,
+
+  speakProAnalyze,
+  speakProFeedback,
 
   // Error helpers
   formatApiError,
