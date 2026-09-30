@@ -65,15 +65,10 @@ function setupNavToggle() {
  * Logout is always the last item.
  */
 function renderAuthNav(container, user) {
-  const displayName = [user.first_name, user.last_name]
-    .filter(Boolean)
-    .join(' ') || user.username;
-
   container.innerHTML = `
-    <span class="navbar__user-name">${escapeHtml(displayName)}</span>
     <a href="dashboard.html" class="navbar__link">Dashboard</a>
     <a href="speakpro.html" class="navbar__link">SpeakPro</a>
-    <button id="logoutBtn" class="navbar__btn">Logout</button>
+    <button id="logoutBtn" class="navbar__btn navbar__btn--outline">Logout</button>
   `;
 
   document.getElementById('logoutBtn').addEventListener('click', handleLogout);
