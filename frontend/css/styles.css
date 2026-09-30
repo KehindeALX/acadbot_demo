@@ -1643,18 +1643,20 @@ a:hover {
 .w-full { width: 100%; }
 
 #careerFilters {
-  flex-wrap: nowrap;
-  overflow-x: auto;
+  flex-wrap: wrap;
+  overflow-x: visible;
   overflow-y: hidden;
   padding-bottom: 4px;
+  gap: var(--space-sm);
 }
 #careerFilters > button {
   flex-shrink: 0;
+  flex: 0 1 auto;
 }
 @media (max-width: 640px) {
   #careerFilters {
-    flex-wrap: wrap;
-    overflow-x: visible;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 }
 

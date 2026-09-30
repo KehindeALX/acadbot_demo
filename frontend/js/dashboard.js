@@ -18,7 +18,7 @@ import { initNavbar } from './navbar.js';
 // ============================================================
 // DOM Elements
 // ============================================================
-const dashboardUserName = document.getElementById('dashboardUserName');
+const dashboardFirstName = document.getElementById('dashboardFirstName');
 const statsGrid = document.getElementById('statsGrid');
 const enrollmentsLoading = document.getElementById('enrollmentsLoading');
 const enrollmentsList = document.getElementById('enrollmentsList');
@@ -104,8 +104,7 @@ async function loadCertificates() {
 function renderUser() {
   if (!user) return;
 
-  const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username;
-  dashboardUserName.textContent = `, ${displayName}`;
+  dashboardFirstName.textContent = user.first_name || user.username || '';
 }
 
 // ============================================================
