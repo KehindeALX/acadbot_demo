@@ -22,7 +22,7 @@ PENDING_TRANSACTION_STATUSES = ('pending', 'queued', 'ongoing')
 
 
 def get_secret_key():
-    return config('PAYSTACK_SECRET_KEY', default='')
+    return config('PAYSTACK_SECRET_KEY', default='').strip().strip('"\'')
 
 
 def get_amount_kobo():
@@ -57,6 +57,8 @@ def amount_in_naira(amount_kobo):
 def call_paystack(url, payload=None, method='POST'):
     headers = {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'MSA-AcadBot/1.0',
         'Authorization': f'Bearer {get_secret_key()}',
     }
     data = json.dumps(payload).encode('utf-8') if payload is not None else None

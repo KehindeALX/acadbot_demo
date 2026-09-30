@@ -61,7 +61,16 @@ def initialize_payment(request):
     except UPSTREAM_ERRORS as exc:
         subscription.status = Subscription.Status.FAILED
         subscription.save(update_fields=['status', 'updated_at'])
-        logger.warning('Paystack initialize failed: %s', type(exc).__name__)
+        if isinstance(exc, HTTPError):
+            try:
+                body_text = exc.read()[:300].decode('utf-8', errors='replace') if hasattr(exc, 'read') else str(exc)[:300]
+            except Exception:
+                body_text = str(exc)[:300]
+            logger.warning('Paystack initialize failed HTTP %s: %s', exc.code, body_text)
+        elif isinstance(exc, URLError):
+            logger.warning('Paystack initialize failed URLError: %s', exc.reason)
+        else:
+            logger.warning('Paystack initialize failed %s: %s', type(exc).__name__, str(exc))
         return error_response(
             status.HTTP_502_BAD_GATEWAY,
             'We could not start the payment right now. Please try again in a moment.',
@@ -104,7 +113,16 @@ def verify_payment(request):
     try:
         transaction = services.verify_transaction(reference)
     except UPSTREAM_ERRORS as exc:
-        logger.warning('Paystack verify failed: %s', type(exc).__name__)
+        if isinstance(exc, HTTPError):
+            try:
+                body_text = exc.read()[:300].decode('utf-8', errors='replace') if hasattr(exc, 'read') else str(exc)[:300]
+            except Exception:
+                body_text = str(exc)[:300]
+            logger.warning('Paystack verify failed HTTP %s: %s', exc.code, body_text)
+        elif isinstance(exc, URLError):
+            logger.warning('Paystack verify failed URLError: %s', exc.reason)
+        else:
+            logger.warning('Paystack verify failed %s: %s', type(exc).__name__, str(exc))
         return error_response(
             status.HTTP_502_BAD_GATEWAY,
             'We could not confirm the payment just now. Please try again in a moment.',
