@@ -1,8 +1,10 @@
 import hashlib
 import hmac
 import json
+import logging
+from urllib.error import HTTPError, URLError
 from datetime import timedelta
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.utils import timezone
@@ -631,3 +633,50 @@ def test_free_lesson_limit_is_configurable(api_client, student, course, enrollme
         second = api_client.get(lesson_url(course.lessons.get(order=2)))
 
     assert second.status_code == status.HTTP_402_PAYMENT_REQUIRED
+
+
+@pytest.mark.django_db
+def test_http_error_401_logs_code_and_body_not_key(api_client, student):
+    api_client.force_authenticate(user=student)
+    with patch('apps.payments.services.config', side_effect=fake_config), \
+         patch('apps.payments.services.urlopen', side_effect=lambda *a, **kw: (_ for _ in ()).throw(HTTPError('https://test', 401, 'Unauthorized', {}, fp=__import__('io').BytesIO(b'{"message":"bad key"}')))), \
+         patch('apps.payments.views.logger') as mock_logger:
+        response = api_client.post(INITIALIZE_URL, {}, format='json')
+    assert response.status_code == status.HTTP_502_BAD_GATEWAY
+    joined = ' '.join(str(a) for c in mock_logger.warning.call_args_list for a in c.args)
+    assert '401' in joined
+    assert 'bad key' in joined
+    assert SECRET_KEY not in joined
+
+
+@pytest.mark.django_db
+def test_urlerror_logs_reason(api_client, student):
+    api_client.force_authenticate(user=student)
+    with patch('apps.payments.services.config', side_effect=fake_config), \
+         patch('apps.payments.services.urlopen', side_effect=lambda *a, **kw: (_ for _ in ()).throw(URLError('connection refused'))), \
+         patch('apps.payments.views.logger') as mock_logger:
+        response = api_client.post(INITIALIZE_URL, {}, format='json')
+    assert response.status_code == status.HTTP_502_BAD_GATEWAY
+    joined = ' '.join(str(a) for c in mock_logger.warning.call_args_list for a in c.args)
+    assert 'connection refused' in joined
+
+
+@pytest.mark.django_db
+def test_secret_key_stripped_of_spaces_and_quotes(api_client, student):
+    dirty = '  "  sk-test  "  '
+    clean = dirty.strip().strip(chr(34) + chr(39))
+    settings = dict(SETTINGS, PAYSTACK_SECRET_KEY=dirty)
+    api_client.force_authenticate(user=student)
+    captured = {}
+    def capture_urlopen(req, timeout=30):
+        captured['auth'] = req.headers.get('Authorization')
+        mock_resp = MagicMock()
+        mock_resp.read = lambda: b'{"data":{"authorization_url":"x","access_code":"y"}}'
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = lambda *a: False
+        return mock_resp
+    with patch('apps.payments.services.config', side_effect=lambda k, **kw: settings.get(k, kw.get('default', ''))), \
+         patch('apps.payments.services.urlopen', capture_urlopen):
+        response = api_client.post(INITIALIZE_URL, {}, format='json')
+    assert response.status_code == status.HTTP_200_OK
+    assert captured['auth'] == f'Bearer {clean}'
