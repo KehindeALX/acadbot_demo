@@ -5,21 +5,14 @@
  * and a journey screen with stage tabs (Roadmap, Skills, Interview, Courses)
  * plus a chat interface.
  *
- * INTEGRATION NOTE (read before wiring the backend):
- * No chat/AI endpoint exists yet on the backend (PRODUCT.md principle #2 —
- * no invented endpoints). This module is built to be *ready to call*: when
- * a chat endpoint is routed, replace the placeholder body of `guideAbia()`
- * in ./api.js with the real call, and this page works unchanged.
- *
  * Career data (cards, roadmap, skills, questions) comes from real API
- * endpoints (/api/careers/, /api/careers/{slug}/).
  */
 
 import {
   listCareers,
   getCareer,
   guideAbia,
-  safeErrorMessage,
+  guideErrorMessage,
   isNetworkError
 } from './api.js';
 import { initNavbar } from './navbar.js';
@@ -53,17 +46,24 @@ let activeCareer = null;
 let activeStage = 'roadmap';
 let isSending = false;
 let messageCount = 0;
+let conversation = [];
 let skillStates = {}; // { skillId: true/false }
 
 // Composer auto-resize bounds
 const INPUT_MIN_HEIGHT = 52;
 const INPUT_MAX_HEIGHT = 150;
 
+const HISTORY_LIMIT = 10;
+
 // ============================================================
 // Init
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
   user = await initNavbar();
+  if (!user) {
+    window.location.href = 'login.html?redirect=msa-guide.html';
+    return;
+  }
   await loadCareers();
   setupEventListeners();
 });
@@ -91,7 +91,7 @@ async function loadCareers() {
     careersError.classList.remove('hidden');
     careersGrid.classList.add('hidden');
     if (!isNetworkError(err)) {
-      showToast(safeErrorMessage(err), 'error');
+      showToast(guideErrorMessage(err), 'error');
     }
   } finally {
     showCareersLoading(false);
@@ -445,21 +445,18 @@ function handleSend() {
   if (activeStage === 'interview' && window.__guideInterview) {
     const currentQ = window.__guideInterview.getCurrent();
     if (currentQ) {
-      // Call the AI stub for feedback on the answer
-      guideAbia({ message: `Interview question: "${currentQ.question || currentQ.text}"\n\nUser's answer: "${text}"\n\nProvide brief, constructive feedback on this interview answer.`, career_slug: activeCareer?.slug })
+      const question = currentQ.question || currentQ.text;
+      const ask = `Interview question: "${question}"\n\nUser's answer: "${text}"\n\nProvide brief, constructive feedback on this interview answer.`;
+
+      sendToAbia(ask)
         .then(reply => {
-          removeTyping();
-          if (reply && reply.success && reply.message) {
-            appendBotMessage(reply.message);
-          }
-          // Show next question after a delay
+          if (reply) appendBotMessage(reply);
           setTimeout(() => {
             window.__guideInterview.showNext();
           }, 1500);
         })
-        .catch(() => {
-          removeTyping();
-          appendBotMessage('Thank you for your answer! Practice makes perfect. Let\'s move to the next question.');
+        .catch(err => {
+          showToast(guideErrorMessage(err), 'error');
           setTimeout(() => {
             window.__guideInterview.showNext();
           }, 1200);
@@ -473,28 +470,34 @@ function handleSend() {
     }
   }
 
-  // Default: send to Abia stub
-  guideAbia({ message: text, career_slug: activeCareer?.slug })
+  sendToAbia(text)
     .then(reply => {
-      removeTyping();
-      if (reply && reply.success && reply.message) {
-        appendBotMessage(reply.message);
-      }
+      if (reply) appendBotMessage(reply);
     })
     .catch(err => {
-      removeTyping();
-      appendBotMessage('Abia isn\'t connected yet — your message was received. The career guide AI will respond here once it\'s wired to the backend.');
-      if (isNetworkError(err)) {
-        showToast('Unable to connect to the server.', 'warning');
-      } else {
-        showToast(safeErrorMessage(err), 'error');
-      }
+      showToast(guideErrorMessage(err), 'error');
     })
     .finally(() => {
       isSending = false;
       guideSend.disabled = false;
       scrollToBottom();
     });
+}
+
+function sendToAbia(text) {
+  const history = conversation.slice(-(HISTORY_LIMIT - 1));
+  history.push({ role: 'user', content: text });
+
+  return guideAbia(history).then(data => {
+    const reply = data && data.reply;
+    if (reply) {
+      conversation.push({ role: 'user', content: text });
+      conversation.push({ role: 'assistant', content: reply });
+    }
+    return reply;
+  }).finally(() => {
+    removeTyping();
+  });
 }
 
 // ============================================================

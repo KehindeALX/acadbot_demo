@@ -349,6 +349,44 @@ export async function submitQuiz(lessonId, answerIndex) {
   });
 }
 
+export async function issueCertificate(courseId) {
+  return apiFetch(`/api/courses/${courseId}/certificate/`, {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
+}
+
+export async function listCertificates() {
+  return apiFetch('/api/certificates/');
+}
+
+export async function verifyCertificate(code) {
+  return apiFetch(`/api/certificates/verify/${encodeURIComponent(code)}/`);
+}
+
+export function certificatePdfUrl(code) {
+  return `${API_BASE}/api/certificates/${encodeURIComponent(code)}/pdf/`;
+}
+
+export async function initializePayment() {
+  return apiFetch('/api/payments/initialize/', {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
+}
+
+export async function verifyPayment(reference) {
+  return apiFetch(`/api/payments/verify/?reference=${encodeURIComponent(reference)}`, {
+    method: 'GET',
+  });
+}
+
+export async function getPaymentStatus() {
+  return apiFetch('/api/payments/status/', {
+    method: 'GET',
+  });
+}
+
 // ============================================================
 // Careers API — MSA AI Guide
 // ============================================================
@@ -384,64 +422,18 @@ export async function getCareer(slug) {
 // Chat API — Ask AcadBot
 // ============================================================
 
-/**
- * Send a message to the AcadBot AI assistant.
- *
- * INTEGRATION NOTE: No chat/AI endpoint is routed on the backend yet
- * (PRODUCT.md principle #2 — no invented endpoints), so this returns a
- * "not connected" placeholder rather than calling a fabricated URL.
- *
- * At integration time, replace this body with the real call, e.g.:
- *   return apiFetch('/api/chat/', {
- *     method: 'POST',
- *     body: JSON.stringify({ message }),
- *   });
- * and adjust the response shape to match the backend serializer.
- *
- * @param {Object} payload
- * @param {string} payload.message - The user's message to AcadBot
- * @returns {Promise<Object>}
- */
-export async function askAcadBot(payload) {
-  // TODO(integration): wire to the real chat endpoint when routed.
-  // Deliberately NOT faked and NOT pointed at an invented URL.
-  return {
-    success: true,
-    message: 'AcadBot is not connected yet — your message was received.',
-    data: { acknowledged: true },
-  };
+export async function askAcadBot(messages) {
+  return apiFetch('/api/guide/chat/', {
+    method: 'POST',
+    body: JSON.stringify({ messages }),
+  });
 }
 
-// ============================================================
-// Chat API — Guide Abia (MSA AI Guide)
-// ============================================================
-
-/**
- * Send a message to the Abia AI career guide.
- *
- * INTEGRATION NOTE: No chat/AI endpoint is routed on the backend yet
- * (PRODUCT.md principle #2 — no invented endpoints), so this returns a
- * "not connected" placeholder rather than calling a fabricated URL.
- *
- * At integration time, replace this body with the real call, e.g.:
- *   return apiFetch('/api/careers/chat/', {
- *     method: 'POST',
- *     body: JSON.stringify({ career_slug, message }),
- *   });
- *
- * @param {Object} payload
- * @param {string} payload.message - The user's message to Abia
- * @param {string} [payload.career_slug] - Active career slug for context
- * @returns {Promise<Object>}
- */
-export async function guideAbia(payload) {
-  // TODO(integration): wire to the real chat endpoint when routed.
-  // Deliberately NOT faked and NOT pointed at an invented URL.
-  return {
-    success: true,
-    message: 'Abia is not connected yet — your message was received. The career guide AI will respond here once it\'s wired to the backend.',
-    data: { acknowledged: true },
-  };
+export async function guideAbia(messages) {
+  return apiFetch('/api/guide/chat/', {
+    method: 'POST',
+    body: JSON.stringify({ messages }),
+  });
 }
 
 // ============================================================
@@ -561,6 +553,13 @@ export function isValidationError(error) {
   return error.status === 400;
 }
 
+export function guideErrorMessage(error) {
+  if ([429, 502, 503].includes(error.status) && error.message) {
+    return error.message;
+  }
+  return safeErrorMessage(error);
+}
+
 /**
  * Check if error is an auth error (401/403)
  * @param {Error} error
@@ -611,6 +610,15 @@ export const api = {
   completeLesson,
   submitQuiz,
 
+  issueCertificate,
+  listCertificates,
+  verifyCertificate,
+  certificatePdfUrl,
+
+  initializePayment,
+  verifyPayment,
+  getPaymentStatus,
+
   // Careers
   listCareers,
   getCareer,
@@ -622,6 +630,7 @@ export const api = {
   // Error helpers
   formatApiError,
   safeErrorMessage,
+  guideErrorMessage,
   isValidationError,
   isAuthError,
   isNetworkError,

@@ -60,6 +60,24 @@
       </div>
     </section>
 
+    <!-- My Certificates -->
+    <section class="page__section" id="certificatesSection" aria-label="My certificates">
+      <h2 class="section-title">My Certificates</h2>
+
+      <div id="certificatesLoading" class="loading">
+        <div class="loading__spinner"></div>
+        <span>Loading your certificates...</span>
+      </div>
+
+      <div id="certificatesList" class="cert-grid hidden"></div>
+
+      <div id="certificatesEmpty" class="empty-state hidden">
+        <div class="empty-state__icon">🏅</div>
+        <h3 class="empty-state__title">No Certificates Yet</h3>
+        <p class="empty-state__message">Finish a course, pass the quizzes, and your certificate will appear here.</p>
+      </div>
+    </section>
+
     <!-- Pagination -->
     <nav id="pagination" class="pagination hidden" aria-label="Enrollment pagination">
       <!-- Pagination links injected here -->

@@ -21,6 +21,25 @@ from .serializers import (
     EnrollSerializer,
 )
 from apps.core.permissions import IsStudent, IsOwnerOrReadOnly
+from apps.payments.services import has_active_access, is_lesson_locked
+
+LOCKED_MESSAGE = (
+    'This lesson is part of the full access plan. Subscribe to unlock every lesson and quiz in the course.'
+)
+
+
+def payment_required():
+    return Response(
+        {
+            'success': False,
+            'error': {
+                'code': status.HTTP_402_PAYMENT_REQUIRED,
+                'message': LOCKED_MESSAGE,
+                'details': None,
+            },
+        },
+        status=status.HTTP_402_PAYMENT_REQUIRED,
+    )
 
 
 class CourseViewSet(viewsets.ReadOnlyModelViewSet):
@@ -33,6 +52,10 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return CourseDetailSerializer
         return CourseSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs.setdefault('context', self.get_serializer_context())
+        return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -77,10 +100,20 @@ class LessonViewSet(viewsets.ReadOnlyModelViewSet):
     def get_serializer_class(self):
         return LessonSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        lesson = self.get_object()
+        if is_lesson_locked(lesson) and not has_active_access(request.user):
+            return payment_required()
+        return super().retrieve(request, *args, **kwargs)
+
     @action(detail=True, methods=['post'], url_path='complete')
     def complete(self, request, pk=None):
         """Mark lesson as complete."""
         lesson = self.get_object()
+
+        if is_lesson_locked(lesson) and not has_active_access(request.user):
+            return payment_required()
+
         enrollment = get_object_or_404(Enrollment, student=request.user, course=lesson.course)
 
         progress, created = LessonProgress.objects.get_or_create(
@@ -106,6 +139,9 @@ class LessonViewSet(viewsets.ReadOnlyModelViewSet):
                 {'success': False, 'error': {'code': 400, 'message': 'This lesson does not have a quiz.'}},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        if is_lesson_locked(lesson) and not has_active_access(request.user):
+            return payment_required()
 
         enrollment = get_object_or_404(Enrollment, student=request.user, course=lesson.course)
 

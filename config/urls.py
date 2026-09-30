@@ -24,10 +24,13 @@ urlpatterns = [
     path('api/auth/', include('apps.accounts.urls')),
     path('api/careers/', include('apps.careers.urls')),
     path('api/courses/', include('apps.courses.urls')),
+    path('api/certificates/', include('apps.courses.cert_urls')),
     path('api/matching/', include('apps.matching.urls')),
     path('api/sessions/', include('apps.sessions.urls')),
     path('api/progress/', include('apps.progress.urls')),
     path('api/dashboard/', include('apps.dashboard.urls')),
+    path('api/guide/', include('apps.guide.urls')),
+    path('api/payments/', include('apps.payments.urls')),
 ]
 
 # Serve media files in development

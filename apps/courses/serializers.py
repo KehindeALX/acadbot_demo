@@ -2,28 +2,48 @@
 Serializers for the Courses app.
 """
 from rest_framework import serializers
-from .models import Course, Lesson, Enrollment, LessonProgress
+from .models import Course, Lesson, Enrollment, LessonProgress, Certificate
 from apps.careers.serializers import CareerSerializer
+from apps.payments.services import has_active_access, is_lesson_locked
 
 
 class LessonSerializer(serializers.ModelSerializer):
+
     """Serializer for lessons (without quiz answer for students)."""
 
     has_quiz = serializers.BooleanField(read_only=True)
+    is_locked = serializers.SerializerMethodField()
 
     class Meta:
         model = Lesson
         fields = [
             'id', 'title', 'content_html', 'order', 'duration_minutes',
-            'has_quiz', 'quiz_question', 'quiz_options',
+            'has_quiz', 'quiz_question', 'quiz_options', 'is_locked',
         ]
+
+    def get_is_locked(self, obj):
+        request = self.context.get('request')
+        if request is None or not request.user.is_authenticated:
+            return False
+        return is_lesson_locked(obj) and not has_active_access(request.user)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data.get('is_locked'):
+            data['content_html'] = ''
+            data['has_quiz'] = False
+            data['quiz_question'] = ''
+            data['quiz_options'] = []
+        return data
 
 
 class LessonDetailSerializer(LessonSerializer):
+
     """Detailed serializer for lesson. The quiz answer key is never exposed here."""
 
 
 class CourseSerializer(serializers.ModelSerializer):
+
     """Serializer for courses."""
 
     career = CareerSerializer(read_only=True)
@@ -34,12 +54,13 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'id', 'career', 'title', 'description', 'module_number',
-            'duration_minutes', 'order', 'is_published', 'thumbnail',
+            'duration_minutes', 'order', 'is_published', 'content_reviewed', 'thumbnail',
             'lessons_count', 'total_duration_minutes', 'created_at', 'updated_at',
         ]
 
 
 class CourseDetailSerializer(CourseSerializer):
+
     """Detailed serializer for course with lessons."""
 
     lessons = LessonSerializer(many=True, read_only=True)
@@ -49,6 +70,7 @@ class CourseDetailSerializer(CourseSerializer):
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):
+
     """Serializer for enrollments."""
 
     course = CourseSerializer(read_only=True)
@@ -69,6 +91,7 @@ class EnrollmentSerializer(serializers.ModelSerializer):
 
 
 class EnrollmentDetailSerializer(EnrollmentSerializer):
+
     """Detailed serializer for enrollment with lesson progress."""
 
     lesson_progress = serializers.SerializerMethodField()
@@ -82,6 +105,7 @@ class EnrollmentDetailSerializer(EnrollmentSerializer):
 
 
 class LessonProgressSerializer(serializers.ModelSerializer):
+
     """Serializer for lesson progress."""
 
     lesson = LessonSerializer(read_only=True)
@@ -101,6 +125,7 @@ class LessonProgressSerializer(serializers.ModelSerializer):
 
 
 class QuizSubmissionSerializer(serializers.Serializer):
+
     """Serializer for quiz submission."""
 
     answer_index = serializers.IntegerField(min_value=0)
@@ -114,6 +139,7 @@ class QuizSubmissionSerializer(serializers.Serializer):
 
 
 class EnrollSerializer(serializers.Serializer):
+
     """Serializer for course enrollment."""
 
     course_id = serializers.IntegerField()
@@ -124,3 +150,44 @@ class EnrollSerializer(serializers.Serializer):
         except Course.DoesNotExist:
             raise serializers.ValidationError('Course not found or not published.')
         return value
+
+
+class CertificateSerializer(serializers.ModelSerializer):
+
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    career_name = serializers.CharField(source='course.career.name', read_only=True)
+    holder_name = serializers.CharField(read_only=True)
+    issued_at = serializers.DateTimeField(read_only=True)
+    pdf_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Certificate
+        fields = [
+            'id', 'code', 'course', 'course_title', 'career_name',
+            'holder_name', 'score', 'issued_at', 'pdf_url',
+        ]
+
+    def get_pdf_url(self, obj):
+        request = self.context.get('request')
+        path = f'/api/certificates/{obj.code}/pdf/'
+        if request is not None:
+            return request.build_absolute_uri(path)
+        return path
+
+
+class CertificateVerifySerializer(serializers.ModelSerializer):
+
+    holder_name = serializers.CharField(read_only=True)
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    issued_at = serializers.SerializerMethodField()
+    valid = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Certificate
+        fields = ['holder_name', 'course_title', 'issued_at', 'valid']
+
+    def get_issued_at(self, obj):
+        return obj.issued_at.date()
+
+    def get_valid(self, obj):
+        return True
