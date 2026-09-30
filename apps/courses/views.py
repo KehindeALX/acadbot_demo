@@ -54,7 +54,6 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
         return CourseSerializer
 
     def get_serializer(self, *args, **kwargs):
-        # Nested lessons blank their content when the viewer has no paid access.
         kwargs.setdefault('context', self.get_serializer_context())
         return super().get_serializer(*args, **kwargs)
 

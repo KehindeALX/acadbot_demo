@@ -51,9 +51,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadCertificates();
 });
 
-// ============================================================
-// Certificates
-// ============================================================
 async function loadCertificates() {
   if (!certificatesLoading) return;
   try {

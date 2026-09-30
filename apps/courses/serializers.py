@@ -8,6 +8,7 @@ from apps.payments.services import has_active_access, is_lesson_locked
 
 
 class LessonSerializer(serializers.ModelSerializer):
+
     """Serializer for lessons (without quiz answer for students)."""
 
     has_quiz = serializers.BooleanField(read_only=True)
@@ -21,7 +22,6 @@ class LessonSerializer(serializers.ModelSerializer):
         ]
 
     def get_is_locked(self, obj):
-        """Locked lessons carry no content and no quiz until the student subscribes."""
         request = self.context.get('request')
         if request is None or not request.user.is_authenticated:
             return False
@@ -38,10 +38,12 @@ class LessonSerializer(serializers.ModelSerializer):
 
 
 class LessonDetailSerializer(LessonSerializer):
+
     """Detailed serializer for lesson. The quiz answer key is never exposed here."""
 
 
 class CourseSerializer(serializers.ModelSerializer):
+
     """Serializer for courses."""
 
     career = CareerSerializer(read_only=True)
@@ -58,6 +60,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class CourseDetailSerializer(CourseSerializer):
+
     """Detailed serializer for course with lessons."""
 
     lessons = LessonSerializer(many=True, read_only=True)
@@ -67,6 +70,7 @@ class CourseDetailSerializer(CourseSerializer):
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):
+
     """Serializer for enrollments."""
 
     course = CourseSerializer(read_only=True)
@@ -87,6 +91,7 @@ class EnrollmentSerializer(serializers.ModelSerializer):
 
 
 class EnrollmentDetailSerializer(EnrollmentSerializer):
+
     """Detailed serializer for enrollment with lesson progress."""
 
     lesson_progress = serializers.SerializerMethodField()
@@ -100,6 +105,7 @@ class EnrollmentDetailSerializer(EnrollmentSerializer):
 
 
 class LessonProgressSerializer(serializers.ModelSerializer):
+
     """Serializer for lesson progress."""
 
     lesson = LessonSerializer(read_only=True)
@@ -119,6 +125,7 @@ class LessonProgressSerializer(serializers.ModelSerializer):
 
 
 class QuizSubmissionSerializer(serializers.Serializer):
+
     """Serializer for quiz submission."""
 
     answer_index = serializers.IntegerField(min_value=0)
@@ -132,6 +139,7 @@ class QuizSubmissionSerializer(serializers.Serializer):
 
 
 class EnrollSerializer(serializers.Serializer):
+
     """Serializer for course enrollment."""
 
     course_id = serializers.IntegerField()
@@ -145,7 +153,6 @@ class EnrollSerializer(serializers.Serializer):
 
 
 class CertificateSerializer(serializers.ModelSerializer):
-    """Serializer for a certificate, shown only to its owner."""
 
     course_title = serializers.CharField(source='course.title', read_only=True)
     career_name = serializers.CharField(source='course.career.name', read_only=True)
@@ -169,7 +176,6 @@ class CertificateSerializer(serializers.ModelSerializer):
 
 
 class CertificateVerifySerializer(serializers.ModelSerializer):
-    """Public verification payload. Never exposes email, username or id."""
 
     holder_name = serializers.CharField(read_only=True)
     course_title = serializers.CharField(source='course.title', read_only=True)

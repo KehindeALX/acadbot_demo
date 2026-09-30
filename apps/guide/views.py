@@ -24,7 +24,7 @@ MAX_MESSAGES = 10
 
 ABIA_SYSTEM_PROMPT = """You are Abia, the AI career guide for More Success Academy (MSA), an African EdTech platform.
 
-MSA mission: Train. Certify. Place. Products: AcadBot (AI LMS) and SpeakPro (communication training). 3,200+ waitlisted learners. NJFP-approved host.
+MSA mission: Train. Certify. Place. Product: AcadBot (AI LMS).
 
 Your role: guide a learner through the career journey they are exploring on the site. Give practical, encouraging, Africa-relevant advice about skills, roadmaps, courses and job interviews. When the learner names a career path, give advice for that path.
 
@@ -35,9 +35,16 @@ CRITICAL: Detect the language the user writes in and ALWAYS respond in that SAME
 
 def get_daily_limit():
     try:
-        return int(config('GUIDE_DAILY_LIMIT', default=20))
+        return int(config('GUIDE_DAILY_LIMIT', default=5))
     except ValueError:
-        return 20
+        return 5
+
+
+def get_global_daily_limit():
+    try:
+        return int(config('GUIDE_GLOBAL_DAILY_LIMIT', default=40))
+    except ValueError:
+        return 40
 
 
 def get_max_tokens():
@@ -47,9 +54,15 @@ def get_max_tokens():
         return 500
 
 
+def used_since(since, user=None):
+    rows = GuideUsage.objects.filter(created_at__gte=since)
+    if user is not None:
+        rows = rows.filter(user=user)
+    return rows.count()
+
+
 def used_today(user):
-    since = timezone.now() - timedelta(days=1)
-    return GuideUsage.objects.filter(user=user, created_at__gte=since).count()
+    return used_since(timezone.now() - timedelta(days=1), user)
 
 
 def call_openrouter(api_key, model, messages):
@@ -116,6 +129,12 @@ def guide_chat(request):
         return error_response(
             status.HTTP_429_TOO_MANY_REQUESTS,
             'You have used all of today\'s questions to Abia. Come back tomorrow.',
+        )
+
+    if used_since(timezone.now() - timedelta(days=1)) >= get_global_daily_limit():
+        return error_response(
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            'Abia is resting for today and will be back tomorrow.',
         )
 
     messages = [{'role': 'system', 'content': ABIA_SYSTEM_PROMPT}]

@@ -1,6 +1,3 @@
-"""
-Certificate issuing, listing, PDF generation and public verification.
-"""
 import io
 
 from django.conf import settings
@@ -23,7 +20,6 @@ GOLD = HexColor('#D4AF37')
 
 
 def build_certificate_pdf(certificate):
-    """Render a certificate to PDF bytes. Nothing is written to disk."""
     buffer = io.BytesIO()
     width, height = landscape(A4)
 
@@ -92,7 +88,6 @@ def build_certificate_pdf(certificate):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def issue_certificate(request, course_id):
-    """Issue a certificate for a completed, reviewed course."""
     enrollment = get_object_or_404(
         Enrollment.objects.select_related('course', 'course__career'),
         student=request.user,
@@ -145,7 +140,6 @@ def issue_certificate(request, course_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_certificates(request):
-    """List the current student's certificates."""
     certificates = Certificate.objects.filter(
         user=request.user
     ).select_related('course', 'course__career')
@@ -157,7 +151,6 @@ def list_certificates(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def certificate_pdf(request, code):
-    """Return the certificate PDF. Only the owner may download it."""
     certificate = get_object_or_404(
         Certificate.objects.select_related('user', 'course', 'course__career'),
         code=code,
@@ -182,7 +175,6 @@ def certificate_pdf(request, code):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def verify_certificate(request, code):
-    """Public verification. Returns only name, course, date and validity."""
     certificate = get_object_or_404(
         Certificate.objects.select_related('user', 'course'),
         code=code,

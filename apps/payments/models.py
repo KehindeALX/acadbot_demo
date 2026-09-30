@@ -1,6 +1,3 @@
-"""
-Models for the Payments app - Paystack subscriptions unlocking paid lessons.
-"""
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _

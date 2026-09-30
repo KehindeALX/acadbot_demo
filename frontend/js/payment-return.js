@@ -1,9 +1,3 @@
-/**
- * MSA AcadBot — Payment Return Page
- * Paystack sends the student back here after a payment. The server decides
- * whether access was granted, so this page only ever reports what it is told.
- */
-
 import { verifyPayment, isAuthError } from './api.js';
 import { initNavbar } from './navbar.js';
 

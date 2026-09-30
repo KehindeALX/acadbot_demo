@@ -14,7 +14,8 @@ CHAT_URL = '/api/guide/chat/'
 SETTINGS = {
     'OPENROUTER_API_KEY': 'sk-test',
     'OPENROUTER_MODEL': 'vendor/some-model',
-    'GUIDE_DAILY_LIMIT': '20',
+    'GUIDE_DAILY_LIMIT': '5',
+    'GUIDE_GLOBAL_DAILY_LIMIT': '40',
     'GUIDE_MAX_TOKENS': '500',
 }
 
@@ -98,7 +99,7 @@ def test_missing_key_returns_503(api_client, student_user):
 @pytest.mark.django_db
 def test_daily_limit_returns_429(api_client, student_user):
     api_client.force_authenticate(user=student_user)
-    for _ in range(20):
+    for _ in range(5):
         GuideUsage.objects.create(user=student_user, prompt_tokens=10, completion_tokens=5)
 
     with patch('apps.guide.views.config', side_effect=fake_config):
@@ -106,7 +107,27 @@ def test_daily_limit_returns_429(api_client, student_user):
 
     assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
     assert response.data['error']['message']
-    assert GuideUsage.objects.count() == 20
+    assert GuideUsage.objects.count() == 5
+
+
+@pytest.mark.django_db
+def test_global_daily_limit_returns_429_for_everyone(api_client, student_user):
+    other = User.objects.create_user(
+        username='otherguidestudent', email='otherguide@test.com',
+        password='TestPass123', role=User.Role.STUDENT,
+    )
+    for _ in range(4):
+        GuideUsage.objects.create(user=student_user, prompt_tokens=10, completion_tokens=5)
+    for _ in range(36):
+        GuideUsage.objects.create(user=other, prompt_tokens=10, completion_tokens=5)
+
+    api_client.force_authenticate(user=student_user)
+    with patch('apps.guide.views.config', side_effect=fake_config):
+        response = post_chat(api_client, [{'role': 'user', 'content': 'Hello Abia'}])
+
+    assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+    assert 'resting' in response.data['error']['message']
+    assert GuideUsage.objects.count() == 40
 
 
 def fake_urlopen(body):

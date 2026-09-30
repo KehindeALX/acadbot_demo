@@ -1,8 +1,3 @@
-"""
-Tests for Paystack subscriptions and the paid-lesson unlock rule.
-
-Every Paystack call is mocked. No network, no keys.
-"""
 import hashlib
 import hmac
 import json
@@ -47,14 +42,19 @@ def signed_headers(raw_body, secret=SECRET_KEY):
     return {'HTTP_X_PAYSTACK_SIGNATURE': digest}
 
 
-def success_transaction(reference, amount=AMOUNT, status_value='success'):
+def success_transaction(reference, amount=AMOUNT, status_value='success', currency='NGN'):
     return {
         'status': True,
+        'message': 'Authorization URL created',
         'data': {
+            'id': 302961,
             'reference': reference,
             'status': status_value,
             'amount': amount,
-            'gateway_response': {'status': status_value},
+            'currency': currency,
+            'gateway': 'bank',
+            'gateway_response': 'Successful',
+            'paid_at': '2026-09-30T02:11:04.000Z',
         },
     }
 
@@ -130,22 +130,21 @@ def activate(student, days=SUBSCRIPTION_DAYS):
     )
 
 
+INITIALIZE_RESPONSE = {
+    'status': True,
+    'data': {
+        'authorization_url': 'https://checkout.paystack.test/abc',
+        'access_code': 'test_access_code',
+        'reference': 'ignored',
+    },
+}
+
+
 def initialize(client):
     with patch('apps.payments.services.config', side_effect=fake_config), \
-            patch('apps.payments.services.urlopen', fake_urlopen({
-                'status': True,
-                'data': {
-                    'authorization_url': 'https://checkout.paystack.test/abc',
-                    'access_code': 'test_access_code',
-                    'reference': 'ignored',
-                },
-            })):
+            patch('apps.payments.services.urlopen', fake_urlopen(INITIALIZE_RESPONSE)):
         return client.post(INITIALIZE_URL, {}, format='json')
 
-
-# ============================================================
-# initialize
-# ============================================================
 
 @pytest.mark.django_db
 def test_initialize_requires_login(api_client):
@@ -185,6 +184,22 @@ def test_initialize_amount_comes_from_settings_not_client(api_client, student):
 
 
 @pytest.mark.django_db
+def test_initialize_sends_the_return_page_as_callback(api_client, student):
+    api_client.force_authenticate(user=student)
+    sent = {}
+
+    def capture(req, timeout=None):
+        sent.update(json.loads(req.data.decode('utf-8')))
+        return fake_urlopen(INITIALIZE_RESPONSE)(req, timeout)
+
+    with patch('apps.payments.services.config', side_effect=fake_config), \
+            patch('apps.payments.services.urlopen', capture):
+        api_client.post(INITIALIZE_URL, {}, format='json')
+
+    assert sent['callback_url'] == 'https://frontend.test/payment-return.html'
+
+
+@pytest.mark.django_db
 def test_initialize_references_are_unique(api_client, student):
     api_client.force_authenticate(user=student)
     first = initialize(api_client).data['data']['reference']
@@ -201,10 +216,6 @@ def test_initialize_without_secret_returns_503(api_client, student):
     assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
     assert Subscription.objects.count() == 0
 
-
-# ============================================================
-# verify
-# ============================================================
 
 @pytest.mark.django_db
 def test_verify_activates_access(api_client, student):
@@ -224,6 +235,49 @@ def test_verify_activates_access(api_client, student):
 
     expected = subscription.paid_at + timedelta(days=SUBSCRIPTION_DAYS)
     assert abs((subscription.expires_at - expected).total_seconds()) < 5
+
+
+@pytest.mark.django_db
+def test_verify_accepts_real_paystack_verify_shape(api_client, student):
+    api_client.force_authenticate(user=student)
+    reference = initialize(api_client).data['data']['reference']
+
+    body = {
+        'status': True,
+        'message': 'Verification successful',
+        'data': {
+            'id': 302961,
+            'reference': reference,
+            'status': 'success',
+            'amount': AMOUNT,
+            'currency': 'NGN',
+            'gateway': 'bank',
+            'gateway_response': 'Successful',
+            'paid_at': '2026-09-30T02:11:04.000Z',
+        },
+    }
+
+    with patch('apps.payments.services.config', side_effect=fake_config), \
+            patch('apps.payments.services.urlopen', fake_urlopen(body)):
+        response = api_client.get(f'{VERIFY_URL}?reference={reference}')
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['data']['active'] is True
+    assert Subscription.objects.get(reference=reference).status == Subscription.Status.ACTIVE
+
+
+@pytest.mark.django_db
+def test_verify_rejects_non_naira_transaction(api_client, student):
+    api_client.force_authenticate(user=student)
+    reference = initialize(api_client).data['data']['reference']
+
+    with patch('apps.payments.services.config', side_effect=fake_config), \
+            patch('apps.payments.services.urlopen', fake_urlopen(success_transaction(reference, currency='USD'))):
+        response = api_client.get(f'{VERIFY_URL}?reference={reference}')
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['data']['active'] is False
+    assert Subscription.objects.get(reference=reference).status == Subscription.Status.FAILED
 
 
 @pytest.mark.django_db
@@ -290,10 +344,6 @@ def test_verify_requires_reference(api_client, student):
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-# ============================================================
-# webhook
-# ============================================================
-
 @pytest.mark.django_db
 def test_webhook_with_valid_signature_activates(api_client, student):
     reference = 'acadbot-webhook-valid'
@@ -301,6 +351,7 @@ def test_webhook_with_valid_signature_activates(api_client, student):
 
     raw_body = json.dumps({'event': 'charge.success', 'data': {
         'reference': reference, 'status': 'success', 'amount': AMOUNT,
+        'currency': 'NGN', 'gateway_response': 'Successful',
     }}).encode('utf-8')
 
     with patch('apps.payments.services.config', side_effect=fake_config):
@@ -319,6 +370,7 @@ def test_webhook_with_invalid_signature_is_rejected(api_client, student):
 
     raw_body = json.dumps({'event': 'charge.success', 'data': {
         'reference': reference, 'status': 'success', 'amount': AMOUNT,
+        'currency': 'NGN', 'gateway_response': 'Successful',
     }}).encode('utf-8')
 
     with patch('apps.payments.services.config', side_effect=fake_config):
@@ -372,7 +424,8 @@ def test_webhook_rejects_amount_mismatch(api_client, student):
     reference = 'acadbot-webhook-amount'
     Subscription.objects.create(user=student, reference=reference, amount=AMOUNT)
 
-    raw_body = json.dumps({'data': {'reference': reference, 'status': 'success', 'amount': 100}}).encode('utf-8')
+    raw_body = json.dumps({'data': {'reference': reference, 'status': 'success', 'amount': 100,
+        'currency': 'NGN', 'gateway_response': 'Successful'}}).encode('utf-8')
 
     with patch('apps.payments.services.config', side_effect=fake_config):
         response = api_client.post(WEBHOOK_URL, raw_body, content_type='application/json', **signed_headers(raw_body))
@@ -394,7 +447,6 @@ def test_webhook_ignores_unknown_reference(api_client, db):
 
 @pytest.mark.django_db
 def test_webhook_does_not_require_csrf_token(api_client, student):
-    """Paystack posts server-to-server, so this view is CSRF exempt."""
     reference = 'acadbot-webhook-csrf'
     Subscription.objects.create(user=student, reference=reference, amount=AMOUNT)
 
@@ -405,10 +457,6 @@ def test_webhook_does_not_require_csrf_token(api_client, student):
 
     assert response.status_code == status.HTTP_200_OK
 
-
-# ============================================================
-# status
-# ============================================================
 
 @pytest.mark.django_db
 def test_status_inactive_without_subscription(api_client, student):
@@ -446,10 +494,6 @@ def test_status_expired_subscription_is_inactive(api_client, student):
 
     assert response.data['data']['active'] is False
 
-
-# ============================================================
-# unlock rule
-# ============================================================
 
 def lesson_url(lesson):
     return f'/api/courses/lessons/{lesson.id}/'
@@ -551,7 +595,6 @@ def test_expired_access_locks_lessons_again(api_client, student, course, enrollm
 
 @pytest.mark.django_db
 def test_course_detail_blanks_locked_lesson_content(api_client, student, course, enrollment):
-    """The course payload is AllowAny, so locked lessons must arrive empty there too."""
     api_client.force_authenticate(user=student)
     with patch('apps.payments.services.config', side_effect=fake_config):
         response = api_client.get(f'/api/courses/{course.id}/')
@@ -571,7 +614,6 @@ def test_course_detail_blanks_locked_lesson_content(api_client, student, course,
 
 @pytest.mark.django_db
 def test_anonymous_course_detail_shows_lesson_content(api_client, course):
-    """Preview for signed-out visitors is unchanged: nothing is withheld from them."""
     with patch('apps.payments.services.config', side_effect=fake_config):
         response = api_client.get(f'/api/courses/{course.id}/')
 

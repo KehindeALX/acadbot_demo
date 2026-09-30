@@ -1,6 +1,3 @@
-"""
-URL configuration for the Payments app.
-"""
 from django.urls import path
 
 from .views import initialize_payment, payment_status, verify_payment, PaystackWebhook

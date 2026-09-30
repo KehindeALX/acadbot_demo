@@ -4,8 +4,6 @@
  * Renders the AI-assistant chat surface: a welcome/empty state with quick
  * actions, an auto-resizing composer, and a message thread.
  *
- * Replies come from POST /api/guide/chat/ via askAcadBot(). The conversation
- * is held in memory on this page only, so a refresh starts a new thread.
  */
 
 import {

@@ -6,9 +6,6 @@
  * plus a chat interface.
  *
  * Career data (cards, roadmap, skills, questions) comes from real API
- * endpoints (/api/careers/, /api/careers/{slug}/). Abia's replies come from
- * POST /api/guide/chat/ via guideAbia(); the conversation is held in memory
- * on this page only, so a refresh starts a new thread.
  */
 
 import {

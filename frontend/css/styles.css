@@ -2739,7 +2739,6 @@ a:hover {
    Paid access — locked lessons and subscription status
    ============================================================ */
 
-/* Locked lessons recede so the open lessons stay the bright path */
 .lesson-card--locked {
   background: var(--navy2);
   border-color: var(--border);
@@ -2766,7 +2765,6 @@ a:hover {
   border: 1px solid var(--gold);
 }
 
-/* Subscription banner under the enrollment panel */
 .access-status {
   margin-top: var(--space-lg);
   padding: var(--space-md) var(--space-lg);
@@ -2798,7 +2796,6 @@ a:hover {
   color: var(--muted);
 }
 
-/* Payment return page states */
 .payment-return {
   max-width: 620px;
   margin: 0 auto;

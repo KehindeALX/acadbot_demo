@@ -1,9 +1,3 @@
-"""
-Views for the Payments app.
-
-Payment status is always decided on the server from a verified Paystack
-transaction. Nothing the browser sends is trusted about amount or entitlement.
-"""
 import json
 import logging
 from urllib.error import HTTPError, URLError
@@ -159,7 +153,6 @@ def payment_state_response(subscription, pending=False):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PaystackWebhook(APIView):
-    """Paystack calls this directly, so it is CSRF exempt and unauthenticated."""
 
     authentication_classes = []
     permission_classes = [AllowAny]
@@ -192,7 +185,7 @@ class PaystackWebhook(APIView):
             'reference': reference,
             'status': data.get('status'),
             'amount': data.get('amount'),
-            'gateway_response': {'status': data.get('status')},
+            'currency': data.get('currency'),
         }
         services.apply_transaction(subscription, transaction)
 

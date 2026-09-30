@@ -1,9 +1,3 @@
-"""
-Payment settings, Paystack calls, and the lesson unlock rule.
-
-Everything that decides whether a student may read a paid lesson lives here so
-the serializer and the views share one rule.
-"""
 import hashlib
 import hmac
 import json
@@ -53,7 +47,6 @@ def get_free_lessons():
 
 
 def build_reference():
-    """Unique per-attempt transaction reference, generated server-side."""
     return f'acadbot-{secrets.token_hex(10)}'
 
 
@@ -62,7 +55,6 @@ def amount_in_naira(amount_kobo):
 
 
 def call_paystack(url, payload=None, method='POST'):
-    """Call Paystack and return the decoded body. Raises on any upstream failure."""
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {get_secret_key()}',
@@ -76,29 +68,26 @@ def call_paystack(url, payload=None, method='POST'):
 
 
 def initialize_transaction(user, email, reference, amount_kobo):
-    """Start a transaction with Paystack and return (authorization_url, raw response)."""
     payload = {
         'email': email,
         'amount': amount_kobo,
         'reference': reference,
-        'callback_url': f'{callback_base_url()}/frontend/payment-return.html',
+        'callback_url': f'{callback_base_url()}/payment-return.html',
     }
     body = call_paystack(PAYSTACK_INITIALIZE_URL, payload)
     return body['data']['authorization_url'], body
 
 
 def verify_transaction(reference):
-    """Ask Paystack to confirm a reference. Returns the transaction data dict."""
     body = call_paystack(PAYSTACK_VERIFY_URL.format(reference), method='GET')
     return body.get('data') or {}
 
 
 def callback_base_url():
-    return config('FRONTEND_BASE_URL', default='https://acadbot-demo.onrender.com').rstrip('/')
+    return config('FRONTEND_BASE_URL', default='https://app.moresuccessacademy.com.ng').rstrip('/')
 
 
 def valid_signature(raw_body, signature):
-    """Paystack signs the raw request body with HMAC SHA512 keyed on the secret."""
     secret = get_secret_key()
     if not secret or not signature:
         return False
@@ -107,19 +96,18 @@ def valid_signature(raw_body, signature):
 
 
 def transaction_succeeded(transaction):
-    return (
-        transaction.get('status') == 'success'
-        and transaction.get('gateway_response', {}).get('status') == 'success'
-    )
+    if transaction.get('status') != 'success':
+        return False
+
+    currency = transaction.get('currency')
+    return currency is None or currency == 'NGN'
 
 
 def transaction_pending(transaction):
-    """The bank has not finished with this transaction yet, so no decision to make."""
     return str(transaction.get('status') or '').lower() in PENDING_TRANSACTION_STATUSES
 
 
 def activate(subscription, paid_at=None):
-    """Mark a subscription paid and start its access window."""
     subscription.status = Subscription.Status.ACTIVE
     subscription.paid_at = paid_at or timezone.now()
     subscription.expires_at = subscription.paid_at + timedelta(days=get_subscription_days())
@@ -128,11 +116,6 @@ def activate(subscription, paid_at=None):
 
 
 def apply_transaction(subscription, transaction):
-    """
-    Activate a subscription from a verified Paystack transaction, but only when
-    the transaction really succeeded, the reference matches and the amount
-    matches what we charged. Idempotent: replaying the same reference is a no-op.
-    """
     if subscription.status == Subscription.Status.ACTIVE and subscription.paid_at:
         return subscription
 
@@ -151,7 +134,6 @@ def apply_transaction(subscription, transaction):
 
 
 def active_subscription(user):
-    """The user's live subscription, or None when they have no paid access."""
     return Subscription.objects.filter(
         user=user,
         status=Subscription.Status.ACTIVE,
@@ -164,7 +146,6 @@ def has_active_access(user):
 
 
 def is_lesson_locked(lesson):
-    """The first FREE_LESSONS_PER_COURSE lessons of a course are open to any enrolled student."""
     siblings = lesson.course.lessons.filter(is_published=True)
     position = siblings.filter(order__lt=lesson.order).count() + 1
     return position > get_free_lessons()

@@ -1,6 +1,3 @@
-"""
-URL configuration for certificates, mounted at /api/certificates/.
-"""
 from django.urls import path
 
 from .certificates import (

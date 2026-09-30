@@ -1,8 +1,3 @@
-/**
- * MSA AcadBot — Public Certificate Verification Page
- * No authentication required. Reads ?code= from the URL or the form.
- */
-
 import { verifyCertificate } from './api.js';
 import { initNavbar } from './navbar.js';
 

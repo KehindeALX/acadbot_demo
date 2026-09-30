@@ -188,14 +188,6 @@ async function checkEnrollmentStatus() {
   renderLessons();
 }
 
-// ============================================================
-// Paid Access
-// ============================================================
-
-/**
- * Ask the server whether this student has paid access. The server is the only
- * authority on payment status — the page never infers it from anything else.
- */
 async function loadPaidAccess() {
   hasPaidAccess = false;
   if (!user) return;
@@ -307,10 +299,6 @@ async function handleSubscribe() {
   }
 }
 
-/**
- * Payment failures have their own honest copy. safeErrorMessage would hide the
- * server's reason behind a generic line, and here the reason is the point.
- */
 function paymentErrorMessage(err) {
   if (err.isNetworkError) {
     return 'Unable to reach the server. Check your connection and try again.';
@@ -775,7 +763,6 @@ function setupEventListeners() {
     openResumeLesson();
   });
 
-  // Certificate button
   if (certBtn) {
     certBtn.addEventListener('click', async () => {
       try {
@@ -791,7 +778,6 @@ function setupEventListeners() {
     });
   }
 
-  // Subscribe button
   subscribeBtn.addEventListener('click', handleSubscribe);
 
   // Lesson viewer
