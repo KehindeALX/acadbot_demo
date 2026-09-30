@@ -137,6 +137,13 @@ def short_strings(value, limit):
     return [item.strip()[:limit] for item in value if isinstance(item, str) and item.strip()]
 
 
+def capped_strings(value, limit, minimum=1):
+    cleaned = short_strings(value, limit)
+    if not cleaned or len(cleaned) < minimum:
+        return None
+    return cleaned[:3]
+
+
 def validate_analyze(data):
     if not isinstance(data, dict):
         return None
@@ -153,6 +160,7 @@ def validate_analyze(data):
         return None
 
     scored = []
+    seen = set()
     for dimension in dimensions:
         if not isinstance(dimension, dict):
             return None
@@ -165,28 +173,31 @@ def validate_analyze(data):
             return None
         if not isinstance(note, str) or not note.strip():
             return None
+        if name in seen:
+            return None
+        seen.add(name)
         scored.append({'name': name, 'score': score, 'note': note.strip()[:120]})
 
-    if [item['name'] for item in scored] != DIMENSION_NAMES:
+    if seen != set(DIMENSION_NAMES):
         return None
 
-    clean_gaps = short_strings(gaps, 160)
-    clean_questions = short_strings(questions, 300)
-    if clean_gaps is None or not clean_gaps or len(clean_gaps) > 3:
-        return None
-    if clean_questions is None or len(clean_questions) != 3:
+    scored.sort(key=lambda item: DIMENSION_NAMES.index(item['name']))
+
+    clean_gaps = capped_strings(gaps, 160)
+    clean_questions = capped_strings(questions, 300, minimum=3)
+    if clean_gaps is None or clean_questions is None:
         return None
 
     if not isinstance(pitch, dict):
         return None
     headline = pitch.get('headline')
     one_liner = pitch.get('one_liner')
-    points = short_strings(pitch.get('points'), 160)
+    points = capped_strings(pitch.get('points'), 160, minimum=3)
     if not isinstance(headline, str) or not headline.strip():
         return None
     if not isinstance(one_liner, str) or not one_liner.strip():
         return None
-    if points is None or len(points) != 3:
+    if points is None:
         return None
 
     return {
@@ -207,18 +218,17 @@ def validate_feedback(data):
         return None
 
     overall = data.get('overall')
-    strengths = short_strings(data.get('strengths'), 200)
-    improve = short_strings(data.get('improve'), 200)
+    strengths = capped_strings(data.get('strengths'), 200)
+    improve = capped_strings(data.get('improve'), 200)
     rewrites = data.get('rewrites')
 
     if not isinstance(overall, str) or not overall.strip():
         return None
-    if strengths is None or not strengths or len(strengths) > 3:
+    if strengths is None or improve is None:
         return None
-    if improve is None or not improve or len(improve) > 3:
+    if not isinstance(rewrites, list) or len(rewrites) < 3:
         return None
-    if not isinstance(rewrites, list) or len(rewrites) != 3:
-        return None
+    rewrites = rewrites[:3]
 
     clean_rewrites = []
     for item in rewrites:

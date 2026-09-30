@@ -1,3 +1,4 @@
+import copy
 import json
 from contextlib import contextmanager
 from unittest.mock import MagicMock, patch
@@ -286,6 +287,43 @@ def test_wrong_shape_twice_returns_502(api_client, student_user):
     bad = json.dumps({'summary': 'fine', 'dimensions': []})
     api_client.force_authenticate(user=student_user)
     response = call_api(fake_urlopen(bad), ANALYZE_URL, api_client, ANALYZE_PAYLOAD)
+    assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+
+@pytest.mark.django_db
+def test_shuffled_dimensions_are_sorted_into_order(api_client, student_user):
+    reply = copy.deepcopy(ANALYZE_REPLY)
+    reply['dimensions'] = list(reversed(reply['dimensions']))
+
+    api_client.force_authenticate(user=student_user)
+    response = call_api(fake_urlopen(json.dumps(reply)), ANALYZE_URL, api_client, ANALYZE_PAYLOAD)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert [item['name'] for item in response.data['dimensions']] == [
+        'Clarity', 'Structure', 'Vocabulary', 'Confidence', 'Audience awareness',
+    ]
+
+
+@pytest.mark.django_db
+def test_four_gaps_are_cut_to_three(api_client, student_user):
+    reply = copy.deepcopy(ANALYZE_REPLY)
+    reply['gaps'] = ANALYZE_REPLY['gaps'] + ['You never name the client']
+
+    api_client.force_authenticate(user=student_user)
+    response = call_api(fake_urlopen(json.dumps(reply)), ANALYZE_URL, api_client, ANALYZE_PAYLOAD)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['gaps'] == ANALYZE_REPLY['gaps']
+
+
+@pytest.mark.django_db
+def test_two_questions_still_fail(api_client, student_user):
+    reply = copy.deepcopy(ANALYZE_REPLY)
+    reply['questions'] = ANALYZE_REPLY['questions'][:2]
+
+    api_client.force_authenticate(user=student_user)
+    response = call_api(fake_urlopen(json.dumps(reply)), ANALYZE_URL, api_client, ANALYZE_PAYLOAD)
+
     assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
 
