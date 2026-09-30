@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify Certificate | MSA AcadBot</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="navbar__logo">
+      <span class="navbar__logo-text">MSA <span>AcadBot</span></span>
+    </a>
+    <button class="navbar__toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mainNav">
+      <span aria-hidden="true">☰</span>
+    </button>
+    <div class="navbar__nav" id="mainNav">
+      <a href="index.html" class="navbar__link">Home</a>
+      <a href="courses.html" class="navbar__link">Courses</a>
+      <a href="acadbot.html" class="navbar__link">Ask AcadBot</a>
+      <a href="msa-guide.html" class="navbar__link">MSA Guide</a>
+      <div id="authNav"></div>
+    </div>
+  </nav>
+
+  <main class="page__main">
+    <header class="page__header">
+      <h1 class="page__title">Verify a Certificate</h1>
+      <p class="page__subtitle">Enter the certificate ID printed on the certificate to confirm it is genuine.</p>
+    </header>
+
+    <section class="page__section">
+      <form id="verifyForm" class="cert-verify-form">
+        <label class="form-label" for="certCode">Certificate ID</label>
+        <input
+          id="certCode"
+          name="code"
+          type="text"
+          class="form-input"
+          placeholder="e.g. A299B39783B680C9"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button type="submit" class="btn btn--primary" id="verifyBtn">Verify</button>
+      </form>
+
+      <div id="verifyStatus" class="verify-status" role="status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/verify.js"></script>
+</body>
+</html>

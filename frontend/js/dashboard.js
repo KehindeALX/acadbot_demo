@@ -7,6 +7,8 @@
 import {
   getMe,
   listEnrollments,
+  listCertificates,
+  certificatePdfUrl,
   safeErrorMessage,
   isAuthError,
   isNetworkError
@@ -23,6 +25,9 @@ const enrollmentsList = document.getElementById('enrollmentsList');
 const emptyState = document.getElementById('emptyState');
 const pagination = document.getElementById('pagination');
 const toastContainer = document.getElementById('toastContainer');
+const certificatesLoading = document.getElementById('certificatesLoading');
+const certificatesList = document.getElementById('certificatesList');
+const certificatesEmpty = document.getElementById('certificatesEmpty');
 
 // ============================================================
 // State
@@ -43,7 +48,58 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderUser();
   setupEventListeners();
   await loadEnrollments(1);
+  await loadCertificates();
 });
+
+// ============================================================
+// Certificates
+// ============================================================
+async function loadCertificates() {
+  if (!certificatesLoading) return;
+  try {
+    const res = await listCertificates();
+    const certs = (res && res.data) || [];
+    certificatesLoading.classList.add('hidden');
+
+    if (!certs.length) {
+      certificatesEmpty.classList.remove('hidden');
+      return;
+    }
+
+    certificatesList.textContent = '';
+    certs.forEach((cert) => {
+      const tile = document.createElement('div');
+      tile.className = 'cert-tile';
+
+      const course = document.createElement('p');
+      course.className = 'cert-tile__course';
+      course.textContent = cert.course_title;
+
+      const meta = document.createElement('p');
+      meta.className = 'cert-tile__meta';
+      meta.textContent = `Issued ${new Date(cert.issued_at).toLocaleDateString()} · Score ${cert.score}%`;
+
+      const code = document.createElement('p');
+      code.className = 'cert-tile__meta cert-card__code';
+      code.textContent = `ID: ${cert.code}`;
+
+      const link = document.createElement('a');
+      link.href = certificatePdfUrl(cert.code);
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.className = 'btn btn--sm';
+      link.textContent = 'Download PDF';
+
+      tile.append(course, meta, code, link);
+      certificatesList.appendChild(tile);
+    });
+
+    certificatesList.classList.remove('hidden');
+  } catch (err) {
+    certificatesLoading.classList.add('hidden');
+    certificatesEmpty.classList.remove('hidden');
+  }
+}
 
 // ============================================================
 // Render User

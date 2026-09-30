@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'apps.sessions.apps.SessionsConfig',
     'apps.progress.apps.ProgressConfig',
     'apps.dashboard.apps.DashboardConfig',
+    'apps.guide.apps.GuideConfig',
+    'apps.payments.apps.PaymentsConfig',
     'apps.core.apps.CoreConfig',
 ]
 
@@ -152,6 +154,8 @@ SPECTACULAR_SETTINGS = {
         {'name': 'sessions', 'description': 'Session scheduling and management'},
         {'name': 'progress', 'description': 'Progress tracking and assessments'},
         {'name': 'dashboard', 'description': 'Analytics and reporting'},
+        {'name': 'guide', 'description': 'Abia AI career guide chat'},
+        {'name': 'payments', 'description': 'Paystack subscriptions and lesson access'},
     ],
 }
 
@@ -194,3 +198,9 @@ LOGIN_URL = '/api/auth/login/'
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+
+CERT_PASS_MARK = config('CERT_PASS_MARK', default=70, cast=int)
+CERT_VERIFY_BASE_URL = config(
+    'CERT_VERIFY_BASE_URL',
+    default='https://app.moresuccessacademy.com.ng/verify.html',
+)

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment | MSA AcadBot</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="navbar__logo">
+      <span class="navbar__logo-text">MSA <span>AcadBot</span></span>
+    </a>
+    <button class="navbar__toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mainNav">
+      <span aria-hidden="true">☰</span>
+    </button>
+    <div class="navbar__nav" id="mainNav">
+      <a href="index.html" class="navbar__link">Home</a>
+      <a href="courses.html" class="navbar__link">Courses</a>
+      <a href="acadbot.html" class="navbar__link">Ask AcadBot</a>
+      <a href="msa-guide.html" class="navbar__link">MSA Guide</a>
+      <div id="authNav">
+        <!-- Authenticated nav will be injected here -->
+      </div>
+    </div>
+  </nav>
+
+  <main class="page__main">
+    <div class="payment-return" id="paymentReturn" role="status" aria-live="polite">
+      <div class="payment-return__icon" id="returnIcon" aria-hidden="true">⏳</div>
+      <h1 class="payment-return__title" id="returnTitle">Confirming your payment</h1>
+      <p class="payment-return__message" id="returnMessage">Hang on while we check with Paystack. This usually takes a few seconds.</p>
+      <div class="payment-return__actions" id="returnActions"></div>
+    </div>
+  </main>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="js/payment-return.js"></script>
+</body>
+</html>

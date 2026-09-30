@@ -4,6 +4,7 @@ Models for the Courses app - courses, lessons, enrollment, progress tracking.
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+import secrets
 
 
 class Course(models.Model):
@@ -20,6 +21,7 @@ class Course(models.Model):
     duration_minutes = models.PositiveIntegerField(_('duration (minutes)'), default=0)
     order = models.PositiveIntegerField(_('order'), default=0)
     is_published = models.BooleanField(_('published'), default=True)
+    content_reviewed = models.BooleanField(_('content reviewed'), default=False)
     thumbnail = models.ImageField(_('thumbnail'), upload_to='course_thumbnails/', blank=True, null=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
@@ -138,6 +140,52 @@ class Enrollment(models.Model):
 
         self.save(update_fields=['progress_percent', 'status', 'completed_at'])
 
+    def quiz_average(self):
+        """Average quiz score across graded lessons, latest attempt per lesson."""
+        graded = [
+            lp for lp in self.lesson_progress.select_related('lesson')
+            if lp.lesson.has_quiz and lp.quiz_correct is not None
+        ]
+        if not graded:
+            return None
+        correct = sum(1 for lp in graded if lp.quiz_correct)
+        return int((correct / len(graded)) * 100)
+
+    def certificate_blockers(self):
+        """Return the list of reasons this enrollment cannot be certified."""
+        from django.conf import settings as django_settings
+
+        blockers = []
+
+        if not self.course.content_reviewed:
+            blockers.append('This course has not been content reviewed yet.')
+
+        total_lessons = self.course.lessons.filter(is_published=True).count()
+        if total_lessons == 0:
+            blockers.append('This course has no published lessons.')
+        else:
+            completed = self.lesson_progress.filter(
+                completed_at__isnull=False,
+                lesson__is_published=True,
+            ).count()
+            if completed < total_lessons:
+                blockers.append(
+                    f'Complete all {total_lessons} lessons first '
+                    f'({completed} of {total_lessons} done).'
+                )
+
+        pass_mark = getattr(django_settings, 'CERT_PASS_MARK', 70)
+        score = self.quiz_average()
+        if score is None:
+            blockers.append('Answer the course quizzes before claiming a certificate.')
+        elif score < pass_mark:
+            blockers.append(
+                f'Your average quiz score is {score}%. '
+                f'You need at least {pass_mark}%.'
+            )
+
+        return blockers
+
 
 class LessonProgress(models.Model):
 
@@ -197,3 +245,41 @@ class LessonProgress(models.Model):
             self.completed_at = timezone.now()
             self.save(update_fields=['completed_at', 'updated_at'])
             self.enrollment.update_progress()
+
+
+def _generate_certificate_code():
+    """Return an unguessable certificate code."""
+    return secrets.token_hex(8).upper()
+
+
+class Certificate(models.Model):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='certificates',
+        verbose_name=_('user'),
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name='certificates',
+        verbose_name=_('course'),
+    )
+    code = models.CharField(_('code'), max_length=32, unique=True, default=_generate_certificate_code)
+    issued_at = models.DateTimeField(_('issued at'), auto_now_add=True)
+    score = models.PositiveIntegerField(_('score'))
+
+    class Meta:
+        db_table = 'certificates'
+        verbose_name = _('certificate')
+        verbose_name_plural = _('certificates')
+        ordering = ['-issued_at']
+
+    def __str__(self):
+        return f'{self.user.email} - {self.course.title} ({self.code})'
+
+    @property
+    def holder_name(self):
+        full_name = f'{self.user.first_name} {self.user.last_name}'.strip()
+        return full_name or self.user.username

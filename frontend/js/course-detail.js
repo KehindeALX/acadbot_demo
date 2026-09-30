@@ -11,6 +11,8 @@ import {
   getEnrollmentDetail,
   completeLesson,
   submitQuiz,
+  initializePayment,
+  getPaymentStatus,
   safeErrorMessage,
   isAuthError,
   isNetworkError
@@ -39,6 +41,9 @@ const progressText = document.getElementById('progressText');
 const enrollBtn = document.getElementById('enrollBtn');
 const continueBtn = document.getElementById('continueBtn');
 const loginPromptBtn = document.getElementById('loginPromptBtn');
+const certBtn = document.getElementById('certificateBtn');
+const subscribeBtn = document.getElementById('subscribeBtn');
+const accessStatus = document.getElementById('accessStatus');
 
 const lessonsLoading = document.getElementById('lessonsLoading');
 const lessonsList = document.getElementById('lessonsList');
@@ -63,6 +68,8 @@ let course = null;
 let user = null;
 let enrollment = null;
 let isEnrolling = false;
+let isSubscribing = false;
+let hasPaidAccess = false;
 
 // Lesson viewer state
 let lessonState = {
@@ -174,10 +181,142 @@ async function checkEnrollmentStatus() {
     }
     enrollment = null;
   }
+  await loadPaidAccess();
   updateEnrollmentUI();
   // Lessons re-render now that enrollment status is known, so the list shows
   // accurate "Preview" vs "Start" buttons (renderCourse() ran before this).
   renderLessons();
+}
+
+// ============================================================
+// Paid Access
+// ============================================================
+
+/**
+ * Ask the server whether this student has paid access. The server is the only
+ * authority on payment status — the page never infers it from anything else.
+ */
+async function loadPaidAccess() {
+  hasPaidAccess = false;
+  if (!user) return;
+
+  try {
+    const data = await getPaymentStatus();
+    hasPaidAccess = data?.data?.active === true;
+  } catch (err) {
+    if (isAuthError(err)) {
+      user = null;
+      initNavbar();
+    }
+    hasPaidAccess = false;
+  }
+}
+
+function hasLockedLessons() {
+  return (course?.lessons || []).some(lesson => lesson.is_locked);
+}
+
+function renderCertificate(cert) {
+  const panel = document.getElementById('certificatePanel');
+  if (!panel) return;
+  panel.textContent = '';
+
+  const card = document.createElement('div');
+  card.className = 'cert-card';
+
+  const info = document.createElement('div');
+  const title = document.createElement('h3');
+  title.className = 'cert-card__title';
+  title.textContent = 'Certificate Earned';
+  const meta = document.createElement('p');
+  meta.className = 'cert-card__meta';
+  meta.textContent = `${cert.course_title} — issued ${new Date(cert.issued_at).toLocaleDateString()}`;
+  const code = document.createElement('p');
+  code.className = 'cert-card__meta cert-card__code';
+  code.textContent = `ID: ${cert.code}`;
+  info.append(title, meta, code);
+
+  const link = document.createElement('a');
+  link.href = certificatePdfUrl(cert.code);
+  link.target = '_blank';
+  link.rel = 'noopener';
+  link.className = 'btn btn--primary';
+  link.style.background = '#D4AF37';
+  link.style.color = '#050B2E';
+  link.textContent = 'Download PDF';
+
+  card.append(info, link);
+  panel.appendChild(card);
+
+  if (certBtn) {
+    certBtn.classList.add('hidden');
+  }
+}
+
+function renderAccessStatus() {
+  if (!user || !hasLockedLessons()) {
+    accessStatus.classList.add('hidden');
+    accessStatus.innerHTML = '';
+    return;
+  }
+
+  accessStatus.classList.remove('hidden');
+
+  if (hasPaidAccess) {
+    accessStatus.className = 'access-status access-status--active';
+    accessStatus.innerHTML = `
+      <div class="access-status__title">Full access is on</div>
+      <div class="access-status__message">Every lesson and quiz in this course is unlocked.</div>
+    `;
+    return;
+  }
+
+  accessStatus.className = 'access-status access-status--locked';
+  accessStatus.innerHTML = `
+    <div class="access-status__title">Some lessons are locked</div>
+    <div class="access-status__message">
+      The first lessons of every course are free to read. Unlock the rest with one subscription.
+    </div>
+    <div class="access-status__meta">Enrolling stays free, and nothing you have read so far is taken away.</div>
+  `;
+}
+
+async function handleSubscribe() {
+  if (isSubscribing || !user) return;
+
+  isSubscribing = true;
+  subscribeBtn.disabled = true;
+  subscribeBtn.textContent = 'Opening payment...';
+
+  try {
+    const data = await initializePayment();
+    const authorizationUrl = data?.data?.authorization_url;
+
+    if (!authorizationUrl) {
+      showToast('We could not start the payment. Please try again.', 'error');
+      return;
+    }
+
+    sessionStorage.setItem('pendingCourseId', String(course.id));
+    window.location.href = authorizationUrl;
+  } catch (err) {
+    showToast(paymentErrorMessage(err), 'error');
+    isSubscribing = false;
+    subscribeBtn.disabled = false;
+    subscribeBtn.textContent = 'Unlock All Lessons';
+  }
+}
+
+/**
+ * Payment failures have their own honest copy. safeErrorMessage would hide the
+ * server's reason behind a generic line, and here the reason is the point.
+ */
+function paymentErrorMessage(err) {
+  if (err.isNetworkError) {
+    return 'Unable to reach the server. Check your connection and try again.';
+  }
+  if ([502, 503].includes(err.status) && err.message) return err.message;
+  return 'We could not start the payment. Please try again in a moment.';
 }
 
 function updateEnrollmentUI() {
@@ -185,6 +324,7 @@ function updateEnrollmentUI() {
   enrollBtn.classList.add('hidden');
   continueBtn.classList.add('hidden');
   loginPromptBtn.classList.add('hidden');
+  subscribeBtn.classList.add('hidden');
   enrollmentProgress.classList.add('hidden');
 
   if (!user) {
@@ -192,7 +332,12 @@ function updateEnrollmentUI() {
     enrollmentStatus.textContent = 'Sign in to enroll in this course';
     loginPromptBtn.classList.remove('hidden');
     loginPromptBtn.href = `login.html?redirect=course-detail.html?id=${course.id}`;
+    renderAccessStatus();
     return;
+  }
+
+  if (certBtn) {
+    certBtn.classList.add('hidden');
   }
 
   if (enrollment) {
@@ -207,11 +352,21 @@ function updateEnrollmentUI() {
     progressText.textContent = `${enrollment.progress_percent || 0}% complete`;
     continueBtn.classList.remove('hidden');
     continueBtn.textContent = enrollment.status === 'COMPLETED' ? 'Review Course' : 'Continue Learning';
+
+    if (course.content_reviewed && enrollment.status === 'COMPLETED' && certBtn) {
+      certBtn.classList.remove('hidden');
+    }
   } else {
     // Not enrolled
     enrollmentStatus.textContent = 'Not enrolled';
     enrollBtn.classList.remove('hidden');
   }
+
+  if (hasLockedLessons() && !hasPaidAccess) {
+    subscribeBtn.classList.remove('hidden');
+  }
+
+  renderAccessStatus();
 }
 
 async function handleEnroll() {
@@ -302,11 +457,15 @@ function renderLessons() {
 
 function createLessonElement(lesson, index) {
   const div = document.createElement('article');
-  div.className = 'card lesson-card';
+  const isLocked = lesson.is_locked === true;
+  div.className = isLocked
+    ? 'card lesson-card lesson-card--locked'
+    : 'card lesson-card';
 
   const hasQuiz = lesson.has_quiz;
   const duration = lesson.duration_minutes || 0;
   const durationStr = duration > 0 ? `${duration} min` : '—';
+  const actionLabel = isLocked ? 'Unlock' : enrollment ? 'Start' : 'Preview';
 
   div.innerHTML = `
     <div class="card__body lesson-card__body">
@@ -320,16 +479,18 @@ function createLessonElement(lesson, index) {
             <div class="lesson-card__meta">
               <span>⏱ ${durationStr}</span>
               ${hasQuiz ? '<span class="card__badge card__badge--published">Quiz</span>' : ''}
+              ${isLocked ? '<span class="lesson-card__lock">🔒 Locked</span>' : ''}
             </div>
           </div>
         </div>
         <button
-          class="btn btn--primary btn--sm"
+          class="btn ${isLocked ? 'btn--secondary' : 'btn--primary'} btn--sm"
           data-lesson-index="${index}"
-          aria-label="Start lesson: ${escapeHtml(lesson.title)}"
+          data-lesson-locked="${isLocked}"
+          aria-label="${isLocked ? 'Unlock lesson' : 'Start lesson'}: ${escapeHtml(lesson.title)}"
           ${isEnrolling ? 'disabled' : ''}
         >
-          ${enrollment ? 'Start' : 'Preview'}
+          ${actionLabel}
         </button>
       </div>
     </div>
@@ -340,6 +501,10 @@ function createLessonElement(lesson, index) {
     // Enroll request in flight — enrollment state is stale, so don't open a
     // lesson (it would render as an ungraded preview even when enrolled).
     if (isEnrolling) return;
+    if (isLocked) {
+      handleSubscribe();
+      return;
+    }
     openLessonViewer(lesson, index);
   });
 
@@ -609,6 +774,25 @@ function setupEventListeners() {
     e.preventDefault();
     openResumeLesson();
   });
+
+  // Certificate button
+  if (certBtn) {
+    certBtn.addEventListener('click', async () => {
+      try {
+        const res = await issueCertificate(course.id);
+        if (res.success) {
+          renderCertificate(res.data);
+        } else if (res.error && res.error.blockers) {
+          showToast(`${res.error.message} ${res.error.blockers.join(' ')}`, 'error');
+        }
+      } catch (e) {
+        showToast('Could not claim certificate. Please try again.', 'error');
+      }
+    });
+  }
+
+  // Subscribe button
+  subscribeBtn.addEventListener('click', handleSubscribe);
 
   // Lesson viewer
   lessonCloseBtn.addEventListener('click', closeLessonViewer);

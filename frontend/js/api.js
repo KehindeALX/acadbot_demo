@@ -350,6 +350,85 @@ export async function submitQuiz(lessonId, answerIndex) {
 }
 
 // ============================================================
+// Certificates API
+// ============================================================
+
+/**
+ * Claim a certificate for a completed course.
+ * @param {string|number} courseId - Course ID
+ * @returns {Promise<Object>} { success, message, data: Certificate }
+ */
+export async function issueCertificate(courseId) {
+  return apiFetch(`/api/courses/${courseId}/certificate/`, {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
+}
+
+/**
+ * List the signed-in student's certificates.
+ * @returns {Promise<Object>} { success, data: Certificate[] }
+ */
+export async function listCertificates() {
+  return apiFetch('/api/certificates/');
+}
+
+/**
+ * Public certificate lookup. No authentication required.
+ * @param {string} code - Certificate verification code
+ * @returns {Promise<Object>} { success, data: { holder_name, course_title, issued_at, valid } }
+ */
+export async function verifyCertificate(code) {
+  return apiFetch(`/api/certificates/verify/${encodeURIComponent(code)}/`);
+}
+
+/**
+ * URL of the PDF for a certificate. Owner only, so the browser must be logged in.
+ * @param {string} code - Certificate verification code
+ * @returns {string} Absolute PDF URL
+ */
+export function certificatePdfUrl(code) {
+  return `${API_BASE}/api/certificates/${encodeURIComponent(code)}/pdf/`;
+}
+
+// ============================================================
+// Payments API
+// ============================================================
+
+/**
+ * Start a Paystack payment for full course access.
+ * The amount is decided on the server; nothing about it is sent from here.
+ * @returns {Promise<Object>} { success, data: { authorization_url, reference, amount, amount_display } }
+ */
+export async function initializePayment() {
+  return apiFetch('/api/payments/initialize/', {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
+}
+
+/**
+ * Confirm a payment with the server after returning from Paystack.
+ * @param {string} reference - The reference returned by initializePayment
+ * @returns {Promise<Object>} { success, data: { active, expires_at, status, reference } }
+ */
+export async function verifyPayment(reference) {
+  return apiFetch(`/api/payments/verify/?reference=${encodeURIComponent(reference)}`, {
+    method: 'GET',
+  });
+}
+
+/**
+ * Current paid-access state for the signed-in student.
+ * @returns {Promise<Object>} { success, data: { active, expires_at, status, reference } }
+ */
+export async function getPaymentStatus() {
+  return apiFetch('/api/payments/status/', {
+    method: 'GET',
+  });
+}
+
+// ============================================================
 // Careers API — MSA AI Guide
 // ============================================================
 
@@ -385,64 +464,35 @@ export async function getCareer(slug) {
 // ============================================================
 
 /**
- * Send a message to the AcadBot AI assistant.
+ * Send the conversation to the MSA assistant and return its reply.
  *
- * INTEGRATION NOTE: No chat/AI endpoint is routed on the backend yet
- * (PRODUCT.md principle #2 — no invented endpoints), so this returns a
- * "not connected" placeholder rather than calling a fabricated URL.
+ * The backend holds the assistant's prompt server-side, so the browser only
+ * ever sends the turn history. It expects the last 10 messages, each
+ * `{ role: 'user' | 'assistant', content }`, with a user message last.
  *
- * At integration time, replace this body with the real call, e.g.:
- *   return apiFetch('/api/chat/', {
- *     method: 'POST',
- *     body: JSON.stringify({ message }),
- *   });
- * and adjust the response shape to match the backend serializer.
- *
- * @param {Object} payload
- * @param {string} payload.message - The user's message to AcadBot
- * @returns {Promise<Object>}
+ * @param {Array<{role: string, content: string}>} messages
+ * @returns {Promise<{reply: string}>}
  */
-export async function askAcadBot(payload) {
-  // TODO(integration): wire to the real chat endpoint when routed.
-  // Deliberately NOT faked and NOT pointed at an invented URL.
-  return {
-    success: true,
-    message: 'AcadBot is not connected yet — your message was received.',
-    data: { acknowledged: true },
-  };
+export async function askAcadBot(messages) {
+  return apiFetch('/api/guide/chat/', {
+    method: 'POST',
+    body: JSON.stringify({ messages }),
+  });
 }
-
-// ============================================================
-// Chat API — Guide Abia (MSA AI Guide)
-// ============================================================
 
 /**
- * Send a message to the Abia AI career guide.
+ * Send the conversation to Abia, the MSA career guide.
  *
- * INTEGRATION NOTE: No chat/AI endpoint is routed on the backend yet
- * (PRODUCT.md principle #2 — no invented endpoints), so this returns a
- * "not connected" placeholder rather than calling a fabricated URL.
- *
- * At integration time, replace this body with the real call, e.g.:
- *   return apiFetch('/api/careers/chat/', {
- *     method: 'POST',
- *     body: JSON.stringify({ career_slug, message }),
- *   });
- *
- * @param {Object} payload
- * @param {string} payload.message - The user's message to Abia
- * @param {string} [payload.career_slug] - Active career slug for context
- * @returns {Promise<Object>}
+ * @param {Array<{role: string, content: string}>} messages
+ * @returns {Promise<{reply: string}>}
  */
-export async function guideAbia(payload) {
-  // TODO(integration): wire to the real chat endpoint when routed.
-  // Deliberately NOT faked and NOT pointed at an invented URL.
-  return {
-    success: true,
-    message: 'Abia is not connected yet — your message was received. The career guide AI will respond here once it\'s wired to the backend.',
-    data: { acknowledged: true },
-  };
+export async function guideAbia(messages) {
+  return apiFetch('/api/guide/chat/', {
+    method: 'POST',
+    body: JSON.stringify({ messages }),
+  });
 }
+
 
 // ============================================================
 // Error Handling Helpers
@@ -561,6 +611,13 @@ export function isValidationError(error) {
   return error.status === 400;
 }
 
+export function guideErrorMessage(error) {
+  if ([429, 502, 503].includes(error.status) && error.message) {
+    return error.message;
+  }
+  return safeErrorMessage(error);
+}
+
 /**
  * Check if error is an auth error (401/403)
  * @param {Error} error
@@ -611,6 +668,17 @@ export const api = {
   completeLesson,
   submitQuiz,
 
+  // Certificates
+  issueCertificate,
+  listCertificates,
+  verifyCertificate,
+  certificatePdfUrl,
+
+  // Payments
+  initializePayment,
+  verifyPayment,
+  getPaymentStatus,
+
   // Careers
   listCareers,
   getCareer,
@@ -622,6 +690,7 @@ export const api = {
   // Error helpers
   formatApiError,
   safeErrorMessage,
+  guideErrorMessage,
   isValidationError,
   isAuthError,
   isNetworkError,

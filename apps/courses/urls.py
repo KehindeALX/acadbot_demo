@@ -8,6 +8,7 @@ from .views import (
     LessonViewSet,
     EnrollmentViewSet,
 )
+from .certificates import issue_certificate
 
 router = DefaultRouter()
 # Register specific routes FIRST to avoid conflicts with course-detail catch-all
@@ -16,5 +17,6 @@ router.register(r'lessons', LessonViewSet, basename='lesson')
 router.register(r'', CourseViewSet, basename='course')
 
 urlpatterns = [
+    path('<int:course_id>/certificate/', issue_certificate, name='certificate-issue'),
     path('', include(router.urls)),
 ]

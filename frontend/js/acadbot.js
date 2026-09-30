@@ -4,22 +4,14 @@
  * Renders the AI-assistant chat surface: a welcome/empty state with quick
  * actions, an auto-resizing composer, and a message thread.
  *
- * INTEGRATION NOTE (read before wiring the backend):
- * No chat/AI endpoint exists yet on the backend (PRODUCT.md principle #2 —
- * no invented endpoints). This module is built to be *ready to call*: when
- * a chat endpoint is routed, replace the placeholder body of `askAcadBot()`
- * in ./api.js with the real call, and this page works unchanged.
- *
- * Until then, sending a message renders the user's message locally (real UI
- * behavior) and responds with an honest "assistant not connected yet" state
- * — never a fabricated AI answer.
+ * Replies come from POST /api/guide/chat/ via askAcadBot(). The conversation
+ * is held in memory on this page only, so a refresh starts a new thread.
  */
 
 import {
-  safeErrorMessage,
-  isNetworkError,
+  guideErrorMessage,
+  askAcadBot,
 } from './api.js';
-import { askAcadBot } from './api.js';
 import { initNavbar } from './navbar.js';
 
 // ============================================================
@@ -37,16 +29,23 @@ const toastContainer = document.getElementById('toastContainer');
 let user = null;
 let isSending = false;
 let messageCount = 0;
+let conversation = [];
 
 // Composer auto-resize bounds
 const INPUT_MIN_HEIGHT = 52;
 const INPUT_MAX_HEIGHT = 150;
+
+const HISTORY_LIMIT = 10;
 
 // ============================================================
 // Init
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
   user = await initNavbar();
+  if (!user) {
+    window.location.href = 'login.html?redirect=acadbot.html';
+    return;
+  }
   setupEventListeners();
   focusInput();
 });
@@ -99,23 +98,23 @@ function handleSend() {
   chatSend.disabled = true;
   showTyping();
 
-  // Call the (future) backend. askAcadBot currently returns a not-connected
-  // result until a real chat endpoint is wired — no fake AI data.
-  askAcadBot({ message: text })
-    .then(reply => {
+  const history = conversation.slice(-(HISTORY_LIMIT - 1));
+  history.push({ role: 'user', content: text });
+
+  askAcadBot(history)
+    .then(data => {
       removeTyping();
-      if (reply && reply.success && reply.message) {
-        appendMessage('bot', reply.message);
-      }
+      const reply = data && data.reply;
+      if (!reply) return;
+      conversation.push({ role: 'user', content: text });
+      conversation.push({ role: 'assistant', content: reply });
+      appendMessage('bot', reply);
     })
     .catch(err => {
       removeTyping();
-      appendMessage('bot', 'AcadBot isn’t connected yet — your message was received. The AI assistant will respond here once it’s wired to the backend.');
-      if (isNetworkError(err)) {
-        showToast('Unable to connect to the server.', 'warning');
-      } else {
-        showToast(safeErrorMessage(err), 'error');
-      }
+      const message = guideErrorMessage(err);
+      appendMessage('bot', message);
+      showToast(message, 'error');
     })
     .finally(() => {
       isSending = false;

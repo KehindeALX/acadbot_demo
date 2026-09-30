@@ -2734,3 +2734,221 @@ a:hover {
     flex: 1;
   }
 }
+
+/* ============================================================
+   Paid access — locked lessons and subscription status
+   ============================================================ */
+
+/* Locked lessons recede so the open lessons stay the bright path */
+.lesson-card--locked {
+  background: var(--navy2);
+  border-color: var(--border);
+}
+.lesson-card--locked .lesson-card__title {
+  color: var(--muted);
+}
+.lesson-card--locked .card__badge--draft {
+  background: rgba(154, 163, 192, 0.1);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.lesson-card__lock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gold);
+  background: var(--gold3);
+  border: 1px solid var(--gold);
+}
+
+/* Subscription banner under the enrollment panel */
+.access-status {
+  margin-top: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.access-status--active {
+  background: rgba(76, 175, 80, 0.12);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+.access-status--locked {
+  background: var(--gold3);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+}
+.access-status__title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: var(--space-xs);
+}
+.access-status__message {
+  color: inherit;
+}
+.access-status__meta {
+  margin-top: var(--space-xs);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Payment return page states */
+.payment-return {
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: center;
+  padding: var(--space-2xl) var(--space-lg);
+}
+.payment-return__icon {
+  font-size: 56px;
+  margin-bottom: var(--space-md);
+  opacity: 0.7;
+}
+.payment-return__title {
+  font-size: 24px;
+  margin-bottom: var(--space-sm);
+}
+.payment-return__message {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: var(--space-lg);
+}
+.payment-return__actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .payment-return {
+    padding: var(--space-xl) var(--space-md);
+  }
+  .enrollment-panel__actions .btn {
+    width: 100%;
+  }
+}
+/* ============================================================
+   Certificates
+   ============================================================ */
+
+.cert-btn {
+  background: #D4AF37;
+  color: #050B2E;
+  border: 1px solid #D4AF37;
+}
+
+.cert-btn:hover {
+  background: #E0C158;
+  border-color: #E0C158;
+}
+
+.cert-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, #050B2E 0%, #0C1550 100%);
+  border: 1px solid #D4AF37;
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+}
+
+.cert-card__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #D4AF37;
+  margin: 0 0 0.35rem;
+}
+
+.cert-card__meta {
+  font-size: 0.9rem;
+  color: #C9CEE8;
+  margin: 0;
+}
+
+.cert-card__code {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.08em;
+  color: #D4AF37;
+}
+
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.cert-tile {
+  background: var(--navy2);
+  border: 1px solid #D4AF37;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.cert-tile__course {
+  font-weight: 700;
+  color: var(--white);
+  margin: 0;
+}
+
+.cert-tile__meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.cert-verify-result {
+  max-width: 520px;
+  margin: 2rem auto;
+  background: var(--navy2);
+  border: 1px solid #D4AF37;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.cert-verify-result__name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #D4AF37;
+  margin: 0 0 0.5rem;
+}
+
+.cert-verify-result__valid {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.15);
+  color: #D4AF37;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cert-verify-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 420px;
+  margin-bottom: 1.5rem;
+}
+
+.cert-verify-form .form-input {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
