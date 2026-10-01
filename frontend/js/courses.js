@@ -156,13 +156,13 @@ function createCourseCard(course) {
       'data': '📊',
       'cyber': '🔐',
       'software': '💻',
-      'ai': '🤖',
+      'ai': '<img src="img/abia-mark.svg" alt="" width="28" height="28"/>',
       'uiux': '🎨',
       'product': '🗺️',
       'digital': '📱',
       'cloud': '☁️',
     };
-    const icon = careerIcons[careerSlug] || '📚';
+    const icon = careerSlug === 'ai' ? '<img src="img/abia-mark.svg" alt="" width="32" height="32"/>' : (careerIcons[careerSlug] || '📚');
     thumbnailHtml = `<div class="course-card__placeholder">${icon}</div>`;
   }
 
