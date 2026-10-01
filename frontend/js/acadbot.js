@@ -136,7 +136,14 @@ function appendMessage(role, text) {
     const avatar = document.createElement('span');
     avatar.className = 'chat-msg__avatar';
     avatar.setAttribute('aria-hidden', 'true');
-    avatar.textContent = '🤖';
+    const img = document.createElement('img');
+    img.src = 'img/acadbot-mark.svg';
+    img.alt = '';
+    img.width = 32;
+    img.height = 32;
+    img.className = 'chat-msg__avatar';
+    img.setAttribute('aria-hidden', 'true');
+    bubble.appendChild(img);
     bubble.appendChild(avatar);
 
     const content = document.createElement('div');
@@ -159,14 +166,25 @@ function showTyping() {
   typing.id = 'typingIndicator';
   typing.setAttribute('role', 'status');
   typing.setAttribute('aria-label', 'AcadBot is typing');
-  typing.innerHTML = `
-    <div class="chat-msg__bubble">
-      <span class="chat-msg__avatar" aria-hidden="true">🤖</span>
-      <div class="chat-msg__content chat-typing" aria-hidden="true">
-        <span></span><span></span><span></span>
-      </div>
-    </div>
-  `;
+  const bubbleWrap = document.createElement('div');
+  bubbleWrap.className = 'chat-msg__bubble';
+  const img2 = document.createElement('img');
+  img2.src = 'img/acadbot-mark.svg';
+  img2.alt = '';
+  img2.width = 32;
+  img2.height = 32;
+  img2.className = 'chat-msg__avatar';
+  img2.setAttribute('aria-hidden', 'true');
+  bubbleWrap.appendChild(img2);
+  const content2 = document.createElement('div');
+  content2.className = 'chat-msg__content chat-typing';
+  content2.setAttribute('aria-hidden', 'true');
+  const s1 = document.createElement('span');
+  const s2 = document.createElement('span');
+  const s3 = document.createElement('span');
+  content2.appendChild(s1); content2.appendChild(s2); content2.appendChild(s3);
+  bubbleWrap.appendChild(content2);
+  typing.appendChild(bubbleWrap);
   chatThread.appendChild(typing);
   scrollToBottom();
 }

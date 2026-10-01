@@ -111,7 +111,7 @@ function renderCareerCards() {
     data: '📊',
     cyber: '🔐',
     software: '💻',
-    ai: '🤖',
+    ai: '<img src="img/abia-mark.svg" alt="" width="28" height="28"/>',
     uiux: '🎨',
     product: '🗺️',
     digital: '📱',
@@ -161,10 +161,10 @@ async function enterJourney(career) {
 
   // Set header
   const defaultIcons = {
-    data: '📊', cyber: '🔐', software: '💻', ai: '🤖',
+    data: '📊', cyber: '🔐', software: '💻', ai: '<img src="img/abia-mark.svg" alt="" width="28" height="28"/>',
     uiux: '🎨', product: '🗺️', digital: '📱', cloud: '☁️',
   };
-  journeyIcon.textContent = career.icon || defaultIcons[career.slug] || '🎯';
+  journeyIcon.innerHTML = career.icon || defaultIcons[career.slug] || '🎯';
   journeyName.textContent = career.name;
   journeyTag.textContent = career.tag || '';
 
